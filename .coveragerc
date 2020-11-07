@@ -4,7 +4,7 @@
 
 [report]
 include =
-    yawn/*
+    yawm/*
 
 omit =
     tests/*
