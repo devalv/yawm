@@ -1,0 +1,4 @@
+[flake8]
+inline-quotes = single
+
+exclude = .git,__pycache__,tests/
