@@ -25,6 +25,7 @@ pytest = "==6.1.*"
 pytest-flake8 = "==1.0.*"
 pytest-cov = "==2.10.*"
 requests = "==2.24.*"
+pre-commit = "==2.8.*"
 
 [requires]
 python_version = "3.8"
