@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
+"""Project configuration file (Starlette)."""
+
 from sqlalchemy.engine.url import URL, make_url
-from starlette.datastructures import Secret
+
 from starlette.config import Config
+from starlette.datastructures import Secret
+
 
 config = Config(".env")
 

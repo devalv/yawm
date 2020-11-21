@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
+"""Alembic migrations additional configuration."""
 from logging.config import fileConfig
-
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
 
 from alembic import context
 
 from app.config import DB_DSN
 from app.main import db as target_metadata
+
+from sqlalchemy import engine_from_config
+from sqlalchemy import pool
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
