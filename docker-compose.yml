@@ -6,8 +6,9 @@ services:
     container_name: yawm-backend
     image: postgres:13
     ports:
-      - "5432:5432"
+      - ${DB_PORT}:${DB_PORT}
     environment:
       - POSTGRES_DB=${DB_DATABASE}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
+    command: -p ${DB_PORT}
