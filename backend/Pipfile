@@ -8,6 +8,8 @@ fastapi = "==0.61.*"
 uvicorn = "==0.12.*"
 ujson = "==4.0.*"
 gino-starlette = "==0.1.*"  # uses asyncpg
+alembic = "==1.4.*"
+psycopg2-binary = "==2.8.*"  # alembic
 # graphene
 
 [dev-packages]
