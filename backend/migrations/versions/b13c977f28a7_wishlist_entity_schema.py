@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
-"""wishlist entity schema
+"""wishlist entity schema.
 
-Revision ID: f8bf1d5305f3
+Revision ID: b13c977f28a7
 Revises:
-Create Date: 2020-11-22 20:19:32.938592
+Create Date: 2020-11-22 21:09:32.838798
 
 """
 from alembic import op
+
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "f8bf1d5305f3"
+revision = "b13c977f28a7"
 down_revision = None
 branch_labels = None
 depends_on = None
 
 
 def upgrade():
+    """Apply changes on database."""
     op.create_table(
         "product",
         sa.Column("id", postgresql.UUID(), nullable=False),
@@ -48,6 +50,7 @@ def upgrade():
 
 
 def downgrade():
+    """Revert changes on database."""
     op.drop_table("product_wishlist")
     op.drop_table("wishlist")
     op.drop_table("product")
