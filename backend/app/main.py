@@ -6,7 +6,8 @@ from typing import Optional
 from fastapi import FastAPI
 
 from .models import db
-# from .models.test import User
+
+# from .models.wishlist import *
 
 
 def get_app():
