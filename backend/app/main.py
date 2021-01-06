@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 """Project initialization file."""
 
-from typing import Optional
-
 from fastapi import FastAPI
 
+from .handlers import wishlist_router
 from .models import db
-
-# from .models.wishlist import *
 
 
 def get_app():
@@ -18,15 +15,4 @@ def get_app():
 
 
 app = get_app()
-
-
-@app.get("/")
-async def root():
-    """Temporary example for swagger testing."""
-    return {"message": "Hello World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):  # noqa
-    """Temporary example for swagger testing."""
-    return {"item_id": item_id, "q": q}
+app.include_router(wishlist_router)

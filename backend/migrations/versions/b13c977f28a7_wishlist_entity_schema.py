@@ -25,7 +25,7 @@ def upgrade():
         sa.Column("id", postgresql.UUID(), nullable=False),
         sa.Column("name", sa.Unicode(length=255), nullable=False),
         sa.Column("url", sa.Unicode(length=8000), nullable=False),
-        sa.Column("price", sa.Numeric(precision=2), nullable=False),
+        sa.Column("price", sa.Numeric(12, 2), nullable=False),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("url"),
     )

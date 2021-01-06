@@ -20,4 +20,4 @@ repos:
             - flake8-import-order
             - flake8-docstrings
             - flake8-quotes
-        args: [--inline-quotes=double, --max-line-length=90]
+        args: [--inline-quotes=double, --max-line-length=90, --ignore=D401]
