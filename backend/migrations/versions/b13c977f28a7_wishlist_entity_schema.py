@@ -22,30 +22,30 @@ def upgrade():
     """Apply changes on database."""
     op.create_table(
         "product",
-        sa.Column("id", postgresql.UUID(), nullable=False),
+        sa.Column("uid", postgresql.UUID(), nullable=False),
         sa.Column("name", sa.Unicode(length=255), nullable=False),
         sa.Column("url", sa.Unicode(length=8000), nullable=False),
         sa.Column("price", sa.Numeric(12, 2), nullable=False),
-        sa.PrimaryKeyConstraint("id"),
+        sa.PrimaryKeyConstraint("uid"),
         sa.UniqueConstraint("url"),
     )
     op.create_table(
         "wishlist",
-        sa.Column("id", postgresql.UUID(), nullable=False),
+        sa.Column("uid", postgresql.UUID(), nullable=False),
         sa.Column("slug", sa.Unicode(length=255), nullable=False),
         sa.Column("name", sa.Unicode(length=255), nullable=False),
-        sa.PrimaryKeyConstraint("id"),
+        sa.PrimaryKeyConstraint("uid"),
         sa.UniqueConstraint("slug"),
     )
     op.create_table(
         "product_wishlist",
-        sa.Column("id", postgresql.UUID(), nullable=False),
-        sa.Column("product_id", postgresql.UUID(), nullable=False),
-        sa.Column("wishlist_id", postgresql.UUID(), nullable=False),
+        sa.Column("uid", postgresql.UUID(), nullable=False),
+        sa.Column("product_uid", postgresql.UUID(), nullable=False),
+        sa.Column("wishlist_uid", postgresql.UUID(), nullable=False),
         sa.Column("reserved", sa.Boolean(), nullable=False),
-        sa.ForeignKeyConstraint(["product_id"], ["product.id"]),
-        sa.ForeignKeyConstraint(["wishlist_id"], ["wishlist.id"]),
-        sa.PrimaryKeyConstraint("id"),
+        sa.ForeignKeyConstraint(["product_uid"], ["product.uid"]),
+        sa.ForeignKeyConstraint(["wishlist_uid"], ["wishlist.uid"]),
+        sa.PrimaryKeyConstraint("uid"),
     )
 
 

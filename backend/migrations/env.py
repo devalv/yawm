@@ -4,8 +4,8 @@ from logging.config import fileConfig
 
 from alembic import context
 
+from app import db as target_metadata
 from app.config import DB_DSN
-from app.main import db as target_metadata
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
