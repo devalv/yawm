@@ -14,10 +14,10 @@ def get_app():
     return application
 
 
-def configure(app: FastAPI):
+def configure(application: FastAPI):
     """Configure application."""
-    app.include_router(wishlist_router)
+    application.include_router(wishlist_router)
 
 
-api = get_app()
-configure(app=api)
+app = get_app()
+configure(application=app)
