@@ -138,3 +138,10 @@ async def delete_wishlist_product(wuid: str, puid: str):
     wishlist = await Wishlist.get_or_404(wuid)
     await wishlist.remove_product(puid)
     return dict(id=wuid)
+
+
+# ----
+@wishlist_router.get("/")
+async def root():
+    """Empty root page."""
+    return dict()
