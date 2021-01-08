@@ -7,7 +7,6 @@ import pytest
 
 # TODO: test for trailing slash
 # TODO: test database for READ operations
-# TODO:
 
 
 @pytest.mark.asyncio

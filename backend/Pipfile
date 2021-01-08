@@ -21,7 +21,7 @@ requests = "==2.24.*"
 pre-commit = "==2.8.*"
 async-asgi-testclient = "==1.4.4"
 pytest-asyncio = "==0.14.0"
-#snapshottest = "==0.5.1"
+pytest-alembic = "==0.2.5"
 
 [requires]
 python_version = "3.8"
