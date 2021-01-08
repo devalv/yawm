@@ -86,7 +86,6 @@ async def add_product_wishlist(
     product_wishlist: ProductWishlistModel = Depends()  # noqa
 ):
     """API for adding existing product to a existing wishlist."""
-    # TODO: урл сомнительный
     wishlist = await Wishlist.get_or_404(product_wishlist.wishlist_uid)
     rv = await wishlist.add_product(product_wishlist.product_uid)
     return rv.to_dict()

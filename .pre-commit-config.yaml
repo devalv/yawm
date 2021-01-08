@@ -20,4 +20,12 @@ repos:
             - flake8-import-order
             - flake8-docstrings
             - flake8-quotes
+            - flake8-commas
+            - flake8-eradicate
+            - flake8-mock
+            - flake8-pie
+            - flake8-print
+            - flake8-printf-formatting
+            - flake8-pytest-style
+            - flake8-variables-names
         args: [--inline-quotes=double, --max-line-length=90, --ignore=D401]
