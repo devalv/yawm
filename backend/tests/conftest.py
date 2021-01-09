@@ -9,7 +9,13 @@ import pytest
 
 
 @pytest.fixture()
-async def api_client():
+def _run_migrations(alembic_runner):
+    """Upgrade database to a latest alembic migration."""
+    alembic_runner.managed_upgrade("head")
+
+
+@pytest.fixture()
+async def api_client(_run_migrations):
     """Fixture for async api http tests.
 
     Each test take new client.

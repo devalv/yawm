@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Yet another wishlist maker."""
+
+"""Yet another wishlist maker.
+
+for additional info see README.md
+"""
+__version__ = "0.0.1"
+__author__ = "Aleksei Deviatkin <yawm@devyatkin.dev>"
 
 from fastapi import FastAPI
 
@@ -21,3 +27,5 @@ def configure(application: FastAPI):
 
 app = get_app()
 configure(application=app)
+
+__all__ = ["app", "__version__", "__author__"]
