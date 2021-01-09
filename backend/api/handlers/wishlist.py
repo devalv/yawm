@@ -13,9 +13,10 @@ from ..models.wishlist import Product, ProductWishlist, Wishlist
 wishlist_router = APIRouter(prefix="/api", redirect_slashes=True, tags=["wishlist"])
 
 
-# TODO: разделить input и output models для очевидности схемы?
+# TODO: отдельная модель для редактирования c Optional полями и без id
+# TODO: отдельная модель для создания
+# TODO: отдельная модель для просмотра
 # TODO: каскадное удаление
-# TODO: статус выполнения операции в ответе?
 
 # pydantic Models aka serializers
 class WishlistModel(BaseModel):
@@ -67,7 +68,7 @@ async def get_wishlist(uid: uuid.UUID):
     return wishlist.to_dict()
 
 
-@wishlist_router.delete("/wishlists/{uid}", response_class=Response)
+@wishlist_router.delete("/wishlists/{uid}", response_class=Response, status_code=204)
 async def delete_wishlist(uid: uuid.UUID):
     """API for deleting a wishlist."""
     wishlist = await Wishlist.get_or_404(uid)
@@ -91,7 +92,9 @@ async def add_product_wishlist(
     return rv.to_dict()
 
 
-@wishlist_router.delete("/products-wishlist/{uid}/", response_class=Response)
+@wishlist_router.delete(
+    "/products-wishlist/{uid}/", response_class=Response, status_code=204
+)
 async def delete_wishlist_product(uid: uuid.UUID):
     """API for removing product from wishlist."""
     product_wishlist = await ProductWishlist.get_or_404(uid)
@@ -120,8 +123,20 @@ async def get_product(uid: uuid.UUID):
     return product.to_dict()
 
 
-@wishlist_router.delete("/products/{uid}", response_class=Response)
+@wishlist_router.delete("/products/{uid}", response_class=Response, status_code=204)
 async def delete_product(uid: uuid.UUID):
     """API for deleting a product."""
     product = await Product.get_or_404(uid)
     await product.delete()
+
+
+@wishlist_router.put("/products/{uid}", response_model=ProductModel)
+async def update_product(uid: uuid.UUID, product: ProductModel):
+    """API for updating a product."""
+    product_obj = await Product.get_or_404(uid)
+
+    # remove empty field
+    product_dict = {k: v for k, v in product.dict().items() if v is not None}
+
+    await product_obj.update(**product_dict).apply()
+    return product_obj.to_dict()
