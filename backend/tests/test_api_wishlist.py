@@ -4,7 +4,7 @@ from api.models.wishlist import Product, Wishlist
 
 import pytest
 
-pytestmark = [pytest.mark.asyncio]
+pytestmark = [pytest.mark.asyncio, pytest.mark.api_full]
 
 
 @pytest.fixture()
@@ -55,6 +55,7 @@ class TestProduct:
 
     API_URL = "/api/products"
 
+    @pytest.mark.api_base
     async def test_product_create(self, snapshot, api_client):
         resp = await api_client.post(
             self.API_URL,
@@ -65,6 +66,7 @@ class TestProduct:
         resp_data.pop("uid", None)
         snapshot.assert_match(resp_data)
 
+    @pytest.mark.api_base
     async def test_products(self, snapshot, api_client, nine_products):
         resp = await api_client.get(self.API_URL)
         assert resp.status_code == 200
@@ -73,6 +75,7 @@ class TestProduct:
             resp_product.pop("uid", None)
         snapshot.assert_match(resp_data)
 
+    @pytest.mark.api_base
     async def test_product_read(self, snapshot, api_client, one_product):
         resp = await api_client.get(f"{self.API_URL}/{one_product.uid}")
         assert resp.status_code == 200
@@ -80,12 +83,14 @@ class TestProduct:
         resp_data.pop("uid", None)
         snapshot.assert_match(resp_data)
 
+    @pytest.mark.api_base
     async def test_product_delete(self, api_client, one_product):
         resp = await api_client.delete(f"{self.API_URL}/{one_product.uid}")
         assert resp.status_code == 204
         new_resp = await api_client.get(f"{self.API_URL}/{one_product.uid}")
         assert new_resp.status_code == 404
 
+    @pytest.mark.api_base
     async def test_product_full_update(self, snapshot, api_client, one_product):
         resp = await api_client.put(
             f"{self.API_URL}/{one_product.uid}",
@@ -112,6 +117,7 @@ class TestEmptyWishlist:
 
     API_URL = "/api/wishlists"
 
+    @pytest.mark.api_base
     async def test_wishlist_create(self, snapshot, api_client):
         resp = await api_client.post(
             self.API_URL, json={"name": "Wishlist1", "slug": "wishlist1"}
@@ -121,12 +127,14 @@ class TestEmptyWishlist:
         resp_data.pop("uid", None)
         snapshot.assert_match(resp_data)
 
+    @pytest.mark.api_base
     async def test_empty_wishlist_delete(self, api_client, one_empty_wishlist):
         resp = await api_client.delete(f"{self.API_URL}/{one_empty_wishlist.uid}")
         assert resp.status_code == 204
         new_resp = await api_client.get(f"{self.API_URL}/{one_empty_wishlist.uid}")
         assert new_resp.status_code == 404
 
+    @pytest.mark.api_base
     async def test_empty_wishlists(self, snapshot, api_client, _four_empty_wishlists):
         resp = await api_client.get(self.API_URL)
         assert resp.status_code == 200
@@ -135,6 +143,7 @@ class TestEmptyWishlist:
             resp_product.pop("uid", None)
         snapshot.assert_match(resp_data)
 
+    @pytest.mark.api_base
     async def test_empty_wishlist_read(self, snapshot, api_client, one_empty_wishlist):
         resp = await api_client.get(self.API_URL + f"/{one_empty_wishlist.uid}")
         assert resp.status_code == 200
@@ -154,6 +163,7 @@ class TestEmptyWishlist:
         resp_data.pop("uid", None)
         snapshot.assert_match(resp_data)
 
+    @pytest.mark.api_base
     async def test_empty_wishlist_full_update(
         self, snapshot, api_client, one_empty_wishlist
     ):
@@ -170,6 +180,7 @@ class TestEmptyWishlist:
 class TestWishlist:
     """Wishlist API tests."""
 
+    @pytest.mark.api_base
     async def test_add_product_wishlist(
         self, api_client, one_empty_wishlist, nine_products
     ):
@@ -197,6 +208,7 @@ class TestWishlist:
             assert products_resp.status_code == 200
             assert len(products_resp.json()) == i + 1
 
+    @pytest.mark.api_base
     async def test_delete_product_wishlist(
         self, snapshot, api_client, one_product_wishlist
     ):
@@ -236,6 +248,7 @@ class TestWishlist:
         )
         assert new_resp.status_code == 404
 
+    @pytest.mark.api_base
     async def test_wishlist_products_list(self, api_client, one_product_wishlist):
         products_resp = await api_client.get(
             f"/api/wishlists/{one_product_wishlist.wishlist_uid}/products"
@@ -261,6 +274,7 @@ class TestWishlist:
         resp = await api_client.post("/api/products-wishlist", json=insert_data)
         assert resp.status_code == 404
 
+    @pytest.mark.api_base
     async def test_reserve_wishlist_product(self, api_client, one_product_wishlist):
         resp = await api_client.put(
             f"/api/products-wishlist/{one_product_wishlist.uid}",
