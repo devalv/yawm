@@ -18,7 +18,7 @@ class Product(db.Model):
 
     __tablename__ = "product"
 
-    uid = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A003
+    uid = db.Column(UUID(), default=uuid4, primary_key=True)
     name = db.Column(db.Unicode(length=255), nullable=False)
     url = db.Column(db.Unicode(length=8000), nullable=False, unique=True)
     price = db.Column(db.Numeric(12, 2), nullable=False, default=0)
@@ -29,7 +29,7 @@ class Wishlist(db.Model):
 
     __tablename__ = "wishlist"
 
-    uid = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A003
+    uid = db.Column(UUID(), default=uuid4, primary_key=True)
     slug = db.Column(db.Unicode(length=255), nullable=False, unique=True)
     name = db.Column(db.Unicode(length=255), nullable=False)
 
@@ -41,17 +41,6 @@ class Wishlist(db.Model):
             )
         except ForeignKeyViolationError:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Product is not found")
-        return rv
-
-    async def remove_product(self, product_uid: str):
-        """Remove existing product from wishlist."""
-        rv = await ProductWishlist.query.where(
-            (ProductWishlist.product_uid == product_uid)
-            & (ProductWishlist.wishlist_uid == self.uid)  # noqa
-        ).gino.first()
-        if not rv:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "Record is not found")
-        await rv.delete()
         return rv
 
     async def get_products(self):
@@ -80,7 +69,7 @@ class ProductWishlist(db.Model):
 
     __tablename__ = "product_wishlist"
 
-    uid = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A003
+    uid = db.Column(UUID(), default=uuid4, primary_key=True)
     product_uid = db.Column(UUID(), db.ForeignKey(Product.uid), nullable=False)
     wishlist_uid = db.Column(UUID(), db.ForeignKey(Wishlist.uid), nullable=False)
     reserved = db.Column(db.Boolean(), nullable=False, default=False)

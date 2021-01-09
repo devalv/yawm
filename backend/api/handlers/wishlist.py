@@ -4,7 +4,7 @@ import decimal
 import uuid
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Response
 
 from pydantic import BaseModel
 
@@ -13,10 +13,12 @@ from ..models.wishlist import Product, ProductWishlist, Wishlist
 wishlist_router = APIRouter(prefix="/api", redirect_slashes=True, tags=["wishlist"])
 
 
-# TODO: отдельная модель для редактирования c Optional полями и без id
-# TODO: отдельная модель для создания
-# TODO: отдельная модель для просмотра
-# TODO: каскадное удаление
+# TODO: @devalv отдельная модель для редактирования c Optional полями и без id
+# TODO: @devalv отдельная модель для создания
+# TODO: @devalv отдельная модель для просмотра
+# TODO: @devalv каскадное удаление
+# TODO: @devalv изменить урлы на более подходящие и универсальные
+
 
 # pydantic Models aka serializers
 class WishlistModel(BaseModel):
@@ -42,6 +44,15 @@ class ProductWishlistModel(BaseModel):
     product_uid: uuid.UUID
     wishlist_uid: uuid.UUID
     uid: Optional[uuid.UUID] = None
+    reserved: Optional[bool]
+
+
+class ProductWishlistUpdateModel(BaseModel):
+    """ProductWishlist update serializer."""
+
+    product_uid: Optional[uuid.UUID]
+    wishlist_uid: Optional[uuid.UUID]
+    reserved: Optional[bool]
 
 
 # api
@@ -75,25 +86,42 @@ async def delete_wishlist(uid: uuid.UUID):
     await wishlist.delete()
 
 
+@wishlist_router.put("/wishlists/{uid}", response_model=WishlistModel)
+async def update_wishlist(uid: uuid.UUID, wishlist: WishlistModel):
+    """API for updating a wishlist."""
+    wishlist_obj = await Wishlist.get_or_404(uid)
+    # remove empty field
+    wishlist_dict = {k: v for k, v in wishlist.dict().items() if v is not None}
+
+    await wishlist_obj.update(**wishlist_dict).apply()
+    return wishlist_obj.to_dict()
+
+
 @wishlist_router.get("/wishlists/{uid}/products", response_model=List[ProductModel])
-async def list_product_wishlists(uid: uuid.UUID):
+async def list_wishlist_products(uid: uuid.UUID):
     """API for getting all related products."""
     wishlist = await Wishlist.get_or_404(uid)
     return await wishlist.get_products()
 
 
 @wishlist_router.post("/products-wishlist", response_model=ProductWishlistModel)
-async def add_product_wishlist(
-    product_wishlist: ProductWishlistModel = Depends()  # noqa
-):
+async def add_wishlist_product(product_wishlist: ProductWishlistModel):
     """API for adding existing product to a existing wishlist."""
     wishlist = await Wishlist.get_or_404(product_wishlist.wishlist_uid)
     rv = await wishlist.add_product(product_wishlist.product_uid)
     return rv.to_dict()
 
 
+@wishlist_router.put("/products-wishlist/{uid}", response_model=ProductWishlistModel)
+async def reserve_wishlist_product(uid: uuid.UUID, pwm: ProductWishlistUpdateModel):
+    """API for reserving existing product-wishlist record."""
+    product_wishlist = await ProductWishlist.get_or_404(uid)
+    await product_wishlist.update(reserved=pwm.reserved).apply()
+    return product_wishlist.to_dict()
+
+
 @wishlist_router.delete(
-    "/products-wishlist/{uid}/", response_class=Response, status_code=204
+    "/products-wishlist/{uid}", response_class=Response, status_code=204
 )
 async def delete_wishlist_product(uid: uuid.UUID):
     """API for removing product from wishlist."""
