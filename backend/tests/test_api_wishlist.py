@@ -6,7 +6,6 @@ import pytest
 
 pytestmark = [pytest.mark.asyncio]
 
-# TODO: test for trailing slash
 # TODO: empty database for each test?
 
 # TODO: создание продукта
@@ -25,6 +24,13 @@ pytestmark = [pytest.mark.asyncio]
 # TODO: удаление вишлиста с продуктами
 # TODO: удаление продукта находящегося в вишлистах
 # TODO: просмотр продуктов в вишлисте
+
+
+async def test_trailing_slash(api_client):
+    """Test that trailing slash redirects working."""
+    resp = await api_client.get("/api/products/")
+    assert resp.is_redirect
+    assert resp.status_code == 307
 
 
 class TestProduct:
