@@ -4,7 +4,7 @@ import decimal
 import uuid
 from typing import List, Optional
 
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Depends, Response
 
 from pydantic import BaseModel
 
@@ -55,13 +55,25 @@ class ProductWishlistUpdateModel(BaseModel):
     reserved: Optional[bool]
 
 
+class PaginatorModel(BaseModel):
+    """Query paginator serializer."""
+
+    limit: int = 10
+    offset: int = 0
+
+
 # api
 
 # wishlist
 @wishlist_router.get("/wishlists", response_model=List[WishlistModel])
-async def list_wishlist():
+async def list_wishlist(paginator: dict = Depends(PaginatorModel)):  # noqa: B008
     """API for listing all the wishlists."""
-    wishlists = await Wishlist.select("uid", "name", "slug").gino.all()
+    wishlists = (
+        await Wishlist.select("uid", "name", "slug")
+        .limit(paginator.limit)
+        .offset(paginator.offset)
+        .gino.all()
+    )
     return wishlists
 
 
@@ -98,10 +110,14 @@ async def update_wishlist(uid: uuid.UUID, wishlist: WishlistModel):
 
 
 @wishlist_router.get("/wishlists/{uid}/products", response_model=List[ProductModel])
-async def list_wishlist_products(uid: uuid.UUID):
+async def list_wishlist_products(
+    uid: uuid.UUID, paginator: dict = Depends(PaginatorModel)  # noqa: B008
+):
     """API for getting all related products."""
     wishlist = await Wishlist.get_or_404(uid)
-    return await wishlist.get_products()
+    return await wishlist.get_products(
+        paginator_limit=paginator.limit, paginator_offset=paginator.offset
+    )
 
 
 @wishlist_router.post("/products-wishlist", response_model=ProductWishlistModel)
@@ -131,9 +147,14 @@ async def delete_wishlist_product(uid: uuid.UUID):
 
 # products
 @wishlist_router.get("/products", response_model=List[ProductModel])
-async def list_products():
+async def list_products(paginator: dict = Depends(PaginatorModel)):  # noqa: B008
     """API for listing all the products."""
-    products = await Product.select("uid", "name", "url", "price").gino.all()
+    products = (
+        await Product.select("uid", "name", "url", "price")
+        .limit(paginator.limit)
+        .offset(paginator.offset)
+        .gino.all()
+    )
     return products
 
 

@@ -38,6 +38,16 @@ async def one_product_wishlist(one_empty_wishlist, one_product):
 
 
 @pytest.fixture()
+async def nine_products_wishlist(one_empty_wishlist, nine_products):
+    products_list = list()
+    wishlist = await Wishlist.get(one_empty_wishlist.uid)
+    for product in nine_products:
+        rv = await wishlist.add_product(product.uid)
+        products_list.append(rv)
+    return products_list
+
+
+@pytest.fixture()
 async def _four_empty_wishlists():
     for i in range(1, 5):
         await Wishlist.create(name=f"test{i}", slug=f"test-slug{i}")
@@ -111,6 +121,31 @@ class TestProduct:
         resp_data.pop("uid", None)
         snapshot.assert_match(resp_data)
 
+    @pytest.mark.api_base
+    async def test_product_paginator_limit(self, snapshot, api_client, nine_products):
+        paginator_limit = 5
+        resp = await api_client.get(
+            self.API_URL, query_string=dict(limit=paginator_limit)
+        )
+        assert resp.status_code == 200
+        resp_data = resp.json()
+        assert len(resp_data) == paginator_limit
+        for resp_product in resp_data:
+            resp_product.pop("uid", None)
+        snapshot.assert_match(resp_data)
+
+    @pytest.mark.api_base
+    async def test_product_paginator_offset(self, snapshot, api_client, nine_products):
+        paginator_offset = 5
+        resp = await api_client.get(
+            self.API_URL, query_string=dict(offset=paginator_offset)
+        )
+        assert resp.status_code == 200
+        resp_data = resp.json()
+        for resp_product in resp_data:
+            resp_product.pop("uid", None)
+        snapshot.assert_match(resp_data)
+
 
 class TestEmptyWishlist:
     """Empty wishlist API tests."""
@@ -137,6 +172,35 @@ class TestEmptyWishlist:
     @pytest.mark.api_base
     async def test_empty_wishlists(self, snapshot, api_client, _four_empty_wishlists):
         resp = await api_client.get(self.API_URL)
+        assert resp.status_code == 200
+        resp_data = resp.json()
+        for resp_product in resp_data:
+            resp_product.pop("uid", None)
+        snapshot.assert_match(resp_data)
+
+    @pytest.mark.api_base
+    async def test_empty_wishlists_paginator_limit(
+        self, snapshot, api_client, _four_empty_wishlists
+    ):
+        paginator_limit = 2
+        resp = await api_client.get(
+            self.API_URL, query_string={"limit": paginator_limit}
+        )
+        assert resp.status_code == 200
+        resp_data = resp.json()
+        assert len(resp_data) == paginator_limit
+        for resp_product in resp_data:
+            resp_product.pop("uid", None)
+        snapshot.assert_match(resp_data)
+
+    @pytest.mark.api_base
+    async def test_empty_wishlists_paginator_offset(
+        self, snapshot, api_client, _four_empty_wishlists
+    ):
+        paginator_offset = 2
+        resp = await api_client.get(
+            self.API_URL, query_string={"offset": paginator_offset}
+        )
         assert resp.status_code == 200
         resp_data = resp.json()
         for resp_product in resp_data:
@@ -255,6 +319,33 @@ class TestWishlist:
         )
         assert products_resp.status_code == 200
         assert len(products_resp.json()) == 1
+
+    @pytest.mark.api_base
+    async def test_paginator_wishlist_products_list(
+        self, api_client, one_empty_wishlist, nine_products_wishlist
+    ):
+        paginator_limit = 5
+        products_resp = await api_client.get(
+            f"/api/wishlists/{one_empty_wishlist.uid}/products",
+            query_string=dict(limit=paginator_limit),
+        )
+        assert products_resp.status_code == 200
+        assert len(products_resp.json()) == paginator_limit
+
+    @pytest.mark.api_base
+    async def test_offset_wishlist_products_list(
+        self, snapshot, api_client, one_empty_wishlist, nine_products_wishlist
+    ):
+        paginator_offset = 5
+        products_resp = await api_client.get(
+            f"/api/wishlists/{one_empty_wishlist.uid}/products",
+            query_string=dict(offset=paginator_offset),
+        )
+        assert products_resp.status_code == 200
+        resp_data = products_resp.json()
+        for resp_product in resp_data:
+            resp_product.pop("uid", None)
+        snapshot.assert_match(resp_data)
 
     async def test_delete_fake_product_wishlist(
         self, snapshot, api_client, one_product_wishlist
