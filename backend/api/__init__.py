@@ -28,4 +28,4 @@ def configure(application: FastAPI):
 app = get_app()
 configure(application=app)
 
-__all__ = ["app", "__version__", "__author__"]
+__all__ = ["app", "__version__", "__author__", "db"]
