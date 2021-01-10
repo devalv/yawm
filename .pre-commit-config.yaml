@@ -28,5 +28,4 @@ repos:
             - flake8-printf-formatting
             - flake8-pytest-style
             - flake8-variables-names
-            - flake8-commas
         args: [--inline-quotes=double, --max-line-length=90, --ignore=D401]
