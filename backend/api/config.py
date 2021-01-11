@@ -8,7 +8,7 @@ from starlette.datastructures import Secret
 
 
 config = Config(".env")
-
+# Gino
 DB_DRIVER = config("DB_DRIVER", default="postgresql")
 DB_HOST = config("DB_HOST", default=None)
 DB_PORT = config("DB_PORT", cast=int, default=None)
@@ -36,3 +36,6 @@ DB_USE_CONNECTION_FOR_REQUEST = config(
 )
 DB_RETRY_LIMIT = config("DB_RETRY_LIMIT", cast=int, default=1)
 DB_RETRY_INTERVAL = config("DB_RETRY_INTERVAL", cast=int, default=1)
+# uvicorn
+API_HOST = config("API_HOST", default="127.0.0.1")
+API_PORT = config("API_PORT", cast=int, default=8000)
