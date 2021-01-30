@@ -32,7 +32,7 @@ jobs:
           git push
       - uses: pre-commit/action@v2.0.0
   smoke-test:
-    needs: [auto-black, pre-commit]
+    needs: linters
     if: always()
     runs-on: ubuntu-latest
     steps:
