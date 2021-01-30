@@ -25,10 +25,10 @@ jobs:
         if: failure()
         run: |
           black .
-          - uses: stefanzweifel/git-auto-commit-action@v4
-            with:
-              commit_message: Format Python code with Black
-              file_pattern: backend/*.py
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Format Python code with Black
+          file_pattern: backend/*.py
   pre-commit:
     needs: auto-black
     runs-on: ubuntu-latest
