@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from ..models.wishlist import Product, ProductWishlist, Wishlist
 
-wishlist_router = APIRouter(prefix="/api", redirect_slashes=True, tags=["wishlist"])
+wishlist_router = APIRouter(prefix="/api/v1", redirect_slashes=True, tags=["wishlist"])
 
 
 # TODO: @devalv отдельная модель для редактирования c Optional полями и без id
