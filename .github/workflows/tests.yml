@@ -5,9 +5,6 @@ name: Tests and codecov.
 on:
   pull_request:
     branches: [ develop, main ]
-#    TODO: remove
-  push:
-    branches: [ feature/* ]
 
 jobs:
   tests:
