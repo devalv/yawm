@@ -22,3 +22,9 @@ async def api_client(alembic_runner):
 
     # clear all data in database by downgrade alembic migrations.
     alembic_runner.migrate_down_to("base")
+
+
+def pytest_sessionfinish(session, exitstatus):
+    """Disable exit code 5 if no tests found."""
+    if exitstatus == 5:
+        session.exitstatus = 0
