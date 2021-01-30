@@ -25,7 +25,8 @@ jobs:
             python-version: '3.8'
       - name: Test with pytest
         run: |
+          cd backend && ls -lh
           python -m pip install --upgrade pip
           python -m pip install pipenv
           pipenv install --dev
-          cd backend && ls -lh && pipenv run pytest -vm "smoke"
+          pipenv run pytest -vm "smoke"
