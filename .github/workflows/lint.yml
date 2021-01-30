@@ -9,7 +9,7 @@ on:
     branches: [ '**' ]
 
 jobs:
-  auto-black:
+  linters:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -30,16 +30,6 @@ jobs:
           git checkout $GITHUB_HEAD_REF
           git commit -am "fixup: Format Python code with Black"
           git push
-
-  pre-commit:
-    needs: auto-black
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-            python-version: '3.8'
       - uses: pre-commit/action@v2.0.0
   smoke-test:
     needs: [auto-black, pre-commit]
