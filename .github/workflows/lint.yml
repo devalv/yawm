@@ -5,8 +5,9 @@ name: Linter and smoke tests
 on:
   pull_request:
     branches: [ develop, main ]
-  push:
-    branches: [ feature/* ]
+# TODO: enable
+#  push:
+#    branches: [ feature/* ]
 
 jobs:
   pre-commit:
