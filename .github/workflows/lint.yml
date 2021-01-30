@@ -24,17 +24,17 @@ jobs:
         if: failure()
         run: |
           black .
-#          git config --global user.name 'autoblack'
-#          git config --global user.email 'actions@github.com'
-#          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
-#          git checkout $GITHUB_HEAD_REF
-#          git commit -am "fixup: Format Python code with Black"
-#          git push
-#          echo "Finished"
-#          { exit 0 }
+          git config --global user.name 'autoblack'
+          git config --global user.email 'actions@github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git checkout $GITHUB_HEAD_REF
+          git commit -am "fixup: Format Python code with Black"
+          git push
+
 
   pre-commit:
     needs: auto-black
+    if: "always()&&(needs.auto-black.outputs.job_status=='success')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -44,6 +44,7 @@ jobs:
       - uses: pre-commit/action@v2.0.0
   smoke-test:
     needs: [auto-black, pre-commit]
+    if: "always()&&(needs.auto-black.outputs.job_status=='success')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
