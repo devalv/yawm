@@ -2,9 +2,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![codecov](https://codecov.io/gh/devalv/yawm/branch/main/graph/badge.svg?token=61KST8QUNE)](https://codecov.io/gh/devalv/yawm)
 
-## Howto
+## yawm
+For additional instructions please see 
 [HOWTO](https://github.com/devalv/yawm/wiki/Howto)
 
-## Project configure
-1. `pipenv install --dev`
-2. `python -m pretty_errors`
