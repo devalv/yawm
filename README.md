@@ -5,4 +5,3 @@
 ## yawm
 For additional instructions please see 
 [HOWTO](https://github.com/devalv/yawm/wiki/Howto)
-
