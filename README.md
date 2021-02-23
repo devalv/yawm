@@ -4,3 +4,7 @@
 
 ## Howto
 [HOWTO](https://github.com/devalv/yawm/wiki/Howto)
+
+## Project configure
+1. `pipenv install --dev`
+2. `python -m pretty_errors`
