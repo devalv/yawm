@@ -3,6 +3,5 @@
 [![codecov](https://codecov.io/gh/devalv/yawm/branch/main/graph/badge.svg?token=61KST8QUNE)](https://codecov.io/gh/devalv/yawm)
 
 ## yawm
-For additional instructions please see 
+For additional instructions please see
 [HOWTO](https://github.com/devalv/yawm/wiki/Howto)
-
