@@ -23,7 +23,6 @@ services:
     volumes:
       - ./backend/:/opt/yawm/app/
     environment:
-      - PIPENV_DONT_LOAD_ENV=1
       - PYTHONPATH=/opt/yawm/app
       - DB_HOST=db
       - DB_PORT=${DB_PORT}
@@ -32,6 +31,6 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - API_HOST=0.0.0.0
     working_dir: /opt/yawm/app
-    command: sh -c "sleep 5 && pipenv run alembic upgrade head && pipenv run python -m main"
+    command: sh -c "sleep 5 && alembic upgrade head && python -m main"
     depends_on:
       - db
