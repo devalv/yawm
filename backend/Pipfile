@@ -1,3 +1,4 @@
+# pipenv lock -r --dev-only > dev-requirements.txt && pipenv lock -r > requirements.txt
 [[source]]
 url = "https://pypi.python.org/simple"
 verify_ssl = true
