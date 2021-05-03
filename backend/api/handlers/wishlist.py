@@ -159,7 +159,9 @@ async def delete_wishlist_product(uid: uuid.UUID):
 
 # products
 @wishlist_router.get("/products", response_model=Page[ProductModelOut])
-@wishlist_router.get("/products/limit-offset", response_model=LimitOffsetPage[ProductModelOut])
+@wishlist_router.get(
+    "/products/limit-offset", response_model=LimitOffsetPage[ProductModelOut]
+)
 async def list_products():  # noqa: B008
     """API for listing all the products."""
     products = Product.query
