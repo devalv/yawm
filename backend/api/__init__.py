@@ -8,6 +8,7 @@ __version__ = "0.0.1"
 __author__ = "Aleksei Deviatkin <yawm@devyatkin.dev>"
 
 from fastapi import FastAPI
+from fastapi_pagination import add_pagination
 
 from .handlers import wishlist_router
 from .models import db
@@ -27,5 +28,6 @@ def configure(application: FastAPI):
 
 app = get_app()
 configure(application=app)
+add_pagination(app)
 
 __all__ = ["app", "__version__", "__author__", "db"]

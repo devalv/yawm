@@ -8,10 +8,12 @@ from fastapi import APIRouter, Depends, Response
 
 from pydantic import BaseModel
 
+from fastapi_pagination import Page, LimitOffsetPage
+from fastapi_pagination.ext.gino import paginate
+
 from ..models.wishlist import Product, ProductWishlist, Wishlist
 
 wishlist_router = APIRouter(prefix="/api/v1", redirect_slashes=True, tags=["wishlist"])
-
 
 # TODO: @devalv отдельная модель для редактирования c Optional полями и без id
 # TODO: @devalv отдельная модель для создания
@@ -36,6 +38,16 @@ class ProductModel(BaseModel):
     url: str
     price: decimal.Decimal
     uid: Optional[uuid.UUID] = None
+
+
+class ProductModelOut(BaseModel):
+    """Product list serializer."""
+
+    name: str
+    uid: uuid.UUID
+
+    class Config:
+        orm_mode = True
 
 
 class ProductWishlistModel(BaseModel):
@@ -146,16 +158,12 @@ async def delete_wishlist_product(uid: uuid.UUID):
 
 
 # products
-@wishlist_router.get("/products", response_model=List[ProductModel])
-async def list_products(paginator: dict = Depends(PaginatorModel)):  # noqa: B008
+@wishlist_router.get("/products", response_model=Page[ProductModelOut])
+@wishlist_router.get("/products/limit-offset", response_model=LimitOffsetPage[ProductModelOut])
+async def list_products():  # noqa: B008
     """API for listing all the products."""
-    products = (
-        await Product.select("uid", "name", "url", "price")
-        .limit(paginator.limit)
-        .offset(paginator.offset)
-        .gino.all()
-    )
-    return products
+    products = Product.query
+    return await paginate(products)
 
 
 @wishlist_router.post("/products", response_model=ProductModel)
