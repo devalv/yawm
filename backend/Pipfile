@@ -1,4 +1,5 @@
 # pipenv lock -r --dev-only > dev-requirements.txt && pipenv lock -r > requirements.txt
+
 [[source]]
 url = "https://pypi.python.org/simple"
 verify_ssl = true
@@ -11,6 +12,8 @@ ujson = "==4.0.*"
 gino-starlette = "==0.1.*"
 alembic = "==1.4.*"
 psycopg2-binary = "*"
+python-multipart = "*"
+fastapi-pagination = {extras = ["gino"], version = "*"}
 
 [dev-packages]
 coverage = "==5.3.*"

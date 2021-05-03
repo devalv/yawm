@@ -5,3 +5,7 @@
 ## yawm
 For additional instructions please see
 [HOWTO](https://github.com/devalv/yawm/wiki/Howto)
+
+**API schema** based on [**JSON API**](https://jsonapi.org)
+
+TODO: describe dir structure 
