@@ -8,6 +8,11 @@ from async_asgi_testclient import TestClient
 import pytest
 
 
+@pytest.fixture
+def alembic_config():
+    return {"script_location": "core/database/migrations"}
+
+
 @pytest.fixture()
 async def api_client(alembic_runner):
     """Fixture for async api http tests.

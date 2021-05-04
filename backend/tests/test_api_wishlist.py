@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Wishlist api tests."""
-from api.models.wishlist import Product, Wishlist
+from core.database import ProductGinoModel, WishlistGinoModel
 
 import pytest
 
@@ -11,7 +11,7 @@ pytestmark = [pytest.mark.asyncio, pytest.mark.api_full]
 async def nine_products():
     products_list = list()
     for i in range(1, 10):
-        product = await Product.create(
+        product = await ProductGinoModel.create(
             name=f"test{i}", url=f"test-url{i}", price=f"12{i}.3{i}"
         )
         products_list.append(product)
@@ -20,29 +20,29 @@ async def nine_products():
 
 @pytest.fixture()
 async def one_product():
-    product = await Product.create(name="test", url="test-url", price="12.3")
+    product = await ProductGinoModel.create(name="test", url="test-url", price="12.3")
     return product
 
 
 @pytest.fixture()
 async def one_empty_wishlist():
-    wishlist = await Wishlist.create(name="test", slug="test-slug")
+    wishlist = await WishlistGinoModel.create(name="test", slug="test-slug")
     return wishlist
 
 
 @pytest.fixture()
 async def one_product_wishlist(one_empty_wishlist, one_product):
-    wishlist = await Wishlist.get(one_empty_wishlist.uid)
-    rv = await wishlist.add_product(one_product.uid)
+    await WishlistGinoModel.get(one_empty_wishlist.uid)
+    rv = await WishlistGinoModel.add_product(one_product.uid)
     return rv
 
 
 @pytest.fixture()
 async def nine_products_wishlist(one_empty_wishlist, nine_products):
     products_list = list()
-    wishlist = await Wishlist.get(one_empty_wishlist.uid)
+    await WishlistGinoModel.get(one_empty_wishlist.uid)
     for product in nine_products:
-        rv = await wishlist.add_product(product.uid)
+        rv = await WishlistGinoModel.add_product(product.uid)
         products_list.append(rv)
     return products_list
 
@@ -50,7 +50,7 @@ async def nine_products_wishlist(one_empty_wishlist, nine_products):
 @pytest.fixture()
 async def _four_empty_wishlists():
     for i in range(1, 5):
-        await Wishlist.create(name=f"test{i}", slug=f"test-slug{i}")
+        await WishlistGinoModel.create(name=f"test{i}", slug=f"test-slug{i}")
 
 
 @pytest.mark.skip(reason="not implemented yet.")
