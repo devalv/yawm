@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Gino connection configuration."""
+"""Project database models (Gino)."""
 
 from gino_starlette import Gino
 
-from .. import config
+from ... import config
 
 db = Gino(
     dsn=config.DB_DSN,

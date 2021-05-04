@@ -18,6 +18,7 @@ For additional instructions please see
 │   │   └── migrations
 │   ├── schemas
 │   ├── services
+│   ├── .env
 │   └── config.py
 ├── tests
 │   ├── snapshots
