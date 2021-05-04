@@ -134,7 +134,7 @@ class TestProduct:
         )
         assert resp.status_code == 200
         resp_data = resp.json()
-        products = resp_data['items']
+        products = resp_data["items"]
         assert len(products) == paginator_limit
         for resp_product in products:
             resp_product.pop("uid", None)
