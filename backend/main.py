@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Simple debug application runner."""
 
-from core import config
-
 import uvicorn
+
+from core import config  # noqa: I100
 
 
 if __name__ == "__main__":

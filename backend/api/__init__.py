@@ -3,10 +3,11 @@
 
 
 from fastapi import FastAPI
+
 from fastapi_pagination import add_pagination
 
-from core.database.models import db
-from .v1.handlers import wishlist_router
+from core.database.models import db  # noqa: I100
+from .v1.handlers import wishlist_router  # noqa: I201
 
 
 def get_app():

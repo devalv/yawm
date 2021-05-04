@@ -58,7 +58,7 @@ class Wishlist(db.Model):
             .offset(paginator_offset)
             .gino.all()
         )
-        return wishlist_products
+        return wishlist_products  # noqa: PIE781
 
 
 class ProductWishlist(db.Model):
