@@ -43,8 +43,9 @@ jobs:
       - name: Test with pytest
         run: |
           cd backend
-          python -m pip install pipenv
-          pipenv install --deploy --dev
-          pipenv run pytest -vm "smoke"
+          pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install -r dev-requirements.txt
+          pytest -vm "smoke"
         env:
           PYTHONPATH: /opt/yawm/app
