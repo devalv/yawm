@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from fastapi_pagination import Page, LimitOffsetPage
 from fastapi_pagination.ext.gino import paginate
 
-from ..models.wishlist import Product, ProductWishlist, Wishlist
+from core.database.models.wishlist import Product, ProductWishlist, Wishlist
 
 wishlist_router = APIRouter(prefix="/api/v1", redirect_slashes=True, tags=["wishlist"])
 

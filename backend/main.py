@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Simple debug application runner."""
 
-from api import config
+from core import config
 
 import uvicorn
 

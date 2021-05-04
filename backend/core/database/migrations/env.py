@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 """Alembic migrations additional configuration."""
+
 from logging.config import fileConfig
 
 from alembic import context
 
-from api import db as target_metadata
-from api.config import DB_DSN
+from core.database.models import db as target_metadata
+from core.config import DB_DSN
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool

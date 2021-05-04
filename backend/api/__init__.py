@@ -1,22 +1,17 @@
 # -*- coding: utf-8 -*-
+"""Project API by versions."""
 
-"""Yet another wishlist maker.
-
-for additional info see README.md
-"""
-__version__ = "0.0.1"
-__author__ = "Aleksei Deviatkin <yawm@devyatkin.dev>"
 
 from fastapi import FastAPI
 from fastapi_pagination import add_pagination
 
-from .handlers import wishlist_router
-from .models import db
+from core.database.models import db
+from .v1.handlers import wishlist_router
 
 
 def get_app():
     """Just simple application initialization."""
-    application = FastAPI(title="Yet another wishlist maker", version="0.0.1")
+    application = FastAPI(title="Yet another wishlist maker", version="0.0.2")
     db.init_app(application)
     return application
 
@@ -30,4 +25,4 @@ app = get_app()
 configure(application=app)
 add_pagination(app)
 
-__all__ = ["app", "__version__", "__author__", "db"]
+__all__ = ["app", "db"]
