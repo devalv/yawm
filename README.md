@@ -49,3 +49,7 @@ Project tests
 
 #### api
 Project API by versions (v1, v2 and etc.).
+
+
+### docker
+Docker-images and docker-compose configuration files.
