@@ -32,17 +32,17 @@ async def one_empty_wishlist():
 
 @pytest.fixture()
 async def one_product_wishlist(one_empty_wishlist, one_product):
-    await WishlistGinoModel.get(one_empty_wishlist.uid)
-    rv = await WishlistGinoModel.add_product(one_product.uid)
+    wishlist = await WishlistGinoModel.get(one_empty_wishlist.uid)
+    rv = await wishlist.add_product(one_product.uid)
     return rv
 
 
 @pytest.fixture()
 async def nine_products_wishlist(one_empty_wishlist, nine_products):
     products_list = list()
-    await WishlistGinoModel.get(one_empty_wishlist.uid)
+    wishlist = await WishlistGinoModel.get(one_empty_wishlist.uid)
     for product in nine_products:
-        rv = await WishlistGinoModel.add_product(product.uid)
+        rv = await wishlist.add_product(product.uid)
         products_list.append(rv)
     return products_list
 
@@ -82,7 +82,10 @@ class TestProduct:
         resp = await api_client.get(self.API_URL)
         assert resp.status_code == 200
         resp_data = resp.json()
-        for resp_product in resp_data:
+        assert isinstance(resp_data, dict)
+        # removing product uid from items
+        resp_products = resp_data["items"]
+        for resp_product in resp_products:
             resp_product.pop("uid", None)
         snapshot.assert_match(resp_data)
 
@@ -127,24 +130,13 @@ class TestProduct:
     async def test_product_paginator_limit(self, snapshot, api_client, nine_products):
         paginator_limit = 5
         resp = await api_client.get(
-            self.API_URL, query_string=dict(limit=paginator_limit)
+            self.API_URL, query_string=dict(size=paginator_limit)
         )
         assert resp.status_code == 200
         resp_data = resp.json()
-        assert len(resp_data) == paginator_limit
-        for resp_product in resp_data:
-            resp_product.pop("uid", None)
-        snapshot.assert_match(resp_data)
-
-    @pytest.mark.api_base
-    async def test_product_paginator_offset(self, snapshot, api_client, nine_products):
-        paginator_offset = 5
-        resp = await api_client.get(
-            self.API_URL, query_string=dict(offset=paginator_offset)
-        )
-        assert resp.status_code == 200
-        resp_data = resp.json()
-        for resp_product in resp_data:
+        products = resp_data['items']
+        assert len(products) == paginator_limit
+        for resp_product in products:
             resp_product.pop("uid", None)
         snapshot.assert_match(resp_data)
 
@@ -335,7 +327,8 @@ class TestWishlist:
             query_string=dict(limit=paginator_limit),
         )
         assert products_resp.status_code == 200
-        assert len(products_resp.json()) == paginator_limit
+        response = products_resp.json()
+        assert len(response) == paginator_limit
 
     @pytest.mark.api_base
     async def test_offset_wishlist_products_list(
