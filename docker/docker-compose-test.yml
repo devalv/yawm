@@ -14,10 +14,10 @@ services:
   app-tests:
     container_name: yawm-tests-backend-api
     build:
-      context: .
+      context: ..
       dockerfile: ./docker/python/Dockerfile
     volumes:
-      - ./backend/:/opt/yawm/app/
+      - ../backend/:/opt/yawm/app/
     environment:
       - PYTHONPATH=/opt/yawm/app
       - DB_HOST=db-tests

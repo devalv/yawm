@@ -16,13 +16,13 @@ services:
   app:
     container_name: yawm-backend-api
     build:
-      context: .
+      context: ..
       dockerfile: ./docker/python/Dockerfile
     ports:
       - 8000:8000
       - 8888:8888
     volumes:
-      - ./backend/:/opt/yawm/app/
+      - ../backend/:/opt/yawm/app/
     environment:
       - PYTHONPATH=/opt/yawm/app
       - DB_HOST=db
