@@ -4,7 +4,7 @@ name: Tests and codecov.
 
 on:
   pull_request:
-    branches: [ develop, main ]
+    branches: [ main ]
 
 jobs:
   tests:

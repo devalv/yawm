@@ -4,7 +4,7 @@ name: Linter and smoke tests
 
 on:
   pull_request:
-    branches: [ develop, main ]
+    branches: [ main ]
   push:
     branches: [ '**' ]
 

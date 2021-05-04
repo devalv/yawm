@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Common project fixtures."""
 
-from api import app
+from ..api import app
 
 from async_asgi_testclient import TestClient
 
