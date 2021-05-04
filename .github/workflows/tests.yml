@@ -12,7 +12,7 @@ jobs:
     env:
       DB_HOST: localhost
       DB_PORT: 5430
-      DB_USER: test_user
+      DB_USER: test_us1er
       DB_PASSWORD: test_pass
       DB_DATABASE: test_db
       PYTHONPATH: /opt/yawm/app

@@ -5,11 +5,11 @@ from logging.config import fileConfig
 
 from alembic import context
 
-from core.database.models import db as target_metadata
-from core.config import DB_DSN
+from sqlalchemy import engine_from_config, pool
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from core.config import DB_DSN  # noqa: I100
+from core.database import db as target_metadata
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

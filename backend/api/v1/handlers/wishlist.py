@@ -6,12 +6,16 @@ from typing import List, Optional
 
 from fastapi import APIRouter, Depends, Response
 
-from pydantic import BaseModel
-
-from fastapi_pagination import Page, LimitOffsetPage
+from fastapi_pagination import LimitOffsetPage, Page
 from fastapi_pagination.ext.gino import paginate
 
-from core.database.models.wishlist import Product, ProductWishlist, Wishlist
+from pydantic import BaseModel
+
+from core.database.models.wishlist import (  # noqa: I100
+    Product,
+    ProductWishlist,
+    Wishlist,
+)
 
 wishlist_router = APIRouter(prefix="/api/v1", redirect_slashes=True, tags=["wishlist"])
 
@@ -46,7 +50,7 @@ class ProductModelOut(BaseModel):
     name: str
     uid: uuid.UUID
 
-    class Config:
+    class Config:  # noqa: D106
         orm_mode = True
 
 
@@ -86,7 +90,7 @@ async def list_wishlist(paginator: dict = Depends(PaginatorModel)):  # noqa: B00
         .offset(paginator.offset)
         .gino.all()
     )
-    return wishlists
+    return wishlists  # noqa: PIE781
 
 
 @wishlist_router.post("/wishlists", response_model=WishlistModel)
