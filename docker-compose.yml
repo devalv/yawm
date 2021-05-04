@@ -1,0 +1,37 @@
+version: "3.7"
+services:
+
+  db:
+    container_name: yawm-db
+    image: postgres:13
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    environment:
+      - POSTGRES_DB=${DB_DATABASE}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    command: -p ${DB_PORT}
+    restart: always
+
+  app:
+    container_name: yawm-backend-api
+    build:
+      context: .
+      dockerfile: ./docker/python/Dockerfile
+    ports:
+      - 8000:8000
+    volumes:
+      - ./backend/:/opt/yawm/app/
+    environment:
+      - PIPENV_DONT_LOAD_ENV=1
+      - PYTHONPATH=/opt/yawm/app
+      - DB_HOST=db
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE}
+      - API_HOST=0.0.0.0
+    working_dir: /opt/yawm/app
+    command: sh -c "sleep 5 && pipenv run alembic upgrade head && pipenv run python -m main"
+    depends_on:
+      - db
