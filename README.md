@@ -4,7 +4,7 @@
 
 # yawm
 For additional instructions please see
-[HOWTO](https://github.com/devalv/yawm/wiki/Howto)
+[Wiki](https://github.com/devalv/yawm/wiki)
 
 **API schema** based on [**JSON API**](https://jsonapi.org)
 
