@@ -21,7 +21,6 @@ class Product(db.Model):
     uid = db.Column(UUID(), default=uuid4, primary_key=True)
     name = db.Column(db.Unicode(length=255), nullable=False)
     url = db.Column(db.Unicode(length=8000), nullable=False, unique=True)
-    price = db.Column(db.Numeric(12, 2), nullable=False, default=0)
 
 
 class Wishlist(db.Model):
@@ -74,4 +73,5 @@ class ProductWishlist(db.Model):
     uid = db.Column(UUID(), default=uuid4, primary_key=True)
     product_uid = db.Column(UUID(), db.ForeignKey(Product.uid), nullable=False)
     wishlist_uid = db.Column(UUID(), db.ForeignKey(Wishlist.uid), nullable=False)
+    substitutable = db.Column(db.Boolean(), nullable=False, default=False)
     reserved = db.Column(db.Boolean(), nullable=False, default=False)
