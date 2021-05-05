@@ -11,16 +11,14 @@ pytestmark = [pytest.mark.asyncio, pytest.mark.api_full]
 async def nine_products():
     products_list = list()
     for i in range(1, 10):
-        product = await ProductGinoModel.create(
-            name=f"test{i}", url=f"test-url{i}", price=f"12{i}.3{i}"
-        )
+        product = await ProductGinoModel.create(name=f"test{i}", url=f"test-url{i}")
         products_list.append(product)
     return products_list
 
 
 @pytest.fixture()
 async def one_product():
-    product = await ProductGinoModel.create(name="test", url="test-url", price="12.3")
+    product = await ProductGinoModel.create(name="test", url="test-url")
     return product
 
 
@@ -69,8 +67,7 @@ class TestProduct:
     @pytest.mark.api_base
     async def test_product_create(self, snapshot, api_client):
         resp = await api_client.post(
-            self.API_URL,
-            json={"name": "Product1", "url": "product1", "price": "123.99"},
+            self.API_URL, json={"name": "Product1", "url": "product1"}
         )
         assert resp.status_code == 200
         resp_data = resp.json()
@@ -108,7 +105,7 @@ class TestProduct:
     async def test_product_full_update(self, snapshot, api_client, one_product):
         resp = await api_client.put(
             f"{self.API_URL}/{one_product.uid}",
-            json={"name": "test-updated", "url": "test-url-updated", "price": "12"},
+            json={"name": "test-updated", "url": "test-url-updated"},
         )
         assert resp.status_code == 200
         resp_data = resp.json()
@@ -118,8 +115,7 @@ class TestProduct:
     @pytest.mark.skip(reason="not implemented yet.")
     async def test_product_partial_update(self, snapshot, api_client, one_product):
         resp = await api_client.put(
-            f"{self.API_URL}/{one_product.uid}",
-            json={"name": "test-partial-updated", "price": "11"},
+            f"{self.API_URL}/{one_product.uid}", json={"name": "test-partial-updated"}
         )
         assert resp.status_code == 200
         resp_data = resp.json()

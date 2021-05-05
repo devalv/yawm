@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Pydantic wishlist models."""
 
-import decimal
 import uuid
 from typing import Optional
 
@@ -21,7 +20,6 @@ class ProductModel(BaseModel):
 
     name: str
     url: str
-    price: decimal.Decimal
     uid: Optional[uuid.UUID] = None
 
 

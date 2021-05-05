@@ -25,7 +25,6 @@ def upgrade():
         sa.Column("uid", postgresql.UUID(), nullable=False),
         sa.Column("name", sa.Unicode(length=255), nullable=False),
         sa.Column("url", sa.Unicode(length=8000), nullable=False),
-        sa.Column("price", sa.Numeric(12, 2), nullable=False),
         sa.PrimaryKeyConstraint("uid"),
         sa.UniqueConstraint("url"),
     )
@@ -43,6 +42,7 @@ def upgrade():
         sa.Column("product_uid", postgresql.UUID(), nullable=False),
         sa.Column("wishlist_uid", postgresql.UUID(), nullable=False),
         sa.Column("reserved", sa.Boolean(), nullable=False),
+        sa.Column("substitutable", sa.Boolean(), nullable=False),
         sa.ForeignKeyConstraint(["product_uid"], ["product.uid"]),
         sa.ForeignKeyConstraint(["wishlist_uid"], ["wishlist.uid"]),
         sa.PrimaryKeyConstraint("uid"),
