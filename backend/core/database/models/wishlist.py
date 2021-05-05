@@ -45,9 +45,7 @@ class Wishlist(db.Model):
     async def get_products(self, paginator_limit: int, paginator_offset: int):
         """Get all related products for wishlist."""
         wishlist_products = (
-            await db.select(
-                [ProductWishlist.uid, Product.name, Product.price, Product.url]
-            )
+            await db.select([ProductWishlist.uid, Product.name, Product.url])
             .select_from(ProductWishlist.join(Product))
             .where(
                 (ProductWishlist.wishlist_uid == self.uid)

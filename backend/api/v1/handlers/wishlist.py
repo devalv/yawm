@@ -6,7 +6,7 @@ from typing import List
 
 from fastapi import APIRouter, Depends, Response
 
-from fastapi_pagination import LimitOffsetPage, Page
+from fastapi_pagination import Page
 from fastapi_pagination.ext.gino import paginate
 
 
@@ -116,9 +116,6 @@ async def delete_wishlist_product(uid: uuid.UUID):
 
 # products
 @wishlist_router.get("/products", response_model=Page[ProductModelOut])
-@wishlist_router.get(
-    "/products/limit-offset", response_model=LimitOffsetPage[ProductModelOut]
-)
 async def list_products():  # noqa: B008
     """API for listing all the products."""
     products = Product.query
@@ -128,7 +125,7 @@ async def list_products():  # noqa: B008
 @wishlist_router.post("/products", response_model=ProductModel)
 async def add_product(product: ProductModel):
     """API for creating a new product."""
-    rv = await Product.create(name=product.name, url=product.url, price=product.price)
+    rv = await Product.create(name=product.name, url=product.url)
     return rv.to_dict()
 
 
