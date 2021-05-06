@@ -14,6 +14,16 @@ class WishlistModel(BaseModel):
     uid: Optional[uuid.UUID] = None
 
 
+class WishlistModelList(BaseModel):
+    """Product list serializer."""
+
+    name: str
+    uid: uuid.UUID
+
+    class Config:  # noqa: D106
+        orm_mode = True
+
+
 class ProductModel(BaseModel):
     """Product serializer."""
 
@@ -22,7 +32,7 @@ class ProductModel(BaseModel):
     uid: Optional[uuid.UUID] = None
 
 
-class ProductModelOut(BaseModel):
+class ProductModelList(BaseModel):
     """Product list serializer."""
 
     name: str
@@ -38,19 +48,26 @@ class ProductWishlistModel(BaseModel):
     product_uid: uuid.UUID
     wishlist_uid: uuid.UUID
     uid: Optional[uuid.UUID] = None
+    substitutable: Optional[bool] = False
+    reserved: Optional[bool] = False
+
+
+class ProductWishlistModelList(BaseModel):
+    """ProductWishlist list serializer."""
+
+    product_uid: uuid.UUID
+    wishlist_uid: uuid.UUID
+    uid: Optional[uuid.UUID] = None
+    substitutable: Optional[bool]
     reserved: Optional[bool]
+
+    class Config:  # noqa: D106
+        orm_mode = True
 
 
 class ProductWishlistUpdateModel(BaseModel):
     """ProductWishlist update serializer."""
 
-    product_uid: Optional[uuid.UUID]
     wishlist_uid: Optional[uuid.UUID]
+    product_uid: Optional[uuid.UUID]
     reserved: Optional[bool]
-
-
-class PaginatorModel(BaseModel):
-    """Query paginator serializer."""
-
-    limit: int = 10
-    offset: int = 0

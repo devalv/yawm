@@ -41,20 +41,28 @@ class Wishlist(db.Model):
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Product is not found")
         return rv
 
-    async def get_products(self, paginator_limit: int, paginator_offset: int):
-        """Get all related products for wishlist."""
-        wishlist_products = (
-            await db.select([ProductWishlist.uid, Product.name, Product.url])
-            .select_from(ProductWishlist.join(Product))
-            .where(
-                (ProductWishlist.wishlist_uid == self.uid)
-                & (ProductWishlist.product_uid == Product.uid)  # noqa: W503
-            )
-            .limit(paginator_limit)
-            .offset(paginator_offset)
-            .gino.all()
+    @property
+    def products_query(self):
+        """Gino query for fetching wishlist-related products."""
+        # Prepare QS for paginator
+        paginator_fields = [
+            Product.name,
+            Product.url,
+            ProductWishlist.uid,
+            ProductWishlist.wishlist_uid,
+            ProductWishlist.product_uid,
+            ProductWishlist.substitutable,
+            ProductWishlist.reserved,
+        ]
+        # Products <-> Wishlists relation
+        paginator_query = db.select(paginator_fields).select_from(
+            ProductWishlist.join(Product)
         )
-        return wishlist_products  # noqa: PIE781
+        # filter Products of current Wishlist
+        filtered_products_paginator_query = paginator_query.where(
+            ProductWishlist.wishlist_uid == self.uid
+        )
+        return filtered_products_paginator_query  # noqa: PIE781
 
 
 class ProductWishlist(db.Model):
