@@ -31,10 +31,8 @@ def upgrade():
     op.create_table(
         "wishlist",
         sa.Column("uid", postgresql.UUID(), nullable=False),
-        sa.Column("slug", sa.Unicode(length=255), nullable=False),
         sa.Column("name", sa.Unicode(length=255), nullable=False),
         sa.PrimaryKeyConstraint("uid"),
-        sa.UniqueConstraint("slug"),
     )
     op.create_table(
         "product_wishlist",

@@ -29,7 +29,6 @@ class Wishlist(db.Model):
     __tablename__ = "wishlist"
 
     uid = db.Column(UUID(), default=uuid4, primary_key=True)
-    slug = db.Column(db.Unicode(length=255), nullable=False, unique=True)
     name = db.Column(db.Unicode(length=255), nullable=False)
 
     async def add_product(self, product_uid: str):
