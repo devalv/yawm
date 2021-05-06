@@ -51,6 +51,7 @@ async def reserve_wishlist_product(
 ):
     """API for reserving existing product-wishlist record."""
     # TODO: check wishlist owner
+    await Wishlist.get_or_404(uid)
     product_wishlist = await ProductWishlist.get_or_404(pw_uid)
     await product_wishlist.update(reserved=pwm.reserved).apply()
     return product_wishlist.to_dict()
@@ -64,6 +65,7 @@ async def substitute_wishlist_product(
 ):
     """API for set Product.substitutable existing product-wishlist record."""
     # TODO: check wishlist owner
+    await Wishlist.get_or_404(uid)
     product_wishlist = await ProductWishlist.get_or_404(pw_uid)
     await product_wishlist.update(substitutable=pwm.substitutable).apply()
     return product_wishlist.to_dict()
