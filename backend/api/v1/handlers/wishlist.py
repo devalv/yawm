@@ -2,9 +2,8 @@
 """Wishlist rest-api handlers."""
 
 import uuid
-from typing import List
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Response
 
 from fastapi_pagination import Page
 from fastapi_pagination.ext.gino import paginate
@@ -16,40 +15,35 @@ from core.database.models.wishlist import (  # noqa: I100
     Wishlist,
 )
 from core.schemas.wishlist import (
-    PaginatorModel,
     ProductModel,
-    ProductModelOut,
+    ProductModelList,
     ProductWishlistModel,
+    ProductWishlistModelList,
     ProductWishlistUpdateModel,
     WishlistModel,
+    WishlistModelList,
 )
 
 wishlist_router = APIRouter(prefix="/api/v1", redirect_slashes=True, tags=["wishlist"])
 
 # TODO: @devalv отдельная модель для редактирования c Optional полями и без id
 # TODO: @devalv отдельная модель для создания
-# TODO: @devalv отдельная модель для просмотра
 # TODO: @devalv каскадное удаление
 # TODO: @devalv изменить урлы на более подходящие и универсальные
 
 
 # wishlist
-@wishlist_router.get("/wishlists", response_model=List[WishlistModel])
-async def list_wishlist(paginator: dict = Depends(PaginatorModel)):  # noqa: B008
+@wishlist_router.get("/wishlists", response_model=Page[WishlistModelList])
+async def list_wishlist():  # noqa: B008
     """API for listing all the wishlists."""
-    wishlists = (
-        await Wishlist.select("uid", "name", "slug")
-        .limit(paginator.limit)
-        .offset(paginator.offset)
-        .gino.all()
-    )
-    return wishlists  # noqa: PIE781
+    wishlists = Wishlist.query
+    return await paginate(wishlists)
 
 
 @wishlist_router.post("/wishlists", response_model=WishlistModel)
 async def add_wishlist(wishlist: WishlistModel):
     """API for creating a new wishlist."""
-    rv = await Wishlist.create(name=wishlist.name, slug=wishlist.slug)
+    rv = await Wishlist.create(name=wishlist.name)
     return rv.to_dict()
 
 
@@ -78,15 +72,13 @@ async def update_wishlist(uid: uuid.UUID, wishlist: WishlistModel):
     return wishlist_obj.to_dict()
 
 
-@wishlist_router.get("/wishlists/{uid}/products", response_model=List[ProductModel])
-async def list_wishlist_products(
-    uid: uuid.UUID, paginator: dict = Depends(PaginatorModel)  # noqa: B008
-):
+@wishlist_router.get(
+    "/wishlists/{uid}/products", response_model=Page[ProductWishlistModelList]
+)
+async def list_wishlist_products(uid: uuid.UUID):
     """API for getting all related products."""
     wishlist = await Wishlist.get_or_404(uid)
-    return await wishlist.get_products(
-        paginator_limit=paginator.limit, paginator_offset=paginator.offset
-    )
+    return await paginate(wishlist.products_query)
 
 
 @wishlist_router.post("/products-wishlist", response_model=ProductWishlistModel)
@@ -115,7 +107,7 @@ async def delete_wishlist_product(uid: uuid.UUID):
 
 
 # products
-@wishlist_router.get("/products", response_model=Page[ProductModelOut])
+@wishlist_router.get("/products", response_model=Page[ProductModelList])
 async def list_products():  # noqa: B008
     """API for listing all the products."""
     products = Product.query
