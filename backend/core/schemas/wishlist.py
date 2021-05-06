@@ -11,7 +11,6 @@ class WishlistModel(BaseModel):
     """Wishlist serializer."""
 
     name: str
-    slug: str
     uid: Optional[uuid.UUID] = None
 
 
