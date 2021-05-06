@@ -45,8 +45,8 @@ class ProductModelList(BaseModel):
 class ProductWishlistModel(BaseModel):
     """ProductWishlist serializer."""
 
-    product_uid: uuid.UUID
     wishlist_uid: uuid.UUID
+    product_uid: uuid.UUID
     uid: Optional[uuid.UUID] = None
     substitutable: Optional[bool] = False
     reserved: Optional[bool] = False
@@ -65,9 +65,18 @@ class ProductWishlistModelList(BaseModel):
         orm_mode = True
 
 
+class AddProductWishlistModelList(BaseModel):
+    """ProductWishlist list serializer."""
+
+    product_uid: uuid.UUID
+    substitutable: Optional[bool]
+    reserved: Optional[bool]
+
+
 class ProductWishlistUpdateModel(BaseModel):
     """ProductWishlist update serializer."""
 
     wishlist_uid: Optional[uuid.UUID]
     product_uid: Optional[uuid.UUID]
     reserved: Optional[bool]
+    substitutable: Optional[bool]
