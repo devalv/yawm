@@ -83,7 +83,7 @@ class TestProduct:
         resp_data = resp.json()
         assert isinstance(resp_data, dict)
         # removing product uid from items
-        resp_products = resp_data["items"]
+        resp_products = resp_data["data"]
         for resp_product in resp_products:
             resp_product.pop("uid", None)
         snapshot.assert_match(resp_data)
@@ -132,7 +132,7 @@ class TestProduct:
         )
         assert resp.status_code == 200
         resp_data = resp.json()
-        products = resp_data["items"]
+        products = resp_data["data"]
         assert len(products) == paginator_limit
         for resp_product in products:
             resp_product.pop("uid", None)
@@ -165,7 +165,7 @@ class TestEmptyWishlist:
         assert resp.status_code == 200
         resp_data = resp.json()
         assert isinstance(resp_data, dict)
-        items = resp_data["items"]
+        items = resp_data["data"]
         count = resp_data["total"]
         assert count == 4
         # remove unique data from fetch
@@ -184,7 +184,7 @@ class TestEmptyWishlist:
         assert resp.status_code == 200
         resp_data = resp.json()
         assert isinstance(resp_data, dict)
-        items = resp_data["items"]
+        items = resp_data["data"]
         size = resp_data["size"]
         total = resp_data["total"]
         assert size == paginator_limit

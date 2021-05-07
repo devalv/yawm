@@ -35,7 +35,7 @@ snapshots["TestProduct.test_product_full_update 1"] = {
 }
 
 snapshots["TestProduct.test_product_paginator_limit 1"] = {
-    "items": [
+    "data": [
         {"name": "test1"},
         {"name": "test2"},
         {"name": "test3"},
@@ -50,7 +50,7 @@ snapshots["TestProduct.test_product_paginator_limit 1"] = {
 snapshots["TestProduct.test_product_read 1"] = {"name": "test", "url": "test-url"}
 
 snapshots["TestProduct.test_products 1"] = {
-    "items": [
+    "data": [
         {"name": "test1"},
         {"name": "test2"},
         {"name": "test3"},
