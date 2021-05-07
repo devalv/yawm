@@ -5,17 +5,16 @@ import uuid
 
 from fastapi import APIRouter, Response
 
-from fastapi_pagination import Page
 from fastapi_pagination.ext.gino import paginate
-
 
 from core.database.models.wishlist import Product  # noqa: I100
 from core.schemas.wishlist import ProductModel, ProductModelList  # noqa: I100
+from core.utils import JsonApiPage  # noqa: I100
 
 product_router = APIRouter(prefix="/api/v1", redirect_slashes=True, tags=["product"])
 
 
-@product_router.get("/products", response_model=Page[ProductModelList])
+@product_router.get("/products", response_model=JsonApiPage[ProductModelList])
 async def list_products():  # noqa: B008
     """API for listing all the products."""
     products = Product.query

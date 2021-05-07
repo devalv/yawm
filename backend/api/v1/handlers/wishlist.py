@@ -5,17 +5,17 @@ import uuid
 
 from fastapi import APIRouter, Response
 
-from fastapi_pagination import Page
 from fastapi_pagination.ext.gino import paginate
 
 
 from core.database.models.wishlist import Wishlist  # noqa: I100
 from core.schemas.wishlist import WishlistModel, WishlistModelList  # noqa: I100
+from core.utils import JsonApiPage  # noqa: I100
 
 wishlist_router = APIRouter(prefix="/api/v1", redirect_slashes=True, tags=["wishlist"])
 
 
-@wishlist_router.get("/wishlists", response_model=Page[WishlistModelList])
+@wishlist_router.get("/wishlists", response_model=JsonApiPage[WishlistModelList])
 async def list_wishlist():  # noqa: B008
     """API for listing all the wishlists."""
     wishlists = Wishlist.query
