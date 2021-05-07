@@ -18,6 +18,7 @@ For additional instructions please see
 │   │   └── migrations
 │   ├── schemas
 │   ├── services
+│   ├── utils
 │   ├── .env
 │   └── config.py
 ├── tests
@@ -43,6 +44,7 @@ Core project features such as:
 * database migrations and models
 * services (business logic)
 * schemas (pydantic models)
+* utils (extra utils, such as fastapi-pagination custom Page)
 
 #### tests
 Project tests
