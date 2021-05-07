@@ -57,7 +57,7 @@ class ProductWishlistModelList(BaseModel):
 
     product_uid: uuid.UUID
     wishlist_uid: uuid.UUID
-    uid: Optional[uuid.UUID] = None
+    uid: Optional[uuid.UUID]
     substitutable: Optional[bool]
     reserved: Optional[bool]
 
