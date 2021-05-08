@@ -2,6 +2,12 @@
 """Project extra utils."""
 
 from .fastapi_pagination import JsonApiPage
-from .gino_models import JsonApiModel
+from .gino_models import JsonApiGinoModel
+from .pydantic_models import JsonApiPydanticCreateBaseModel, JsonApiPydanticListModel
 
-__all__ = ["JsonApiPage", "JsonApiModel"]
+__all__ = [
+    "JsonApiPage",
+    "JsonApiGinoModel",
+    "JsonApiPydanticListModel",
+    "JsonApiPydanticCreateBaseModel",
+]
