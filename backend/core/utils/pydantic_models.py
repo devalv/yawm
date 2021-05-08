@@ -46,6 +46,10 @@ class JsonApiPydanticCreateBaseModel(BaseModel):
         orm_mode = True
 
 
+class JsonApiPydanticUpdateBaseModel(JsonApiPydanticCreateBaseModel):
+    """Pydantic update model."""
+
+
 class JsonApiPydanticModel(JsonApiPydanticCreateBaseModel):
     """Pydantic pagination model."""
 

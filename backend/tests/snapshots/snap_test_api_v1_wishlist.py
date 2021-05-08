@@ -8,10 +8,14 @@ from snapshottest import Snapshot
 snapshots = Snapshot()
 
 snapshots["TestEmptyWishlist.test_empty_wishlist_full_update 1"] = {
-    "name": "test-updated"
+    "attributes": {"name": "test-updated"},
+    "type": "wishlist",
 }
 
-snapshots["TestEmptyWishlist.test_empty_wishlist_read 1"] = {"name": "test"}
+snapshots["TestEmptyWishlist.test_empty_wishlist_read 1"] = {
+    "attributes": {"name": "test"},
+    "type": "wishlist",
+}
 
 snapshots["TestEmptyWishlist.test_empty_wishlists 1"] = [
     {"attributes": {"name": "test1"}, "type": "wishlist"},
@@ -25,7 +29,10 @@ snapshots["TestEmptyWishlist.test_empty_wishlists_paginator_limit 1"] = [
     {"attributes": {"name": "test2"}, "type": "wishlist"},
 ]
 
-snapshots["TestEmptyWishlist.test_wishlist_create 1"] = {"name": "Wishlist1"}
+snapshots["TestEmptyWishlist.test_wishlist_create 1"] = {
+    "attributes": {"name": "Wishlist1"},
+    "type": "wishlist",
+}
 
 snapshots["TestProduct.test_product_create 1"] = {
     "attributes": {"name": "Product1", "url": "https://devyatkin.dev"},

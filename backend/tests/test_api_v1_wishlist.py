@@ -22,7 +22,7 @@ async def nine_products():
 
 @pytest.fixture()
 async def one_product():
-    product = await ProductGinoModel.create(name="test", url=f"https://devyatkin.dev/1")
+    product = await ProductGinoModel.create(name="test", url="https://devyatkin.dev/1")
     return product
 
 
@@ -149,9 +149,12 @@ class TestEmptyWishlist:
 
     @pytest.mark.api_base
     async def test_wishlist_create(self, snapshot, api_client):
-        resp = await api_client.post(self.API_URL, json={"name": "Wishlist1"})
+        resp = await api_client.post(
+            self.API_URL, json={"attributes": {"name": "Wishlist1"}}
+        )
         assert resp.status_code == 200
         resp_data = resp.json()
+        assert "id" in resp_data
         resp_data.pop("id", None)
         snapshot.assert_match(resp_data)
 
@@ -205,25 +208,13 @@ class TestEmptyWishlist:
         resp_data.pop("id", None)
         snapshot.assert_match(resp_data)
 
-    @pytest.mark.skip(reason="not implemented yet.")
-    async def test_empty_wishlist_partial_update(
-        self, snapshot, api_client, one_empty_wishlist
-    ):
-        resp = await api_client.put(
-            f"{self.API_URL}/{one_empty_wishlist.id}",
-            json={"slug": "test-slug-updated"},
-        )
-        assert resp.status_code == 200
-        resp_data = resp.json()
-        resp_data.pop("id", None)
-        snapshot.assert_match(resp_data)
-
     @pytest.mark.api_base
     async def test_empty_wishlist_full_update(
         self, snapshot, api_client, one_empty_wishlist
     ):
         resp = await api_client.put(
-            f"{self.API_URL}/{one_empty_wishlist.id}", json={"name": "test-updated"}
+            f"{self.API_URL}/{one_empty_wishlist.id}",
+            json={"attributes": {"name": "test-updated"}},
         )
         assert resp.status_code == 200
         resp_data = resp.json()
