@@ -35,8 +35,9 @@ async def one_empty_wishlist():
 @pytest.fixture()
 async def one_product_wishlist(one_empty_wishlist, one_product):
     wishlist = await WishlistGinoModel.get(one_empty_wishlist.id)
-    rv = await wishlist.add_product(one_product.id)
-    return rv
+    return await wishlist.add_product(
+        one_product.id, reserved=False, substitutable=False
+    )
 
 
 @pytest.fixture()
@@ -44,7 +45,7 @@ async def nine_products_wishlist(one_empty_wishlist, nine_products):
     products_list = list()
     wishlist = await WishlistGinoModel.get(one_empty_wishlist.id)
     for product in nine_products:
-        rv = await wishlist.add_product(product.id)
+        rv = await wishlist.add_product(product.id, reserved=False, substitutable=True)
         products_list.append(rv)
     return products_list
 
@@ -58,7 +59,7 @@ async def _four_empty_wishlists():
 @pytest.mark.skip(reason="not implemented yet.")
 async def test_trailing_slash(api_client):
     """Test that trailing slash redirects working."""
-    resp = await api_client.get(f"{API_URL_PREFIX}/products/")
+    resp = await api_client.get(f"{API_URL_PREFIX}/product/")
     assert resp.is_redirect
     assert resp.status_code == 307
 
@@ -66,7 +67,7 @@ async def test_trailing_slash(api_client):
 class TestProduct:
     """Product API tests."""
 
-    API_URL = f"{API_URL_PREFIX}/products"
+    API_URL = f"{API_URL_PREFIX}/product"
 
     @pytest.mark.api_base
     async def test_product_create(self, snapshot, api_client):
@@ -145,7 +146,7 @@ class TestProduct:
 class TestEmptyWishlist:
     """Empty wishlist API tests."""
 
-    API_URL = f"{API_URL_PREFIX}/wishlists"
+    API_URL = f"{API_URL_PREFIX}/wishlist"
 
     @pytest.mark.api_base
     async def test_wishlist_create(self, snapshot, api_client):
@@ -235,24 +236,30 @@ class TestWishlist:
         """
 
         for i, product in enumerate(nine_products):
-            insert_data = {"product_id": f"{product.id}"}
+            insert_data = {
+                "attributes": {
+                    "product_id": f"{product.id}",
+                    "reserved": False,
+                    "substitutable": True,
+                }
+            }
             expected_data = insert_data.copy()
-            expected_data["wishlist_id"] = f"{one_empty_wishlist.id}"
+            expected_data["attributes"]["wishlist_id"] = f"{one_empty_wishlist.id}"
+            expected_data["type"] = "wishlist_products"
             resp = await api_client.post(
-                f"{API_URL_PREFIX}/wishlists/{one_empty_wishlist.id}/products",
+                f"{API_URL_PREFIX}/wishlist/{one_empty_wishlist.id}/products",
                 json=insert_data,
             )
 
             assert resp.status_code == 200
             resp_data = resp.json()
+            assert "id" in resp_data
             resp_data.pop("id", None)
-            resp_data.pop("reserved", None)
-            resp_data.pop("substitutable", None)
             assert resp_data == expected_data
 
         # check all products in wishlist
         products_resp = await api_client.get(
-            f"{API_URL_PREFIX}/wishlists/{one_empty_wishlist.id}/products"
+            f"{API_URL_PREFIX}/wishlist/{one_empty_wishlist.id}/products"
         )
 
         assert products_resp.status_code == 200
@@ -266,14 +273,14 @@ class TestWishlist:
         self, snapshot, api_client, one_product_wishlist
     ):
         resp = await api_client.delete(
-            f"{API_URL_PREFIX}/wishlists/{one_product_wishlist.wishlist_id}/products/{one_product_wishlist.id}"  # noqa: E501
+            f"{API_URL_PREFIX}/wishlist/{one_product_wishlist.wishlist_id}/products/{one_product_wishlist.id}"  # noqa: E501
         )
 
         assert resp.status_code == 204
 
         # check all products in wishlist
         products_resp = await api_client.get(
-            f"{API_URL_PREFIX}/wishlists/{one_product_wishlist.wishlist_id}/products"
+            f"{API_URL_PREFIX}/wishlist/{one_product_wishlist.wishlist_id}/products"
         )
         assert products_resp.status_code == 200
         product_resp_data = products_resp.json()
@@ -287,11 +294,11 @@ class TestWishlist:
     ):
         # TODO: maybe make validation error?
         resp = await api_client.delete(
-            f"{API_URL_PREFIX}/wishlists/{one_product_wishlist.wishlist_id}"
+            f"{API_URL_PREFIX}/wishlist/{one_product_wishlist.wishlist_id}"
         )
         assert resp.status_code == 204
         new_resp = await api_client.get(
-            f"{API_URL_PREFIX}/wishlists/{one_product_wishlist.wishlist_id}"
+            f"{API_URL_PREFIX}/wishlist/{one_product_wishlist.wishlist_id}"
         )
         assert new_resp.status_code == 404
 
@@ -310,7 +317,7 @@ class TestWishlist:
     @pytest.mark.api_base
     async def test_wishlist_products_list(self, api_client, one_product_wishlist):
         products_resp = await api_client.get(
-            f"{API_URL_PREFIX}/wishlists/{one_product_wishlist.wishlist_id}/products"
+            f"{API_URL_PREFIX}/wishlist/{one_product_wishlist.wishlist_id}/products"
         )
         assert products_resp.status_code == 200
         product_resp_data = products_resp.json()
@@ -324,7 +331,7 @@ class TestWishlist:
     ):
         paginator_limit = 5
         products_resp = await api_client.get(
-            f"{API_URL_PREFIX}/wishlists/{one_empty_wishlist.id}/products",
+            f"{API_URL_PREFIX}/wishlist/{one_empty_wishlist.id}/products",
             query_string=dict(size=paginator_limit),
         )
         assert products_resp.status_code == 200
@@ -337,7 +344,7 @@ class TestWishlist:
         self, snapshot, api_client, one_product_wishlist
     ):
         resp = await api_client.delete(
-            f"{API_URL_PREFIX}/wishlists/{one_product_wishlist.wishlist_id}/products/{one_product_wishlist.product_id}"  # noqa: E501
+            f"{API_URL_PREFIX}/wishlist/{one_product_wishlist.wishlist_id}/products/{one_product_wishlist.product_id}"  # noqa: E501
         )
         assert resp.status_code == 404
 
@@ -345,39 +352,55 @@ class TestWishlist:
         self, api_client, one_empty_wishlist, nine_products
     ):
         insert_data = {
-            "product_id": f"{one_empty_wishlist.id}",
-            "wishlist_id": f"{one_empty_wishlist.id}",
+            "attributes": {
+                "product_id": f"{one_empty_wishlist.id}",
+                "reserved": False,
+                "substitutable": True,
+            }
         }
         resp = await api_client.post(
-            f"{API_URL_PREFIX}/wishlists/{one_empty_wishlist.id}/products",  # noqa: E501
+            f"{API_URL_PREFIX}/wishlist/{one_empty_wishlist.id}/products",  # noqa: E501
             json=insert_data,
         )
+
         assert resp.status_code == 404
 
     @pytest.mark.api_base
     async def test_reserve_wishlist_product(self, api_client, one_product_wishlist):
         resp = await api_client.put(
-            f"{API_URL_PREFIX}/wishlists/{one_product_wishlist.wishlist_id}/products/{one_product_wishlist.id}/reserve",  # noqa: E501
-            json={"reserved": True},
+            f"{API_URL_PREFIX}/wishlist/{one_product_wishlist.wishlist_id}/products/{one_product_wishlist.id}",  # noqa: E501
+            json={"attributes": {"reserved": True}},
         )
         assert resp.status_code == 200
-        assert resp.json()["reserved"] is True
+        assert resp.json()["attributes"]["reserved"] is True
 
     @pytest.mark.api_base
     async def test_substitute_wishlist_product(self, api_client, one_product_wishlist):
+        assert not one_product_wishlist.substitutable
         resp = await api_client.put(
-            f"{API_URL_PREFIX}/wishlists/{one_product_wishlist.wishlist_id}/products/{one_product_wishlist.id}/substitute",  # noqa: E501
-            json={"substitutable": True},
+            f"{API_URL_PREFIX}/wishlist/{one_product_wishlist.wishlist_id}/products/{one_product_wishlist.id}",  # noqa: E501
+            json={"attributes": {"substitutable": True}},
         )
         assert resp.status_code == 200
-        assert resp.json()["substitutable"] is True
+        assert resp.json()["attributes"]["substitutable"]
+
+    @pytest.mark.api_base
+    async def test_update_wishlist_product(self, api_client, one_product_wishlist):
+        assert not one_product_wishlist.substitutable
+        resp = await api_client.put(
+            f"{API_URL_PREFIX}/wishlist/{one_product_wishlist.wishlist_id}/products/{one_product_wishlist.id}",  # noqa: E501
+            json={"attributes": {"substitutable": True, "reserved": True}},
+        )
+        assert resp.status_code == 200
+        assert resp.json()["attributes"]["substitutable"] is True
+        assert resp.json()["attributes"]["reserved"] is True
 
     async def test_reserve_fake_wishlist_product(
         self, api_client, one_product_wishlist
     ):
         resp = await api_client.put(
-            f"{API_URL_PREFIX}/wishlists/{one_product_wishlist.id}/products/{one_product_wishlist.id}/reserve",  # noqa: E501
-            json={"reserved": True},
+            f"{API_URL_PREFIX}/wishlist/{one_product_wishlist.id}/products/{one_product_wishlist.id}",  # noqa: E501
+            json={"attributes": {"reserved": True}},
         )
         assert resp.status_code == 404
 
@@ -385,8 +408,8 @@ class TestWishlist:
         self, api_client, one_product_wishlist
     ):
         resp = await api_client.put(
-            f"{API_URL_PREFIX}/wishlists/{one_product_wishlist.id}/products/{one_product_wishlist.id}/substitute",  # noqa: E501
-            json={"substitutable": True},
+            f"{API_URL_PREFIX}/wishlist/{one_product_wishlist.id}/products/{one_product_wishlist.id}",  # noqa: E501
+            json={"attributes": {"substitutable": True}},
         )
         assert resp.status_code == 404
 

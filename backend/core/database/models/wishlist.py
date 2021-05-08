@@ -38,35 +38,14 @@ class Wishlist(db.Model, JsonApiGinoModel):
         """Get products related to wishlist object."""
         return WishlistProducts.query.where(WishlistProducts.wishlist_id == self.id)
 
-    # TODO: remove?
-    # @property
-    # def products_query(self):
-    #     """Gino query for fetching wishlist-related products."""
-    #     # Prepare QS for paginator
-    #     paginator_fields = [  # noqa: E800
-    #         Product.name,  # noqa: E800
-    #         Product.url,  # noqa: E800
-    #         ProductWishlist.uid,  # noqa: E800
-    #         ProductWishlist.wishlist_uid,  # noqa: E800
-    #         ProductWishlist.product_uid,  # noqa: E800
-    #         ProductWishlist.substitutable,  # noqa: E800
-    #         ProductWishlist.reserved,  # noqa: E800
-    #     ]  # noqa: E800
-    #     # Products <-> Wishlists relation
-    #     paginator_query = db.select(paginator_fields).select_from(  # noqa: E800
-    #         ProductWishlist.join(Product)  # noqa: E800
-    #     )  # noqa: E800
-    #     # filter Products of current Wishlist
-    #     filtered_products_paginator_query = paginator_query.where(  # noqa: E800
-    #         ProductWishlist.wishlist_uid == self.uid  # noqa: E800
-    #     )  # noqa: E800
-    #     return filtered_products_paginator_query  # noqa: E800
-
-    async def add_product(self, product_id: str):
+    async def add_product(self, product_id: str, reserved: bool, substitutable: bool):
         """Add existing product to wishlist."""
         try:
             rv = await WishlistProducts.create(
-                product_id=product_id, wishlist_id=self.id
+                product_id=product_id,
+                wishlist_id=self.id,
+                reserved=reserved,
+                substitutable=substitutable,
             )
         except ForeignKeyViolationError:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Product is not found")
