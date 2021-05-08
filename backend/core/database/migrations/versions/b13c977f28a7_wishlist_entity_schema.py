@@ -35,7 +35,7 @@ def upgrade():
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
-        "product_wishlist",
+        "wishlist_products",
         sa.Column("id", postgresql.UUID(), nullable=False),
         sa.Column("product_id", postgresql.UUID(), nullable=False),
         sa.Column("wishlist_id", postgresql.UUID(), nullable=False),
@@ -49,6 +49,6 @@ def upgrade():
 
 def downgrade():
     """Revert changes on database."""
-    op.drop_table("product_wishlist")
+    op.drop_table("wishlist_products")
     op.drop_table("wishlist")
     op.drop_table("product")

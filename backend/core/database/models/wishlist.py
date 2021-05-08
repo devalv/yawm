@@ -36,7 +36,7 @@ class Wishlist(db.Model, JsonApiGinoModel):
     @property
     def products(self):
         """Get products related to wishlist object."""
-        return ProductWishlist.query.where(ProductWishlist.wishlist_id == self.id)
+        return WishlistProducts.query.where(WishlistProducts.wishlist_id == self.id)
 
     # TODO: remove?
     # @property
@@ -65,7 +65,7 @@ class Wishlist(db.Model, JsonApiGinoModel):
     async def add_product(self, product_id: str):
         """Add existing product to wishlist."""
         try:
-            rv = await ProductWishlist.create(
+            rv = await WishlistProducts.create(
                 product_id=product_id, wishlist_id=self.id
             )
         except ForeignKeyViolationError:
@@ -73,18 +73,18 @@ class Wishlist(db.Model, JsonApiGinoModel):
         return rv
 
 
-class ProductWishlist(db.Model, JsonApiGinoModel):
-    """Product and Wishlist connection.
+class WishlistProducts(db.Model, JsonApiGinoModel):
+    """Product related to Wishlist connection.
 
     The absence of unique together indices (product_id, wishlist_id) has been
     done intentionally to avoid product count.
     Example: 2 same products in 1 list should be 2 records.
     """
 
-    __tablename__ = "product_wishlist"
+    __tablename__ = "wishlist_products"
 
     id = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A002, A003, VNE003
-    product_id = db.Column(UUID(), db.ForeignKey(Product.id), nullable=False)
     wishlist_id = db.Column(UUID(), db.ForeignKey(Wishlist.id), nullable=False)
+    product_id = db.Column(UUID(), db.ForeignKey(Product.id), nullable=False)
     substitutable = db.Column(db.Boolean(), nullable=False, default=False)
     reserved = db.Column(db.Boolean(), nullable=False, default=False)
