@@ -27,39 +27,92 @@ snapshots["TestEmptyWishlist.test_empty_wishlists_paginator_limit 1"] = [
 
 snapshots["TestEmptyWishlist.test_wishlist_create 1"] = {"name": "Wishlist1"}
 
-snapshots["TestProduct.test_product_create 1"] = {"name": "Product1", "url": "product1"}
+snapshots["TestProduct.test_product_create 1"] = {
+    "attributes": {"name": "Product1", "url": "https://devyatkin.dev"},
+    "type": "product",
+}
 
 snapshots["TestProduct.test_product_full_update 1"] = {
-    "name": "test-updated",
-    "url": "test-url-updated",
+    "attributes": {"name": "test-updated", "url": "https://ya.ru"},
+    "type": "product",
 }
 
 snapshots["TestProduct.test_product_paginator_limit 1"] = {
     "data": [
-        {"attributes": {"name": "test1"}, "type": "product"},
-        {"attributes": {"name": "test2"}, "type": "product"},
-        {"attributes": {"name": "test3"}, "type": "product"},
-        {"attributes": {"name": "test4"}, "type": "product"},
-        {"attributes": {"name": "test5"}, "type": "product"},
+        {
+            "attributes": {"name": "test1", "url": "https://devyatkin.dev/1"},
+            "type": "product",
+        },
+        {
+            "attributes": {"name": "test2", "url": "https://devyatkin.dev/2"},
+            "type": "product",
+        },
+        {
+            "attributes": {"name": "test3", "url": "https://devyatkin.dev/3"},
+            "type": "product",
+        },
+        {
+            "attributes": {"name": "test4", "url": "https://devyatkin.dev/4"},
+            "type": "product",
+        },
+        {
+            "attributes": {"name": "test5", "url": "https://devyatkin.dev/5"},
+            "type": "product",
+        },
     ],
     "page": 0,
     "size": 5,
     "total": 9,
 }
 
-snapshots["TestProduct.test_product_read 1"] = {"name": "test", "url": "test-url"}
+snapshots["TestProduct.test_product_partial_update 1"] = {
+    "attributes": {"name": "partial-updated-name", "url": "https://devyatkin.dev/1"},
+    "type": "product",
+}
+
+snapshots["TestProduct.test_product_read 1"] = {
+    "attributes": {"name": "test", "url": "https://devyatkin.dev/1"},
+    "type": "product",
+}
 
 snapshots["TestProduct.test_products 1"] = {
     "data": [
-        {"attributes": {"name": "test1"}, "type": "product"},
-        {"attributes": {"name": "test2"}, "type": "product"},
-        {"attributes": {"name": "test3"}, "type": "product"},
-        {"attributes": {"name": "test4"}, "type": "product"},
-        {"attributes": {"name": "test5"}, "type": "product"},
-        {"attributes": {"name": "test6"}, "type": "product"},
-        {"attributes": {"name": "test7"}, "type": "product"},
-        {"attributes": {"name": "test8"}, "type": "product"},
-        {"attributes": {"name": "test9"}, "type": "product"},
+        {
+            "attributes": {"name": "test1", "url": "https://devyatkin.dev/1"},
+            "type": "product",
+        },
+        {
+            "attributes": {"name": "test2", "url": "https://devyatkin.dev/2"},
+            "type": "product",
+        },
+        {
+            "attributes": {"name": "test3", "url": "https://devyatkin.dev/3"},
+            "type": "product",
+        },
+        {
+            "attributes": {"name": "test4", "url": "https://devyatkin.dev/4"},
+            "type": "product",
+        },
+        {
+            "attributes": {"name": "test5", "url": "https://devyatkin.dev/5"},
+            "type": "product",
+        },
+        {
+            "attributes": {"name": "test6", "url": "https://devyatkin.dev/6"},
+            "type": "product",
+        },
+        {
+            "attributes": {"name": "test7", "url": "https://devyatkin.dev/7"},
+            "type": "product",
+        },
+        {
+            "attributes": {"name": "test8", "url": "https://devyatkin.dev/8"},
+            "type": "product",
+        },
+        {
+            "attributes": {"name": "test9", "url": "https://devyatkin.dev/9"},
+            "type": "product",
+        },
     ],
     "page": 0,
     "size": 50,
