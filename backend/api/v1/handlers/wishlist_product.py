@@ -9,7 +9,7 @@ from fastapi_pagination.ext.gino import paginate
 
 from core.database.models.wishlist import ProductWishlist, Wishlist  # noqa: I100
 from core.schemas.wishlist import (
-    AddProductWishlistModelList,
+    AddProductWishlistModel,
     ProductWishlistModel,
     ProductWishlistModelList,
     ProductWishlistUpdateModel,
@@ -27,14 +27,14 @@ wishlist_product_router = APIRouter(
 async def list_wishlist_products(uid: uuid.UUID):
     """API for getting all related products."""
     wishlist = await Wishlist.get_or_404(uid)
-    return await paginate(wishlist.products_query)
+    return await paginate(wishlist.products)
 
 
 @wishlist_product_router.post(
     "/wishlists/{uid}/products", response_model=ProductWishlistModel
 )
 async def add_wishlist_product(
-    uid: uuid.UUID, product_wishlist: AddProductWishlistModelList
+    uid: uuid.UUID, product_wishlist: AddProductWishlistModel
 ):
     """API for adding existing product to a existing wishlist."""
     # TODO: add many products
@@ -76,5 +76,7 @@ async def substitute_wishlist_product(
 )
 async def delete_wishlist_product(uid: uuid.UUID, pw_uid: uuid.UUID):
     """API for removing product from wishlist."""
+    # TODO: check wishlist owner
+    await Wishlist.get_or_404(uid)
     product_wishlist = await ProductWishlist.get_or_404(pw_uid)
     await product_wishlist.delete()
