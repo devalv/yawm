@@ -13,14 +13,16 @@ API_URL_PREFIX = "/api/v1"
 async def nine_products():
     products_list = list()
     for i in range(1, 10):
-        product = await ProductGinoModel.create(name=f"test{i}", url=f"test-url{i}")
+        product = await ProductGinoModel.create(
+            name=f"test{i}", url=f"https://devyatkin.dev/{i}"
+        )
         products_list.append(product)
     return products_list
 
 
 @pytest.fixture()
 async def one_product():
-    product = await ProductGinoModel.create(name="test", url="test-url")
+    product = await ProductGinoModel.create(name="test", url=f"https://devyatkin.dev/1")
     return product
 
 
@@ -69,7 +71,8 @@ class TestProduct:
     @pytest.mark.api_base
     async def test_product_create(self, snapshot, api_client):
         resp = await api_client.post(
-            self.API_URL, json={"name": "Product1", "url": "product1"}
+            self.API_URL,
+            json={"attributes": {"name": "Product1", "url": "https://devyatkin.dev"}},
         )
         assert resp.status_code == 200
         resp_data = resp.json()
@@ -107,17 +110,17 @@ class TestProduct:
     async def test_product_full_update(self, snapshot, api_client, one_product):
         resp = await api_client.put(
             f"{self.API_URL}/{one_product.id}",
-            json={"name": "test-updated", "url": "test-url-updated"},
+            json={"attributes": {"name": "test-updated", "url": "https://ya.ru"}},
         )
         assert resp.status_code == 200
         resp_data = resp.json()
         resp_data.pop("id", None)
         snapshot.assert_match(resp_data)
 
-    @pytest.mark.skip(reason="not implemented yet.")
     async def test_product_partial_update(self, snapshot, api_client, one_product):
         resp = await api_client.put(
-            f"{self.API_URL}/{one_product.id}", json={"name": "test-partial-updated"}
+            f"{self.API_URL}/{one_product.id}",
+            json={"attributes": {"name": "partial-updated-name"}},
         )
         assert resp.status_code == 200
         resp_data = resp.json()
@@ -395,3 +398,9 @@ class TestWishlist:
             json={"substitutable": True},
         )
         assert resp.status_code == 404
+
+
+class TestPaginator:
+    """Extended paginator tests."""
+
+    pass

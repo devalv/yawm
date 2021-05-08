@@ -21,8 +21,32 @@ class JsonApiPydanticCreateBaseModel(BaseModel):
     type: str  # noqa: A002, A003, VNE003
     attributes: JsonApiPydanticAttributesBaseModel
 
+    @property
+    def validated_attributes(self):
+        """Validated model attributes."""
+        result = dict()
 
-class JsonApiPydanticListModel(JsonApiPydanticCreateBaseModel):
+        for attr, attr_value in self.attributes:
+            result[attr] = attr_value
+
+        return result
+
+    @property
+    def non_null_attributes(self):
+        """Return non-null only attributes values."""
+        result = dict()
+
+        for attr, attr_value in self.attributes:
+            if attr_value is not None:
+                result[attr] = attr_value
+
+        return result
+
+    class Config:  # noqa: D106
+        orm_mode = True
+
+
+class JsonApiPydanticModel(JsonApiPydanticCreateBaseModel):
     """Pydantic pagination model."""
 
     id: uuid.UUID  # noqa: A002, A003, VNE003
