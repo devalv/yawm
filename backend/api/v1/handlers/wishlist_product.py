@@ -7,22 +7,21 @@ from fastapi import APIRouter, Response
 
 from fastapi_pagination.ext.gino import paginate
 
-from core.database.models.wishlist import ProductWishlist, Wishlist  # noqa: I100
-from core.schemas.wishlist import (
-    AddProductWishlistModel,
-    ProductWishlistModel,
-    ProductWishlistModelList,
-    ProductWishlistUpdateModel,
+from core.database.models.wishlist import Wishlist, WishlistProducts  # noqa: I100
+from core.schemas import (
+    WishlistProductsCreateModel,
+    WishlistProductsModel,
+    WishlistProductsUpdateModel,
 )
 from core.utils import JsonApiPage  # noqa: I100
 
 wishlist_product_router = APIRouter(
-    prefix="/api/v1", redirect_slashes=True, tags=["wishlist-product"]
+    prefix="/api/v1", redirect_slashes=True, tags=["wishlist-products"]
 )
 
 
 @wishlist_product_router.get(
-    "/wishlists/{id}/products", response_model=JsonApiPage[ProductWishlistModelList]
+    "/wishlist/{id}/products", response_model=JsonApiPage[WishlistProductsModel]
 )
 async def list_wishlist_products(id: uuid.UUID):  # noqa: A002
     """API for getting all related products."""
@@ -31,52 +30,35 @@ async def list_wishlist_products(id: uuid.UUID):  # noqa: A002
 
 
 @wishlist_product_router.post(
-    "/wishlists/{id}/products", response_model=ProductWishlistModel
+    "/wishlist/{id}/products", response_model=WishlistProductsModel
 )
-async def add_wishlist_product(
-    id: uuid.UUID, product_wishlist: AddProductWishlistModel  # noqa: A002
+async def create_wishlist_product(
+    id: uuid.UUID, product: WishlistProductsCreateModel  # noqa: A002
 ):
     """API for adding existing product to a existing wishlist."""
     # TODO: add many products
     wishlist = await Wishlist.get_or_404(id)
-    rv = await wishlist.add_product(product_wishlist.product_id)
-    return rv.to_dict()
+    return await wishlist.add_product(**product.validated_attributes)
 
 
 @wishlist_product_router.put(
-    "/wishlists/{id}/products/{pw_id}/reserve", response_model=ProductWishlistModel
+    "/wishlist/{id}/products/{pw_id}", response_model=WishlistProductsModel
 )
-async def reserve_wishlist_product(
-    id: uuid.UUID, pw_id: uuid.UUID, pwm: ProductWishlistUpdateModel  # noqa: A002
+async def update_wishlist_product(
+    id: uuid.UUID, pw_id: uuid.UUID, pwm: WishlistProductsUpdateModel  # noqa: A002
 ):
-    """API for reserving existing product-wishlist record."""
-    # TODO: check wishlist owner
+    """API for updating product associated to a wishlist."""
     await Wishlist.get_or_404(id)
-    product_wishlist = await ProductWishlist.get_or_404(pw_id)
-    await product_wishlist.update(reserved=pwm.reserved).apply()
-    return product_wishlist.to_dict()
-
-
-@wishlist_product_router.put(
-    "/wishlists/{id}/products/{pw_id}/substitute", response_model=ProductWishlistModel
-)
-async def substitute_wishlist_product(
-    id: uuid.UUID, pw_id: uuid.UUID, pwm: ProductWishlistUpdateModel  # noqa: A002
-):
-    """API for set Product.substitutable existing product-wishlist record."""
-    # TODO: check wishlist owner
-    await Wishlist.get_or_404(id)
-    product_wishlist = await ProductWishlist.get_or_404(pw_id)
-    await product_wishlist.update(substitutable=pwm.substitutable).apply()
-    return product_wishlist.to_dict()
+    wishlist_product = await WishlistProducts.get_or_404(pw_id)
+    await wishlist_product.update(**pwm.non_null_attributes).apply()
+    return wishlist_product
 
 
 @wishlist_product_router.delete(
-    "/wishlists/{id}/products/{pw_id}", response_class=Response, status_code=204
+    "/wishlist/{id}/products/{pw_id}", response_class=Response, status_code=204
 )
 async def delete_wishlist_product(id: uuid.UUID, pw_id: uuid.UUID):  # noqa: A002
     """API for removing product from wishlist."""
-    # TODO: check wishlist owner
     await Wishlist.get_or_404(id)
-    product_wishlist = await ProductWishlist.get_or_404(pw_id)
-    await product_wishlist.delete()
+    wishlist_product = await WishlistProducts.get_or_404(pw_id)
+    await wishlist_product.delete()
