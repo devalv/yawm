@@ -10,12 +10,12 @@ from sqlalchemy.dialects.postgresql import UUID
 from starlette import status
 from starlette.exceptions import HTTPException
 
-from core.utils import JsonApiModel  # noqa: I100
+from core.utils import JsonApiGinoModel  # noqa: I100
 
 from . import db
 
 
-class Product(db.Model, JsonApiModel):
+class Product(db.Model, JsonApiGinoModel):
     """Yep, this is a Product with link to online store."""
 
     __tablename__ = "product"
@@ -25,7 +25,7 @@ class Product(db.Model, JsonApiModel):
     url = db.Column(db.Unicode(length=8000), nullable=False, unique=True)
 
 
-class Wishlist(db.Model, JsonApiModel):
+class Wishlist(db.Model, JsonApiGinoModel):
     """Wishlist is a user-bound list of Product(s)."""
 
     __tablename__ = "wishlist"
@@ -73,7 +73,7 @@ class Wishlist(db.Model, JsonApiModel):
         return rv
 
 
-class ProductWishlist(db.Model, JsonApiModel):
+class ProductWishlist(db.Model, JsonApiGinoModel):
     """Product and Wishlist connection.
 
     The absence of unique together indices (product_id, wishlist_id) has been

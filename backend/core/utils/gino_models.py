@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """Gino models extra utils."""
+
 from inspect import iscoroutinefunction
 
 
-class JsonApiModel:
-    """Extend version of Gino db Model."""
+class JsonApiGinoModel:
+    """Gino db Model extra utilities."""
 
     __attrs_to_skip = frozenset(("attributes", "id"))
     __crud_base_methods = frozenset(("update", "query", "create", "select", "delete"))
