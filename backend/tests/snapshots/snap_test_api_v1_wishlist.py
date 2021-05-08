@@ -14,15 +14,15 @@ snapshots["TestEmptyWishlist.test_empty_wishlist_full_update 1"] = {
 snapshots["TestEmptyWishlist.test_empty_wishlist_read 1"] = {"name": "test"}
 
 snapshots["TestEmptyWishlist.test_empty_wishlists 1"] = [
-    {"name": "test1"},
-    {"name": "test2"},
-    {"name": "test3"},
-    {"name": "test4"},
+    {"attributes": {"name": "test1"}, "type": "wishlist"},
+    {"attributes": {"name": "test2"}, "type": "wishlist"},
+    {"attributes": {"name": "test3"}, "type": "wishlist"},
+    {"attributes": {"name": "test4"}, "type": "wishlist"},
 ]
 
 snapshots["TestEmptyWishlist.test_empty_wishlists_paginator_limit 1"] = [
-    {"name": "test1"},
-    {"name": "test2"},
+    {"attributes": {"name": "test1"}, "type": "wishlist"},
+    {"attributes": {"name": "test2"}, "type": "wishlist"},
 ]
 
 snapshots["TestEmptyWishlist.test_wishlist_create 1"] = {"name": "Wishlist1"}
@@ -36,11 +36,11 @@ snapshots["TestProduct.test_product_full_update 1"] = {
 
 snapshots["TestProduct.test_product_paginator_limit 1"] = {
     "data": [
-        {"name": "test1"},
-        {"name": "test2"},
-        {"name": "test3"},
-        {"name": "test4"},
-        {"name": "test5"},
+        {"attributes": {"name": "test1"}, "type": "product"},
+        {"attributes": {"name": "test2"}, "type": "product"},
+        {"attributes": {"name": "test3"}, "type": "product"},
+        {"attributes": {"name": "test4"}, "type": "product"},
+        {"attributes": {"name": "test5"}, "type": "product"},
     ],
     "page": 0,
     "size": 5,
@@ -51,15 +51,15 @@ snapshots["TestProduct.test_product_read 1"] = {"name": "test", "url": "test-url
 
 snapshots["TestProduct.test_products 1"] = {
     "data": [
-        {"name": "test1"},
-        {"name": "test2"},
-        {"name": "test3"},
-        {"name": "test4"},
-        {"name": "test5"},
-        {"name": "test6"},
-        {"name": "test7"},
-        {"name": "test8"},
-        {"name": "test9"},
+        {"attributes": {"name": "test1"}, "type": "product"},
+        {"attributes": {"name": "test2"}, "type": "product"},
+        {"attributes": {"name": "test3"}, "type": "product"},
+        {"attributes": {"name": "test4"}, "type": "product"},
+        {"attributes": {"name": "test5"}, "type": "product"},
+        {"attributes": {"name": "test6"}, "type": "product"},
+        {"attributes": {"name": "test7"}, "type": "product"},
+        {"attributes": {"name": "test8"}, "type": "product"},
+        {"attributes": {"name": "test9"}, "type": "product"},
     ],
     "page": 0,
     "size": 50,

@@ -29,24 +29,24 @@ async def add_wishlist(wishlist: WishlistModel):
     return rv.to_dict()
 
 
-@wishlist_router.get("/wishlists/{uid}", response_model=WishlistModel)
-async def get_wishlist(uid: uuid.UUID):
+@wishlist_router.get("/wishlists/{id}", response_model=WishlistModel)
+async def get_wishlist(id: uuid.UUID):  # noqa: A002
     """API for getting a wishlist."""
-    wishlist = await Wishlist.get_or_404(uid)
+    wishlist = await Wishlist.get_or_404(id)
     return wishlist.to_dict()
 
 
-@wishlist_router.delete("/wishlists/{uid}", response_class=Response, status_code=204)
-async def delete_wishlist(uid: uuid.UUID):
+@wishlist_router.delete("/wishlists/{id}", response_class=Response, status_code=204)
+async def delete_wishlist(id: uuid.UUID):  # noqa: A002
     """API for deleting a wishlist."""
-    wishlist = await Wishlist.get_or_404(uid)
+    wishlist = await Wishlist.get_or_404(id)
     await wishlist.delete()
 
 
-@wishlist_router.put("/wishlists/{uid}", response_model=WishlistModel)
-async def update_wishlist(uid: uuid.UUID, wishlist: WishlistModel):
+@wishlist_router.put("/wishlists/{id}", response_model=WishlistModel)
+async def update_wishlist(id: uuid.UUID, wishlist: WishlistModel):  # noqa: A002
     """API for updating a wishlist."""
-    wishlist_obj = await Wishlist.get_or_404(uid)
+    wishlist_obj = await Wishlist.get_or_404(id)
     # remove empty field
     wishlist_dict = {k: v for k, v in wishlist.dict().items() if v is not None}
 
