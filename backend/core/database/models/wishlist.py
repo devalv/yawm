@@ -20,7 +20,7 @@ class Product(db.Model, JsonApiModel):
 
     __tablename__ = "product"
 
-    uid = db.Column(UUID(), default=uuid4, primary_key=True)
+    id = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A002, A003, VNE003
     name = db.Column(db.Unicode(length=255), nullable=False)
     url = db.Column(db.Unicode(length=8000), nullable=False, unique=True)
 
@@ -30,13 +30,13 @@ class Wishlist(db.Model, JsonApiModel):
 
     __tablename__ = "wishlist"
 
-    uid = db.Column(UUID(), default=uuid4, primary_key=True)
+    id = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A002, A003, VNE003
     name = db.Column(db.Unicode(length=255), nullable=False)
 
     @property
     def products(self):
         """Get products related to wishlist object."""
-        return ProductWishlist.query.where(ProductWishlist.wishlist_uid == self.uid)
+        return ProductWishlist.query.where(ProductWishlist.wishlist_id == self.id)
 
     # TODO: remove?
     # @property
@@ -62,11 +62,11 @@ class Wishlist(db.Model, JsonApiModel):
     #     )  # noqa: E800
     #     return filtered_products_paginator_query  # noqa: E800
 
-    async def add_product(self, product_uid: str):
+    async def add_product(self, product_id: str):
         """Add existing product to wishlist."""
         try:
             rv = await ProductWishlist.create(
-                product_uid=product_uid, wishlist_uid=self.uid
+                product_id=product_id, wishlist_id=self.id
             )
         except ForeignKeyViolationError:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Product is not found")
@@ -76,15 +76,15 @@ class Wishlist(db.Model, JsonApiModel):
 class ProductWishlist(db.Model, JsonApiModel):
     """Product and Wishlist connection.
 
-    The absence of unique together indices (product_uid, wishlist_uid) has been
+    The absence of unique together indices (product_id, wishlist_id) has been
     done intentionally to avoid product count.
     Example: 2 same products in 1 list should be 2 records.
     """
 
     __tablename__ = "product_wishlist"
 
-    uid = db.Column(UUID(), default=uuid4, primary_key=True)
-    product_uid = db.Column(UUID(), db.ForeignKey(Product.uid), nullable=False)
-    wishlist_uid = db.Column(UUID(), db.ForeignKey(Wishlist.uid), nullable=False)
+    id = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A002, A003, VNE003
+    product_id = db.Column(UUID(), db.ForeignKey(Product.id), nullable=False)
+    wishlist_id = db.Column(UUID(), db.ForeignKey(Wishlist.id), nullable=False)
     substitutable = db.Column(db.Boolean(), nullable=False, default=False)
     reserved = db.Column(db.Boolean(), nullable=False, default=False)

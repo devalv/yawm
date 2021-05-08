@@ -28,24 +28,24 @@ async def add_product(product: ProductModel):
     return rv.to_dict()
 
 
-@product_router.get("/products/{uid}", response_model=ProductModel)
-async def get_product(uid: uuid.UUID):
+@product_router.get("/products/{id}", response_model=ProductModel)
+async def get_product(id: uuid.UUID):  # noqa: A002
     """API for getting a product."""
-    product = await Product.get_or_404(uid)
+    product = await Product.get_or_404(id)
     return product.to_dict()
 
 
-@product_router.delete("/products/{uid}", response_class=Response, status_code=204)
-async def delete_product(uid: uuid.UUID):
+@product_router.delete("/products/{id}", response_class=Response, status_code=204)
+async def delete_product(id: uuid.UUID):  # noqa: A002
     """API for deleting a product."""
-    product = await Product.get_or_404(uid)
+    product = await Product.get_or_404(id)
     await product.delete()
 
 
-@product_router.put("/products/{uid}", response_model=ProductModel)
-async def update_product(uid: uuid.UUID, product: ProductModel):
+@product_router.put("/products/{id}", response_model=ProductModel)
+async def update_product(id: uuid.UUID, product: ProductModel):  # noqa: A002
     """API for updating a product."""
-    product_obj = await Product.get_or_404(uid)
+    product_obj = await Product.get_or_404(id)
 
     # remove empty field
     product_dict = {k: v for k, v in product.dict().items() if v is not None}
