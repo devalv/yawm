@@ -4,6 +4,7 @@
 from .fastapi_pagination import JsonApiPage
 from .gino_models import JsonApiGinoModel
 from .pydantic_models import (
+    JsonApiDataPydanticModel,
     JsonApiPydanticCreateBaseModel,
     JsonApiPydanticModel,
     JsonApiPydanticUpdateBaseModel,
@@ -15,4 +16,5 @@ __all__ = [
     "JsonApiPydanticModel",
     "JsonApiPydanticCreateBaseModel",
     "JsonApiPydanticUpdateBaseModel",
+    "JsonApiDataPydanticModel",
 ]
