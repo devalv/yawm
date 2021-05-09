@@ -7,7 +7,12 @@ from .product import (
     ProductDataUpdateModel,
     ProductModel,
 )
-from .wishlist import WishlistCreateModel, WishlistModel, WishlistUpdateModel
+from .wishlist import (
+    WishlistDataCreateModel,
+    WishlistDataModel,
+    WishlistDataUpdateModel,
+    WishlistModel,
+)
 from .wishlist_products import (
     WishlistProductsCreateModel,
     WishlistProductsModel,
@@ -20,8 +25,9 @@ __all__ = [
     "ProductDataUpdateModel",
     "ProductDataModel",
     "WishlistModel",
-    "WishlistCreateModel",
-    "WishlistUpdateModel",
+    "WishlistDataModel",
+    "WishlistDataCreateModel",
+    "WishlistDataUpdateModel",
     "WishlistProductsModel",
     "WishlistProductsCreateModel",
     "WishlistProductsUpdateModel",
