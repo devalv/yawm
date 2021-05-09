@@ -63,7 +63,11 @@ class WishlistProducts(db.Model, JsonApiGinoModel):
     __tablename__ = "wishlist_products"
 
     id = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A002, A003, VNE003
-    wishlist_id = db.Column(UUID(), db.ForeignKey(Wishlist.id), nullable=False)
-    product_id = db.Column(UUID(), db.ForeignKey(Product.id), nullable=False)
+    wishlist_id = db.Column(
+        UUID(), db.ForeignKey(Wishlist.id, ondelete="CASCADE"), nullable=False
+    )
+    product_id = db.Column(
+        UUID(), db.ForeignKey(Product.id, ondelete="CASCADE"), nullable=False
+    )
     substitutable = db.Column(db.Boolean(), nullable=False, default=False)
     reserved = db.Column(db.Boolean(), nullable=False, default=False)
