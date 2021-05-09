@@ -9,7 +9,12 @@ from fastapi_pagination.ext.gino import paginate
 
 
 from core.database.models.wishlist import Wishlist  # noqa: I100
-from core.schemas import WishlistCreateModel, WishlistModel, WishlistUpdateModel
+from core.schemas import (
+    WishlistDataCreateModel,
+    WishlistDataModel,
+    WishlistDataUpdateModel,
+    WishlistModel,
+)
 from core.utils import JsonApiPage  # noqa: I100
 
 wishlist_router = APIRouter(prefix="/api/v1", redirect_slashes=True, tags=["wishlist"])
@@ -21,23 +26,25 @@ async def list_wishlist():
     return await paginate(Wishlist.query)
 
 
-@wishlist_router.get("/wishlist/{id}", response_model=WishlistModel)
+@wishlist_router.get("/wishlist/{id}", response_model=WishlistDataModel)
 async def get_wishlist(id: uuid.UUID):  # noqa: A002
     """API for getting a wishlist."""
     return await Wishlist.get_or_404(id)
 
 
-@wishlist_router.post("/wishlist", response_model=WishlistModel)
-async def create_wishlist(wishlist: WishlistCreateModel):
+@wishlist_router.post("/wishlist", response_model=WishlistDataModel)
+async def create_wishlist(wishlist: WishlistDataCreateModel):
     """API for creating a new wishlist."""
-    return await Wishlist.create(**wishlist.validated_attributes)
+    return await Wishlist.create(**wishlist.data.validated_attributes)
 
 
-@wishlist_router.put("/wishlist/{id}", response_model=WishlistModel)
-async def update_wishlist(id: uuid.UUID, wishlist: WishlistUpdateModel):  # noqa: A002
+@wishlist_router.put("/wishlist/{id}", response_model=WishlistDataModel)
+async def update_wishlist(
+    id: uuid.UUID, wishlist: WishlistDataUpdateModel  # noqa: A002
+):
     """API for updating a wishlist."""
     wishlist_obj = await Wishlist.get_or_404(id)
-    await wishlist_obj.update(**wishlist.non_null_attributes).apply()
+    await wishlist_obj.update(**wishlist.data.non_null_attributes).apply()
     return wishlist_obj
 
 

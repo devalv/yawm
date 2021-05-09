@@ -30,8 +30,7 @@ snapshots["TestEmptyWishlist.test_empty_wishlists_paginator_limit 1"] = [
 ]
 
 snapshots["TestEmptyWishlist.test_wishlist_create 1"] = {
-    "attributes": {"name": "Wishlist1"},
-    "type": "wishlist",
+    "data": {"attributes": {"name": "Wishlist1"}, "type": "wishlist"}
 }
 
 snapshots["TestProduct.test_product_create 1"] = {

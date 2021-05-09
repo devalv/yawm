@@ -173,14 +173,15 @@ class TestEmptyWishlist:
     @pytest.mark.api_base
     async def test_wishlist_create(self, snapshot, api_client):
         resp = await api_client.post(
-            self.API_URL, json={"attributes": {"name": "Wishlist1"}}
+            self.API_URL, json={"data": {"attributes": {"name": "Wishlist1"}}}
         )
         assert resp.status_code == 200
-        resp_data = resp.json()
+        resp_json_data = resp.json()
+        resp_data = resp_json_data["data"]
         assert "id" in resp_data
         assert "type" in resp_data
         resp_data.pop("id", None)
-        snapshot.assert_match(resp_data)
+        snapshot.assert_match(resp_json_data)
 
     @pytest.mark.api_base
     async def test_empty_wishlist_delete(self, api_client, one_empty_wishlist):
@@ -193,15 +194,15 @@ class TestEmptyWishlist:
     async def test_empty_wishlists(self, snapshot, api_client, _four_empty_wishlists):
         resp = await api_client.get(self.API_URL)
         assert resp.status_code == 200
-        resp_data = resp.json()
-        assert isinstance(resp_data, dict)
-        assert "id" in resp_data
-        assert "type" in resp_data
-        items = resp_data["data"]
-        count = resp_data["total"]
+        resp_json_data = resp.json()
+        assert isinstance(resp_json_data, dict)
+        items = resp_json_data["data"]
+        count = resp_json_data["total"]
         assert count == 4
         # remove unique data from fetch
         for resp_product in items:
+            assert "id" in resp_product
+            assert "type" in resp_product
             resp_product.pop("id", None)
         snapshot.assert_match(items)
 
@@ -215,8 +216,6 @@ class TestEmptyWishlist:
         )
         assert resp.status_code == 200
         resp_data = resp.json()
-        assert "id" in resp_data
-        assert "type" in resp_data
         assert isinstance(resp_data, dict)
         items = resp_data["data"]
         size = resp_data["size"]
@@ -225,6 +224,8 @@ class TestEmptyWishlist:
         assert total == 4
         # remove unique data from fetch
         for resp_product in items:
+            assert "id" in resp_product
+            assert "type" in resp_product
             resp_product.pop("id", None)
         snapshot.assert_match(items)
 
@@ -232,7 +233,8 @@ class TestEmptyWishlist:
     async def test_empty_wishlist_read(self, snapshot, api_client, one_empty_wishlist):
         resp = await api_client.get(self.API_URL + f"/{one_empty_wishlist.id}")
         assert resp.status_code == 200
-        resp_data = resp.json()
+        resp_json_data = resp.json()
+        resp_data = resp_json_data["data"]
         assert "id" in resp_data
         assert "type" in resp_data
         resp_data.pop("id", None)
@@ -244,10 +246,11 @@ class TestEmptyWishlist:
     ):
         resp = await api_client.put(
             f"{self.API_URL}/{one_empty_wishlist.id}",
-            json={"attributes": {"name": "test-updated"}},
+            json={"data": {"attributes": {"name": "test-updated"}}},
         )
         assert resp.status_code == 200
-        resp_data = resp.json()
+        resp_json_data = resp.json()
+        resp_data = resp_json_data["data"]
         assert "id" in resp_data
         assert "type" in resp_data
         resp_data.pop("id", None)

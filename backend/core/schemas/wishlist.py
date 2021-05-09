@@ -4,6 +4,9 @@
 from pydantic import BaseModel
 
 from core.utils import (  # noqa: I100
+    JsonApiDataPydanticCreateBaseModel,
+    JsonApiDataPydanticModel,
+    JsonApiDataPydanticUpdateBaseModel,
     JsonApiPydanticCreateBaseModel,
     JsonApiPydanticModel,
     JsonApiPydanticUpdateBaseModel,
@@ -28,6 +31,12 @@ class WishlistModel(JsonApiPydanticModel):
     attributes: WishlistAttributesModel
 
 
+class WishlistDataModel(JsonApiDataPydanticModel):
+    """Wishlist data model."""
+
+    data: WishlistModel
+
+
 class WishlistCreateModel(JsonApiPydanticCreateBaseModel):
     """Wishlist creation serializer."""
 
@@ -35,8 +44,20 @@ class WishlistCreateModel(JsonApiPydanticCreateBaseModel):
     attributes: WishlistAttributesModel
 
 
+class WishlistDataCreateModel(JsonApiDataPydanticCreateBaseModel):
+    """Wishlist data creation serializer."""
+
+    data: WishlistCreateModel
+
+
 class WishlistUpdateModel(JsonApiPydanticUpdateBaseModel):
     """Wishlist update serializer."""
 
     type: str = "wishlist"  # noqa: A003, VNE003
     attributes: WishlistUpdateAttributesModel
+
+
+class WishlistDataUpdateModel(JsonApiDataPydanticUpdateBaseModel):
+    """Wishlist data update serializer."""
+
+    data: WishlistUpdateModel
