@@ -2,10 +2,10 @@
 """Pydantic models."""
 
 from .product import (
-    ProductCreateModel,
+    ProductDataCreateModel,
     ProductDataModel,
+    ProductDataUpdateModel,
     ProductModel,
-    ProductUpdateModel,
 )
 from .wishlist import WishlistCreateModel, WishlistModel, WishlistUpdateModel
 from .wishlist_products import (
@@ -16,8 +16,8 @@ from .wishlist_products import (
 
 __all__ = [
     "ProductModel",
-    "ProductCreateModel",
-    "ProductUpdateModel",
+    "ProductDataCreateModel",
+    "ProductDataUpdateModel",
     "ProductDataModel",
     "WishlistModel",
     "WishlistCreateModel",
