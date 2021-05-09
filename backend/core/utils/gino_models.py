@@ -7,7 +7,7 @@ from inspect import iscoroutinefunction
 class JsonApiGinoModel:
     """Gino db Model extra utilities."""
 
-    __attrs_to_skip = frozenset(("attributes", "id"))
+    __attrs_to_skip = frozenset(("attributes", "id", "data"))
     __crud_base_methods = frozenset(("update", "query", "create", "select", "delete"))
 
     @property
@@ -56,3 +56,12 @@ class JsonApiGinoModel:
     def type(self):  # noqa: A003
         """JSON:API spec type should be a db model name."""
         return self.__tablename__
+
+    @property
+    def data(self):
+        """Object data for pydantic models.
+
+        JSON:API 1.0 specification says that we must provide
+        `data` key with `id`, `type` and `attributes`.
+        """
+        return {"id": self.id, "type": self.type, "attributes": self.attributes}
