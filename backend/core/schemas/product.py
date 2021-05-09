@@ -6,6 +6,9 @@ from typing import Optional
 from pydantic import BaseModel, HttpUrl
 
 from core.utils import (  # noqa: I100
+    JsonApiDataPydanticCreateBaseModel,
+    JsonApiDataPydanticModel,
+    JsonApiDataPydanticUpdateBaseModel,
     JsonApiPydanticCreateBaseModel,
     JsonApiPydanticModel,
     JsonApiPydanticUpdateBaseModel,
@@ -33,6 +36,12 @@ class ProductModel(JsonApiPydanticModel):
     attributes: ProductAttributesModel
 
 
+class ProductDataModel(JsonApiDataPydanticModel):
+    """Product data model."""
+
+    data: ProductModel
+
+
 class ProductCreateModel(JsonApiPydanticCreateBaseModel):
     """Product creation serializer."""
 
@@ -40,8 +49,20 @@ class ProductCreateModel(JsonApiPydanticCreateBaseModel):
     attributes: ProductAttributesModel
 
 
+class ProductDataCreateModel(JsonApiDataPydanticCreateBaseModel):
+    """Product data creation serializer."""
+
+    data: ProductCreateModel
+
+
 class ProductUpdateModel(JsonApiPydanticUpdateBaseModel):
     """Product update serializer."""
 
     type: str = "product"  # noqa: A003, VNE003
     attributes: ProductUpdateAttributesModel
+
+
+class ProductDataUpdateModel(JsonApiDataPydanticUpdateBaseModel):
+    """Project data update serializer."""
+
+    data: ProductUpdateModel

@@ -35,13 +35,17 @@ snapshots["TestEmptyWishlist.test_wishlist_create 1"] = {
 }
 
 snapshots["TestProduct.test_product_create 1"] = {
-    "attributes": {"name": "Product1", "url": "https://devyatkin.dev"},
-    "type": "product",
+    "data": {
+        "attributes": {"name": "Product1", "url": "https://devyatkin.dev"},
+        "type": "product",
+    }
 }
 
 snapshots["TestProduct.test_product_full_update 1"] = {
-    "attributes": {"name": "test-updated", "url": "https://ya.ru"},
-    "type": "product",
+    "data": {
+        "attributes": {"name": "test-updated", "url": "https://ya.ru"},
+        "type": "product",
+    }
 }
 
 snapshots["TestProduct.test_product_paginator_limit 1"] = {
@@ -73,13 +77,20 @@ snapshots["TestProduct.test_product_paginator_limit 1"] = {
 }
 
 snapshots["TestProduct.test_product_partial_update 1"] = {
-    "attributes": {"name": "partial-updated-name", "url": "https://devyatkin.dev/1"},
-    "type": "product",
+    "data": {
+        "attributes": {
+            "name": "partial-updated-name",
+            "url": "https://devyatkin.dev/1",
+        },
+        "type": "product",
+    }
 }
 
 snapshots["TestProduct.test_product_read 1"] = {
-    "attributes": {"name": "test", "url": "https://devyatkin.dev/1"},
-    "type": "product",
+    "data": {
+        "attributes": {"name": "test", "url": "https://devyatkin.dev/1"},
+        "type": "product",
+    }
 }
 
 snapshots["TestProduct.test_products 1"] = {

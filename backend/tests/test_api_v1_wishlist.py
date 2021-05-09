@@ -73,12 +73,19 @@ class TestProduct:
     async def test_product_create(self, snapshot, api_client):
         resp = await api_client.post(
             self.API_URL,
-            json={"attributes": {"name": "Product1", "url": "https://devyatkin.dev"}},
+            json={
+                "data": {
+                    "attributes": {"name": "Product1", "url": "https://devyatkin.dev"}
+                }
+            },
         )
         assert resp.status_code == 200
-        resp_data = resp.json()
+        resp_json_data = resp.json()
+        resp_data = resp_json_data["data"]
+        assert "id" in resp_data
+        assert "type" in resp_data
         resp_data.pop("id", None)
-        snapshot.assert_match(resp_data)
+        snapshot.assert_match(resp_json_data)
 
     @pytest.mark.api_base
     async def test_products(self, snapshot, api_client, nine_products):
@@ -89,6 +96,8 @@ class TestProduct:
         # removing product id from items
         resp_products = resp_data["data"]
         for resp_product in resp_products:
+            assert "id" in resp_product
+            assert "type" in resp_product
             resp_product.pop("id", None)
         snapshot.assert_match(resp_data)
 
@@ -96,9 +105,12 @@ class TestProduct:
     async def test_product_read(self, snapshot, api_client, one_product):
         resp = await api_client.get(f"{self.API_URL}/{one_product.id}")
         assert resp.status_code == 200
-        resp_data = resp.json()
+        resp_json_data = resp.json()
+        resp_data = resp_json_data["data"]
+        assert "id" in resp_data
+        assert "type" in resp_data
         resp_data.pop("id", None)
-        snapshot.assert_match(resp_data)
+        snapshot.assert_match(resp_json_data)
 
     @pytest.mark.api_base
     async def test_product_delete(self, api_client, one_product):
@@ -111,22 +123,30 @@ class TestProduct:
     async def test_product_full_update(self, snapshot, api_client, one_product):
         resp = await api_client.put(
             f"{self.API_URL}/{one_product.id}",
-            json={"attributes": {"name": "test-updated", "url": "https://ya.ru"}},
+            json={
+                "data": {"attributes": {"name": "test-updated", "url": "https://ya.ru"}}
+            },
         )
         assert resp.status_code == 200
-        resp_data = resp.json()
+        resp_json_data = resp.json()
+        resp_data = resp_json_data["data"]
+        assert "id" in resp_data
+        assert "type" in resp_data
         resp_data.pop("id", None)
-        snapshot.assert_match(resp_data)
+        snapshot.assert_match(resp_json_data)
 
     async def test_product_partial_update(self, snapshot, api_client, one_product):
         resp = await api_client.put(
             f"{self.API_URL}/{one_product.id}",
-            json={"attributes": {"name": "partial-updated-name"}},
+            json={"data": {"attributes": {"name": "partial-updated-name"}}},
         )
         assert resp.status_code == 200
-        resp_data = resp.json()
+        resp_json_data = resp.json()
+        resp_data = resp_json_data["data"]
+        assert "id" in resp_data
+        assert "type" in resp_data
         resp_data.pop("id", None)
-        snapshot.assert_match(resp_data)
+        snapshot.assert_match(resp_json_data)
 
     @pytest.mark.api_base
     async def test_product_paginator_limit(self, snapshot, api_client, nine_products):
@@ -135,12 +155,14 @@ class TestProduct:
             self.API_URL, query_string=dict(size=paginator_limit)
         )
         assert resp.status_code == 200
-        resp_data = resp.json()
-        products = resp_data["data"]
-        assert len(products) == paginator_limit
-        for resp_product in products:
+        resp_json_data = resp.json()
+        resp_data = resp_json_data["data"]
+        assert len(resp_data) == paginator_limit
+        for resp_product in resp_data:
+            assert "id" in resp_product
+            assert "type" in resp_product
             resp_product.pop("id", None)
-        snapshot.assert_match(resp_data)
+        snapshot.assert_match(resp_json_data)
 
 
 class TestEmptyWishlist:
@@ -156,6 +178,7 @@ class TestEmptyWishlist:
         assert resp.status_code == 200
         resp_data = resp.json()
         assert "id" in resp_data
+        assert "type" in resp_data
         resp_data.pop("id", None)
         snapshot.assert_match(resp_data)
 
@@ -172,6 +195,8 @@ class TestEmptyWishlist:
         assert resp.status_code == 200
         resp_data = resp.json()
         assert isinstance(resp_data, dict)
+        assert "id" in resp_data
+        assert "type" in resp_data
         items = resp_data["data"]
         count = resp_data["total"]
         assert count == 4
@@ -190,6 +215,8 @@ class TestEmptyWishlist:
         )
         assert resp.status_code == 200
         resp_data = resp.json()
+        assert "id" in resp_data
+        assert "type" in resp_data
         assert isinstance(resp_data, dict)
         items = resp_data["data"]
         size = resp_data["size"]
@@ -206,6 +233,8 @@ class TestEmptyWishlist:
         resp = await api_client.get(self.API_URL + f"/{one_empty_wishlist.id}")
         assert resp.status_code == 200
         resp_data = resp.json()
+        assert "id" in resp_data
+        assert "type" in resp_data
         resp_data.pop("id", None)
         snapshot.assert_match(resp_data)
 
@@ -219,6 +248,8 @@ class TestEmptyWishlist:
         )
         assert resp.status_code == 200
         resp_data = resp.json()
+        assert "id" in resp_data
+        assert "type" in resp_data
         resp_data.pop("id", None)
         snapshot.assert_match(resp_data)
 
@@ -254,6 +285,7 @@ class TestWishlist:
             assert resp.status_code == 200
             resp_data = resp.json()
             assert "id" in resp_data
+            assert "type" in resp_data
             resp_data.pop("id", None)
             assert resp_data == expected_data
 
@@ -264,6 +296,8 @@ class TestWishlist:
 
         assert products_resp.status_code == 200
         product_resp_data = products_resp.json()
+        assert "id" in product_resp_data
+        assert "type" in product_resp_data
         assert isinstance(product_resp_data, dict)
         total = product_resp_data["total"]
         assert total == 9
@@ -285,6 +319,8 @@ class TestWishlist:
         assert products_resp.status_code == 200
         product_resp_data = products_resp.json()
         assert isinstance(product_resp_data, dict)
+        assert "id" in product_resp_data
+        assert "type" in product_resp_data
         total = product_resp_data["total"]
         assert total == 0
 
@@ -321,6 +357,8 @@ class TestWishlist:
         )
         assert products_resp.status_code == 200
         product_resp_data = products_resp.json()
+        assert "id" in product_resp_data
+        assert "type" in product_resp_data
         assert isinstance(product_resp_data, dict)
         total = product_resp_data["total"]
         assert total == 1
@@ -336,6 +374,8 @@ class TestWishlist:
         )
         assert products_resp.status_code == 200
         product_resp_data = products_resp.json()
+        assert "id" in product_resp_data
+        assert "type" in product_resp_data
         assert isinstance(product_resp_data, dict)
         size = product_resp_data["size"]
         assert size == paginator_limit
@@ -372,7 +412,10 @@ class TestWishlist:
             json={"attributes": {"reserved": True}},
         )
         assert resp.status_code == 200
-        assert resp.json()["attributes"]["reserved"] is True
+        resp_data = resp.json()
+        assert "id" in resp_data
+        assert "type" in resp_data
+        assert resp_data["attributes"]["reserved"] is True
 
     @pytest.mark.api_base
     async def test_substitute_wishlist_product(self, api_client, one_product_wishlist):
@@ -382,7 +425,10 @@ class TestWishlist:
             json={"attributes": {"substitutable": True}},
         )
         assert resp.status_code == 200
-        assert resp.json()["attributes"]["substitutable"]
+        resp_data = resp.json()
+        assert "id" in resp_data
+        assert "type" in resp_data
+        assert resp_data["attributes"]["substitutable"]
 
     @pytest.mark.api_base
     async def test_update_wishlist_product(self, api_client, one_product_wishlist):
@@ -392,8 +438,11 @@ class TestWishlist:
             json={"attributes": {"substitutable": True, "reserved": True}},
         )
         assert resp.status_code == 200
-        assert resp.json()["attributes"]["substitutable"] is True
-        assert resp.json()["attributes"]["reserved"] is True
+        resp_data = resp.json()
+        assert "id" in resp_data
+        assert "type" in resp_data
+        assert resp_data["attributes"]["substitutable"] is True
+        assert resp_data["attributes"]["reserved"] is True
 
     async def test_reserve_fake_wishlist_product(
         self, api_client, one_product_wishlist
