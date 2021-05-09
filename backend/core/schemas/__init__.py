@@ -14,9 +14,10 @@ from .wishlist import (
     WishlistModel,
 )
 from .wishlist_products import (
-    WishlistProductsCreateModel,
+    WishlistProductsDataCreateModel,
+    WishlistProductsDataModel,
+    WishlistProductsDataUpdateModel,
     WishlistProductsModel,
-    WishlistProductsUpdateModel,
 )
 
 __all__ = [
@@ -29,6 +30,7 @@ __all__ = [
     "WishlistDataCreateModel",
     "WishlistDataUpdateModel",
     "WishlistProductsModel",
-    "WishlistProductsCreateModel",
-    "WishlistProductsUpdateModel",
+    "WishlistProductsDataModel",
+    "WishlistProductsDataCreateModel",
+    "WishlistProductsDataUpdateModel",
 ]

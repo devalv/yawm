@@ -8,10 +8,11 @@ from fastapi import APIRouter, Response
 from fastapi_pagination.ext.gino import paginate
 
 from core.database.models.wishlist import Wishlist, WishlistProducts  # noqa: I100
-from core.schemas import (
-    WishlistProductsCreateModel,
+from core.schemas import (  # noqa: I100
+    WishlistProductsDataCreateModel,
+    WishlistProductsDataModel,
+    WishlistProductsDataUpdateModel,
     WishlistProductsModel,
-    WishlistProductsUpdateModel,
 )
 from core.utils import JsonApiPage  # noqa: I100
 
@@ -30,27 +31,27 @@ async def list_wishlist_products(id: uuid.UUID):  # noqa: A002
 
 
 @wishlist_product_router.post(
-    "/wishlist/{id}/products", response_model=WishlistProductsModel
+    "/wishlist/{id}/products", response_model=WishlistProductsDataModel
 )
 async def create_wishlist_product(
-    id: uuid.UUID, product: WishlistProductsCreateModel  # noqa: A002
+    id: uuid.UUID, product: WishlistProductsDataCreateModel  # noqa: A002
 ):
     """API for adding existing product to a existing wishlist."""
     # TODO: add many products
     wishlist = await Wishlist.get_or_404(id)
-    return await wishlist.add_product(**product.validated_attributes)
+    return await wishlist.add_product(**product.data.validated_attributes)
 
 
 @wishlist_product_router.put(
-    "/wishlist/{id}/products/{pw_id}", response_model=WishlistProductsModel
+    "/wishlist/{id}/products/{pw_id}", response_model=WishlistProductsDataModel
 )
 async def update_wishlist_product(
-    id: uuid.UUID, pw_id: uuid.UUID, pwm: WishlistProductsUpdateModel  # noqa: A002
+    id: uuid.UUID, pw_id: uuid.UUID, pwm: WishlistProductsDataUpdateModel  # noqa: A002
 ):
     """API for updating product associated to a wishlist."""
     await Wishlist.get_or_404(id)
     wishlist_product = await WishlistProducts.get_or_404(pw_id)
-    await wishlist_product.update(**pwm.non_null_attributes).apply()
+    await wishlist_product.update(**pwm.data.non_null_attributes).apply()
     return wishlist_product
 
 

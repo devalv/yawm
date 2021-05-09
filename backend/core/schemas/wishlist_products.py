@@ -7,6 +7,9 @@ from typing import Optional
 from pydantic import BaseModel
 
 from core.utils import (  # noqa: I100
+    JsonApiDataPydanticCreateBaseModel,
+    JsonApiDataPydanticModel,
+    JsonApiDataPydanticUpdateBaseModel,
     JsonApiPydanticCreateBaseModel,
     JsonApiPydanticModel,
     JsonApiPydanticUpdateBaseModel,
@@ -44,6 +47,12 @@ class WishlistProductsModel(JsonApiPydanticModel):
     attributes: WishlistProductsAttributesModel
 
 
+class WishlistProductsDataModel(JsonApiDataPydanticModel):
+    """Wishlist products data model."""
+
+    data: WishlistProductsModel
+
+
 class WishlistProductsCreateModel(JsonApiPydanticCreateBaseModel):
     """Wishlist products creation serializer."""
 
@@ -51,8 +60,20 @@ class WishlistProductsCreateModel(JsonApiPydanticCreateBaseModel):
     attributes: WishlistProductsCreateAttributesModel
 
 
+class WishlistProductsDataCreateModel(JsonApiDataPydanticCreateBaseModel):
+    """Wishlist products data creation serializer."""
+
+    data: WishlistProductsCreateModel
+
+
 class WishlistProductsUpdateModel(JsonApiPydanticUpdateBaseModel):
     """Wishlist products update serializer."""
 
     type: str = "wishlist_products"  # noqa: A003, VNE003
     attributes: WishlistProductsUpdateAttributesModel
+
+
+class WishlistProductsDataUpdateModel(JsonApiDataPydanticUpdateBaseModel):
+    """Wishlist products data update serializer."""
+
+    data: WishlistProductsUpdateModel
