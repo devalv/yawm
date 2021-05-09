@@ -42,18 +42,28 @@ class JsonApiPydanticCreateBaseModel(BaseModel):
 
         return result
 
-    class Config:  # noqa: D106
-        orm_mode = True
+
+class JsonApiDataPydanticCreateBaseModel(BaseModel):
+    """Pydantic JSON:API data creation model."""
+
+    data: JsonApiPydanticCreateBaseModel
 
 
 class JsonApiPydanticUpdateBaseModel(JsonApiPydanticCreateBaseModel):
     """Pydantic update model."""
 
 
+class JsonApiDataPydanticUpdateBaseModel(JsonApiDataPydanticCreateBaseModel):
+    """Pydantic JSON:API data update model."""
+
+
 class JsonApiPydanticModel(JsonApiPydanticCreateBaseModel):
     """JSON:API says that `data` key must be on a response."""
 
     id: uuid.UUID  # noqa: A002, A003, VNE003
+
+    class Config:  # noqa: D106
+        orm_mode = True
 
 
 class JsonApiDataPydanticModel(BaseModel):
