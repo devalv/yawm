@@ -331,12 +331,15 @@ class TestWishlist:
     async def test_delete_product_wishlist(
         self, snapshot, api_client, wishlist_products_1
     ):
+        # check products count
+        products_resp = await api_client.get(f"{API_URL_PREFIX}/product")
+        assert products_resp.status_code == 200
+        assert products_resp.json()["total"] == 1
+        # delete 1 wishlist products
         resp = await api_client.delete(
             f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}"  # noqa: E501
         )
-
         assert resp.status_code == 204
-
         # check all products in wishlist
         products_resp = await api_client.get(
             f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products"
@@ -346,6 +349,10 @@ class TestWishlist:
         assert isinstance(product_resp_data, dict)
         total = product_resp_data["total"]
         assert total == 0
+        # check products count
+        products_resp = await api_client.get(f"{API_URL_PREFIX}/product")
+        assert products_resp.status_code == 200
+        assert products_resp.json()["total"] == 1
 
     @pytest.mark.skip(reason="not implemented yet.")
     async def test_delete_wishlist_with_products(self, api_client, wishlist_products_1):
