@@ -288,11 +288,6 @@ class TestWishlist:
 
     @pytest.mark.api_base
     async def test_add_product_wishlist(self, api_client, ew_1, products_9):
-        """
-
-        :type nine_products: list
-        """
-
         for i, product in enumerate(products_9):
             insert_data = {
                 "data": {
@@ -352,29 +347,62 @@ class TestWishlist:
         total = product_resp_data["total"]
         assert total == 0
 
-    @pytest.mark.skip(reason="not implemented yet.")
+    @pytest.mark.api_full
     async def test_delete_wishlist_with_products(self, api_client, wishlist_products_1):
-        # TODO: maybe make validation error?
+        # check that wpr have 1 record
+        wpr = await api_client.get(
+            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products"
+        )
+        assert wpr.json()["total"] == 1
+        # delete wishlist assigned to wpr
         resp = await api_client.delete(
             f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}"
         )
         assert resp.status_code == 204
+        # check that wishlist deleted
         new_resp = await api_client.get(
             f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}"
         )
         assert new_resp.status_code == 404
+        # check that wpr deleted too
+        wpr_2 = await api_client.get(
+            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products"
+        )
+        assert wpr_2.status_code == 404
 
-    @pytest.mark.skip(reason="not implemented yet.")
-    async def test_delete_product_in_wishlist(self, api_client, wishlist_products_1):
-        # TODO: maybe make validation error?
+    @pytest.mark.api_full
+    async def test_delete_product_in_wishlist(self, api_client, wishlist_products_9):
+        # check that we have 9 products
+        initial_products = await api_client.get(f"{API_URL_PREFIX}/product")
+        initial_products_total = initial_products.json()["total"]
+        initial_products_total == 9
+        #
+        first_product = wishlist_products_9[0]
+        # check that wpr exists
+        wpr = await api_client.get(
+            f"{API_URL_PREFIX}/wishlist/{first_product.wishlist_id}/products"
+        )
+        assert wpr.json()["total"] == 9
+        # delete one of product
+
         resp = await api_client.delete(
-            f"{API_URL_PREFIX}/products/{wishlist_products_1.product_id}"
+            f"{API_URL_PREFIX}/product/{first_product.product_id}"
         )
         assert resp.status_code == 204
+        # check that record deleted
         new_resp = await api_client.get(
-            f"{API_URL_PREFIX}/products/{wishlist_products_1.product_id}"
+            f"{API_URL_PREFIX}/product/{first_product.product_id}"
         )
         assert new_resp.status_code == 404
+        # check that now we have 8 products
+        reduced_products = await api_client.get(f"{API_URL_PREFIX}/product")
+        reduced_products_total = reduced_products.json()["total"]
+        reduced_products_total == 8
+        # check that wpr exists
+        wpr_2 = await api_client.get(
+            f"{API_URL_PREFIX}/wishlist/{first_product.wishlist_id}/products"
+        )
+        assert wpr_2.json()["total"] == 8
 
     @pytest.mark.api_base
     async def test_wishlist_products_list(self, api_client, wishlist_products_1):
