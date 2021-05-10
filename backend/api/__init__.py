@@ -7,7 +7,12 @@ from fastapi import FastAPI
 from fastapi_pagination import add_pagination
 
 from core.database.models import db  # noqa: I100
-from .v1 import product_router, wishlist_product_router, wishlist_router  # noqa: I201
+from .v1 import (  # noqa: I201
+    product_router,
+    utils_router,
+    wishlist_product_router,
+    wishlist_router,
+)
 
 
 def get_app():
@@ -22,6 +27,7 @@ def configure(application: FastAPI):
     application.include_router(wishlist_router)
     application.include_router(product_router)
     application.include_router(wishlist_product_router)
+    application.include_router(utils_router)
 
 
 app = get_app()
