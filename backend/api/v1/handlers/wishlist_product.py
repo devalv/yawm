@@ -37,7 +37,6 @@ async def create_wishlist_product(
     id: uuid.UUID, product: WishlistProductsDataCreateModel  # noqa: A002
 ):
     """API for adding existing product to a existing wishlist."""
-    # TODO: add many products
     wishlist = await Wishlist.get_or_404(id)
     return await wishlist.add_product(**product.data.validated_attributes)
 
