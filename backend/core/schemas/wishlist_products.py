@@ -19,8 +19,10 @@ from core.utils import (  # noqa: I100
 class WishlistProductsAttributesModel(BaseModel):
     """Wishlist products attributes serializer."""
 
-    wishlist_id: uuid.UUID  # TODO: JSON:API related?
-    product_id: uuid.UUID  # TODO: JSON:API related?
+    # TODO: JSON:API related?
+
+    wishlist_id: uuid.UUID
+    product_id: uuid.UUID
     reserved: bool
     substitutable: bool
 
@@ -28,7 +30,9 @@ class WishlistProductsAttributesModel(BaseModel):
 class WishlistProductsCreateAttributesModel(BaseModel):
     """Wishlist products create attributes serializer."""
 
-    product_id: uuid.UUID  # TODO: JSON:API related?
+    # TODO: JSON:API related?
+
+    product_id: uuid.UUID
     reserved: bool
     substitutable: bool
 
@@ -36,7 +40,9 @@ class WishlistProductsCreateAttributesModel(BaseModel):
 class WishlistProductsUpdateAttributesModel(BaseModel):
     """Wishlist products update attributes serializer."""
 
-    product_id: Optional[uuid.UUID]  # TODO: JSON:API related?
+    # TODO: JSON:API related?
+
+    product_id: Optional[uuid.UUID]
     reserved: Optional[bool]
     substitutable: Optional[bool]
 
