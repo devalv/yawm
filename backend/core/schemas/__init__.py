@@ -7,6 +7,7 @@ from .product import (
     ProductDataUpdateModel,
     ProductModel,
 )
+from .utils import ExtractUrlDataInModel, ExtractUrlModelDataOutModel
 from .wishlist import (
     WishlistDataCreateModel,
     WishlistDataModel,
@@ -33,4 +34,6 @@ __all__ = [
     "WishlistProductsDataModel",
     "WishlistProductsDataCreateModel",
     "WishlistProductsDataUpdateModel",
+    "ExtractUrlModelDataOutModel",
+    "ExtractUrlDataInModel",
 ]
