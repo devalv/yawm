@@ -3,7 +3,7 @@
 
 import uuid
 
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Response, status
 
 from fastapi_pagination.ext.gino import paginate
 
@@ -45,7 +45,9 @@ async def update_product(id: uuid.UUID, product: ProductDataUpdateModel):  # noq
     return product_obj
 
 
-@product_router.delete("/product/{id}", response_class=Response, status_code=204)
+@product_router.delete(
+    "/product/{id}", response_class=Response, status_code=status.HTTP_204_NO_CONTENT
+)
 async def delete_product(id: uuid.UUID):  # noqa: A002
     """API for deleting a product."""
     product = await Product.get_or_404(id)

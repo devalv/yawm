@@ -3,7 +3,7 @@
 
 import uuid
 
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Response, status
 
 from fastapi_pagination.ext.gino import paginate
 
@@ -55,7 +55,9 @@ async def update_wishlist_product(
 
 
 @wishlist_product_router.delete(
-    "/wishlist/{id}/products/{pw_id}", response_class=Response, status_code=204
+    "/wishlist/{id}/products/{pw_id}",
+    response_class=Response,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_wishlist_product(id: uuid.UUID, pw_id: uuid.UUID):  # noqa: A002
     """API for removing product from wishlist."""
