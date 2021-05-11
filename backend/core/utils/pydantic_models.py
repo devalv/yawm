@@ -61,7 +61,11 @@ class JsonApiDataPydanticUpdateBaseModel(JsonApiDataPydanticCreateBaseModel):
 
 
 class JsonApiPydanticModel(JsonApiPydanticCreateBaseModel):
-    """JSON:API says that `data` key must be on a response."""
+    """Pydantic object model.
+    
+    It`s a proper response_model for JsonApiPage, 
+    for other response_models use JsonApiDataPydanticModel instead.
+    """
 
     id: uuid.UUID  # noqa: A002, A003, VNE003
 
@@ -70,7 +74,7 @@ class JsonApiPydanticModel(JsonApiPydanticCreateBaseModel):
 
 
 class JsonApiDataPydanticModel(BaseModel):
-    """Pydantic pagination model."""
+    """JSON:API says that `data` key must be on a response."""
 
     data: JsonApiPydanticModel
 
