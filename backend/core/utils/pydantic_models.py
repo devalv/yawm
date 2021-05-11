@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Pydantic models extra utils."""
+"""Pydantic models extra utils.
+
+The main idea is to have a standard format for model interfaces.
+"""
 
 import uuid
 from abc import abstractmethod
