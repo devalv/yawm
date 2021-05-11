@@ -62,8 +62,8 @@ class JsonApiDataPydanticUpdateBaseModel(JsonApiDataPydanticCreateBaseModel):
 
 class JsonApiPydanticModel(JsonApiPydanticCreateBaseModel):
     """Pydantic object model.
-    
-    It`s a proper response_model for JsonApiPage, 
+
+    It`s a proper response_model for JsonApiPage,
     for other response_models use JsonApiDataPydanticModel instead.
     """
 
