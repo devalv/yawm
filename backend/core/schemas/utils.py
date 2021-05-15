@@ -21,7 +21,6 @@ class ExtractUrlAttributesOutModel(BaseModel):
     """Extract url attributes serializer."""
 
     h1: Optional[str]
-    title: Optional[str]
 
 
 class ExtractUrlInModel(JsonApiPydanticCreateBaseModel):

@@ -7,6 +7,7 @@ from core.schemas import (  # noqa: I100
     ExtractUrlDataInModel,
     ExtractUrlModelDataOutModel,
 )
+from core.services import get_product_name  # noqa: I100
 
 utils_router = APIRouter(prefix="/api/v1", redirect_slashes=True, tags=["utils"])
 
@@ -18,7 +19,6 @@ utils_router = APIRouter(prefix="/api/v1", redirect_slashes=True, tags=["utils"]
 )
 async def extract_name_by_url(product_url: ExtractUrlDataInModel):
     """Extract product name by url."""
-    # TODO: provide code
-    h1_str = f"h1 header of {product_url.data.attributes.url}"
-    title_str = f"title of {product_url.data.attributes.url}"
-    return {"data": {"attributes": {"h1": h1_str, "title": title_str}}}
+    # TODO: change status code
+    value = await get_product_name(product_url.data.attributes.url)
+    return {"data": {"attributes": {"h1": value}}}
