@@ -96,8 +96,12 @@ class PageParser:
             previous_chunk = chunk
 
 
-async def get_product_name(url: str, chunk_size: int = 100):
-    """Get product name from url."""
+async def get_product_name(url: str, chunk_size: int = 100) -> str:
+    """Get product name from url.
+
+    Note:
+        If response will be empty - name will be None.
+    """
     async with httpx.AsyncClient() as client:
         async with client.stream("GET", url) as response:
             response_iter = response.aiter_text
