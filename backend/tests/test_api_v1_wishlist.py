@@ -9,12 +9,12 @@ pytestmark = [pytest.mark.asyncio, pytest.mark.api_full]
 API_URL_PREFIX = "/api/v1"
 
 
-@pytest.fixture()
+@pytest.fixture
 async def products_1():
     return await ProductGinoModel.create(name="test", url="https://devyatkin.dev/1")
 
 
-@pytest.fixture()
+@pytest.fixture
 async def products_9():
     products_list = list()
     for i in range(1, 10):
@@ -25,7 +25,7 @@ async def products_9():
     return products_list
 
 
-@pytest.fixture()
+@pytest.fixture
 async def products_149():
     products_list = list()
     for i in range(1, 150):
@@ -36,26 +36,26 @@ async def products_149():
     return products_list
 
 
-@pytest.fixture()
+@pytest.fixture
 async def ew_1():
     """1 empty wishlist."""
     wishlist = await WishlistGinoModel.create(name="test")
     return wishlist
 
 
-@pytest.fixture()
+@pytest.fixture
 async def empty_wishlists_4():
     for i in range(1, 5):
         await WishlistGinoModel.create(name=f"test{i}")
 
 
-@pytest.fixture()
+@pytest.fixture
 async def empty_wishlists_149():
     for i in range(1, 150):
         await WishlistGinoModel.create(name=f"test{i}")
 
 
-@pytest.fixture()
+@pytest.fixture
 async def wishlist_products_1(ew_1, products_1):
     wishlist = await WishlistGinoModel.get(ew_1.id)
     return await wishlist.add_product(
@@ -63,7 +63,7 @@ async def wishlist_products_1(ew_1, products_1):
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 async def wishlist_products_9(ew_1, products_9):
     products_list = list()
     wishlist = await WishlistGinoModel.get(ew_1.id)
