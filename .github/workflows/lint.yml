@@ -44,8 +44,8 @@ jobs:
         run: |
           cd backend
           pip install --upgrade pip
-          python -m pip install -r requirements.txt
-          python -m pip install -r dev-requirements.txt
+          python -m pip install pipenv
+          pipenv install --deploy --system --dev
           python -m pytest -vm "smoke"
         env:
           PYTHONPATH: /opt/yawm/app
