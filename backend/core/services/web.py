@@ -68,8 +68,10 @@ class PageParser:
                             if post_value_ind >= 0:
                                 two_chunks = True
                                 break
-                    elif post_value_ind >= 0:
+                    elif post_value_ind >= 0 and not additional_search_pattern:
                         break
+                    elif additional_search_pattern and not previous_chunk:
+                        post_value_ind = -1
 
             # поиск открывающего тэга
             # TODO: translate
