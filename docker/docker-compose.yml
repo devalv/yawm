@@ -32,6 +32,6 @@ services:
       - API_HOST=${API_HOST}
       - API_PORT=${API_PORT}
     working_dir: /opt/yawm/app
-    command: sh -c "sleep 5 && alembic upgrade head && python -m main"
+    command: sh -c "sleep 5 && pipenv run alembic upgrade head && pipenv run python -m main"
     depends_on:
       - db
