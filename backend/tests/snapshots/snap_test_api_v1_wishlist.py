@@ -73,6 +73,13 @@ snapshots["TestProduct.test_product_paginator_limit 1"] = {
     "page": 0,
     "size": 5,
     "total": 9,
+    "links": {
+        "first": "/api/v1/product?size=5&page=0",
+        "last": "/api/v1/product?size=5&page=1",
+        "next": "/api/v1/product?size=5&page=1",
+        "prev": None,
+        "self": "/api/v1/product?size=5",
+    },
 }
 
 snapshots["TestProduct.test_product_partial_update 1"] = {
@@ -134,6 +141,13 @@ snapshots["TestProduct.test_products 1"] = {
     "page": 0,
     "size": 50,
     "total": 9,
+    "links": {
+        "first": "/api/v1/product?page=0",
+        "last": "/api/v1/product?page=0",
+        "next": None,
+        "prev": None,
+        "self": "/api/v1/product",
+    },
 }
 
 snapshots["TestProductPaginator.test_default_paginator 1"] = {

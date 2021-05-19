@@ -120,6 +120,9 @@ class TestProduct:
         resp = await api_client.get(self.API_URL)
         assert resp.status_code == 200
         resp_data = resp.json()
+
+        print(resp_data)
+
         assert isinstance(resp_data, dict)
         # removing product id from items
         resp_products = resp_data["data"]
@@ -494,11 +497,76 @@ class TestWishlist:
         assert resp.status_code == 404
 
 
-class TestWPPaginator:
+class PaginatorValidator:
+    """Utils for validation dynamic paginator data"""
+
+    @staticmethod
+    def validate_links(
+        links: dict,
+        url: str,
+        last_page_num: int,
+        next_page_num: int,
+        prev_page_num: int,
+        self_page_num: int,
+        size: int = None,
+    ) -> None:
+        # paginator url prefix
+        if size is not None:
+            pagination_url_prefix = f"{url}?size={size}&page="
+        else:
+            pagination_url_prefix = f"{url}?page="
+
+        # validate pagination links values
+        assert links["first"] == f"{pagination_url_prefix}0"
+
+        if self_page_num is not None:
+            try:
+                assert links["self"] == f"{pagination_url_prefix}{self_page_num}"
+            except AssertionError:
+                assert f"page={self_page_num}" in links["self"]
+                assert f"size={size}" in links["self"]
+        elif size is not None:
+            try:
+                assert links["self"] == f"{url}?size={size}"
+            except AssertionError:
+                assert f"page={self_page_num}" in links["self"]
+                assert f"size={size}" in links["self"]
+        else:
+            assert links["self"] == url
+
+        if last_page_num is not None:
+            try:
+                assert links["last"] == f"{pagination_url_prefix}{last_page_num}"
+            except AssertionError:
+                assert f"page={self_page_num}" in links["last"]
+                assert f"size={size}" in links["last"]
+        else:
+            assert links["last"] is None
+
+        if next_page_num is not None:
+            try:
+                assert links["next"] == f"{pagination_url_prefix}{next_page_num}"
+            except AssertionError:
+                assert f"page={self_page_num}" in links["next"]
+                assert f"size={size}" in links["next"]
+        else:
+            assert links["next"] is None
+
+        if prev_page_num is not None:
+            try:
+                assert links["prev"] == f"{pagination_url_prefix}{prev_page_num}"
+            except AssertionError:
+                assert f"page={self_page_num}" in links["prev"]
+                assert f"size={size}" in links["prev"]
+        else:
+            assert links["prev"] is None
+
+
+class TestWPPaginator(PaginatorValidator):
     """Wishlist Products paginator extra tests."""
 
     @staticmethod
-    def validate_response(json_data: dict):
+    def validate_response(json_data: dict) -> None:
         response_data = json_data["data"]
         for product in response_data:
             attributes = product["attributes"]
@@ -508,7 +576,6 @@ class TestWPPaginator:
             product.pop("id", None)
             attributes.pop("wishlist_id", None)
             attributes.pop("product_id", None)
-        return json_data
 
     @pytest.mark.api_full
     async def test_default_paginator(self, snapshot, api_client, ew_1, wp_149):
@@ -518,6 +585,16 @@ class TestWPPaginator:
         response = await api_client.get(api_url)
         assert response.status_code == 200
         response_json_data = response.json()
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            last_page_num=2,
+            next_page_num=1,
+            prev_page_num=None,
+            self_page_num=None,
+        )
+        # assert response data
         self.validate_response(response_json_data)
         snapshot.assert_match(response_json_data)
 
@@ -529,6 +606,16 @@ class TestWPPaginator:
         response = await api_client.get(api_url, query_string=dict(page=1))
         assert response.status_code == 200
         response_json_data = response.json()
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            last_page_num=2,
+            next_page_num=2,
+            prev_page_num=0,
+            self_page_num=1,
+        )
+        # check response data
         self.validate_response(response_json_data)
         snapshot.assert_match(response_json_data)
 
@@ -541,6 +628,16 @@ class TestWPPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            last_page_num=2,
+            next_page_num=1,
+            prev_page_num=None,
+            self_page_num=0,
+        )
+        # assert response data
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -552,6 +649,16 @@ class TestWPPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            last_page_num=2,
+            next_page_num=None,
+            prev_page_num=1,
+            self_page_num=2,
+        )
+        # assert response data
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -564,6 +671,17 @@ class TestWPPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=f"{api_url}",
+            last_page_num=14,
+            next_page_num=1,
+            prev_page_num=None,
+            self_page_num=None,
+            size=10,
+        )
+        # assert response data
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -578,6 +696,16 @@ class TestWPPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            size=10,
+            last_page_num=14,
+            next_page_num=None,
+            prev_page_num=13,
+            self_page_num=14,
+        )
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -592,10 +720,20 @@ class TestWPPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            size=10,
+            last_page_num=14,
+            next_page_num=None,
+            prev_page_num=14,
+            self_page_num=15,
+        )
         snapshot.assert_match(response_json_data)
 
 
-class TestProductPaginator:
+class TestProductPaginator(PaginatorValidator):
     """Products paginator extra tests."""
 
     @staticmethod
@@ -615,6 +753,15 @@ class TestProductPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            last_page_num=2,
+            next_page_num=1,
+            prev_page_num=None,
+            self_page_num=None,
+        )
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -626,6 +773,15 @@ class TestProductPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            last_page_num=2,
+            next_page_num=2,
+            prev_page_num=0,
+            self_page_num=1,
+        )
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -637,6 +793,15 @@ class TestProductPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            last_page_num=2,
+            next_page_num=1,
+            prev_page_num=None,
+            self_page_num=0,
+        )
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -648,6 +813,15 @@ class TestProductPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            last_page_num=2,
+            next_page_num=None,
+            prev_page_num=1,
+            self_page_num=2,
+        )
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -660,6 +834,16 @@ class TestProductPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            size=10,
+            last_page_num=14,
+            next_page_num=1,
+            prev_page_num=None,
+            self_page_num=None,
+        )
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -674,6 +858,16 @@ class TestProductPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            size=10,
+            last_page_num=14,
+            next_page_num=None,
+            prev_page_num=13,
+            self_page_num=14,
+        )
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -688,10 +882,20 @@ class TestProductPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            size=10,
+            last_page_num=14,
+            next_page_num=None,
+            prev_page_num=14,
+            self_page_num=15,
+        )
         snapshot.assert_match(response_json_data)
 
 
-class TestWishlistPaginator:
+class TestWishlistPaginator(PaginatorValidator):
     """Wishlist paginator extra tests."""
 
     @staticmethod
@@ -711,6 +915,15 @@ class TestWishlistPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            last_page_num=2,
+            next_page_num=1,
+            prev_page_num=None,
+            self_page_num=None,
+        )
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -722,6 +935,15 @@ class TestWishlistPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            last_page_num=2,
+            next_page_num=2,
+            prev_page_num=0,
+            self_page_num=1,
+        )
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -735,6 +957,15 @@ class TestWishlistPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            last_page_num=2,
+            next_page_num=1,
+            prev_page_num=None,
+            self_page_num=0,
+        )
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -746,6 +977,15 @@ class TestWishlistPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            last_page_num=2,
+            next_page_num=None,
+            prev_page_num=1,
+            self_page_num=2,
+        )
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -760,6 +1000,16 @@ class TestWishlistPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            size=10,
+            last_page_num=14,
+            next_page_num=1,
+            prev_page_num=None,
+            self_page_num=None,
+        )
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -774,6 +1024,16 @@ class TestWishlistPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            size=10,
+            last_page_num=14,
+            next_page_num=None,
+            prev_page_num=13,
+            self_page_num=14,
+        )
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
@@ -788,4 +1048,14 @@ class TestWishlistPaginator:
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            size=10,
+            last_page_num=14,
+            next_page_num=None,
+            prev_page_num=14,
+            self_page_num=15,
+        )
         snapshot.assert_match(response_json_data)
