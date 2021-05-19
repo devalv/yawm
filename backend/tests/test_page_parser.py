@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """PageParser tests."""
 
+from core.database import ProductGinoModel
 from core.services import get_product_name
 
 import pytest
@@ -39,6 +40,11 @@ def h3_before_h1_response() -> bytes:
 def h11_before_h1_response() -> bytes:
     minified_html = b'<!DOCTYPE html><html lang="en"><head> <meta charset="UTF-8"> <title>Title</title></head><body><h11>Fake</h11><h1>TestProduct4</h1></body></html>'  # noqa: E501
     return minified_html
+
+
+@pytest.fixture
+async def products_1():
+    return await ProductGinoModel.create(name="test", url="https://devyatkin.dev/1")
 
 
 class TestPageParser:
@@ -126,6 +132,16 @@ class TestApi:
         test_url = "https://bad.io"
         httpx_mock.add_response(status_code=500)
 
+        response = await api_client.post(
+            f"{self.API_URL}", json={"data": {"attributes": {"url": test_url}}}
+        )
+        assert response.status_code == 200
+        snapshot.assert_match(response.json())
+
+    async def test_existing_product(
+        self, snapshot, api_client, products_1, css_response
+    ):
+        test_url = products_1.url
         response = await api_client.post(
             f"{self.API_URL}", json={"data": {"attributes": {"url": test_url}}}
         )

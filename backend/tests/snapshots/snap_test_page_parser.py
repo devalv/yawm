@@ -21,6 +21,10 @@ snapshots["TestApi.test_bad_url 1"] = {
     "data": {"attributes": {"h1": None}, "type": "utils"}
 }
 
+snapshots["TestApi.test_existing_product 1"] = {
+    "data": {"attributes": {"h1": "test"}, "type": "utils"}
+}
+
 snapshots["TestApi.test_good_input 1"] = {
     "data": {"attributes": {"h1": "adidas Gazelle"}, "type": "utils"}
 }
