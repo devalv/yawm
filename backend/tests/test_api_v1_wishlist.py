@@ -121,8 +121,6 @@ class TestProduct:
         assert resp.status_code == 200
         resp_data = resp.json()
 
-        print(resp_data)
-
         assert isinstance(resp_data, dict)
         # removing product id from items
         resp_products = resp_data["data"]
