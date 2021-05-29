@@ -39,3 +39,5 @@ DB_RETRY_INTERVAL = config("DB_RETRY_INTERVAL", cast=int, default=1)
 # uvicorn
 API_HOST = config("API_HOST", default="127.0.0.1")
 API_PORT = config("API_PORT", cast=int, default=8000)
+# crawler User-Agent
+CRAWLER_USER_AGENT = config("CRAWLER_USER_AGENT", default="yawm-api")
