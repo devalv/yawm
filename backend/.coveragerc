@@ -3,6 +3,7 @@
 [report]
 include =
     api/*
+    core/*
 
 omit =
     tests/*
