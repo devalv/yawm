@@ -6,6 +6,7 @@ from .handlers import (
     utils_router,
     wishlist_product_router,
     wishlist_router,
+    security_router,
 )
 
 
@@ -14,4 +15,5 @@ __all__ = (
     "wishlist_product_router",
     "wishlist_router",
     "utils_router",
+    "security_router",
 )
