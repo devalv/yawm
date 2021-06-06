@@ -5,6 +5,7 @@ from .product import product_router
 from .utils import utils_router
 from .wishlist import wishlist_router
 from .wishlist_product import wishlist_product_router
+from .security import security_router
 
 
 __all__ = (
@@ -12,4 +13,5 @@ __all__ = (
     "wishlist_product_router",
     "wishlist_router",
     "utils_router",
+    "security_router",
 )

@@ -12,6 +12,7 @@ from .v1 import (  # noqa: I201
     utils_router,
     wishlist_product_router,
     wishlist_router,
+    security_router,
 )
 
 
@@ -28,6 +29,7 @@ def configure(application: FastAPI):
     application.include_router(product_router)
     application.include_router(wishlist_product_router)
     application.include_router(utils_router)
+    application.include_router(security_router)
 
 
 app = get_app()
