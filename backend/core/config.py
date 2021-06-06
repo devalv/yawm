@@ -39,5 +39,12 @@ DB_RETRY_INTERVAL = config("DB_RETRY_INTERVAL", cast=int, default=1)
 # uvicorn
 API_HOST = config("API_HOST", default="127.0.0.1")
 API_PORT = config("API_PORT", cast=int, default=8000)
+# security
+API_DOMAIN = config("API_DOMAIN", default=None)
+SECRET_KEY = config("SECRET_KEY", default=None)
+ALGORITHM = config("ALGORITHM", default="HS256")
+ACCESS_TOKEN_EXPIRE_MIN = config("ACCESS_TOKEN_EXPIRE_MIN", default=30)
+GOOGLE_CLIENT_ID = config("GOOGLE_CLIENT_ID", default=None)
+GOOGLE_CLIENT_SECRETS_JSON = config("GOOGLE_CLIENT_SECRETS_JSON", default=None)
 # crawler User-Agent
 CRAWLER_USER_AGENT = config("CRAWLER_USER_AGENT", default="yawm-api")
