@@ -132,3 +132,6 @@ dmypy.json
 # IDEA configurations
 .idea/
 /.vscode/
+
+# Google secrets
+oauth2.json
