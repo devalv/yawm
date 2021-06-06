@@ -233,64 +233,36 @@ async def swap_token(request: Request = None):
     # if not request.headers.get("X-Requested-With"):
     #     raise HTTPException(status_code=400, detail="Incorrect headers")
 
-    google_client_type = request.headers.get("X-Google-OAuth2-Type")
+    # TODO: use for extra client checking?
+    # google_client_type = request.headers.get("X-Google-OAuth2-Type")
 
-    if google_client_type == "server":
-        try:
-            body_bytes = await request.body()
-            auth_code = jsonable_encoder(body_bytes)
-
-            credentials = client.credentials_from_clientsecrets_and_code(
-                GOOGLE_CLIENT_SECRETS_JSON, ["profile", "email"], auth_code
-            )
-
-            http_auth = credentials.authorize(httplib2.Http())
-
-            email = credentials.id_token["email"]
-
-        except:
-            raise HTTPException(
-                status_code=400, detail="Unable to validate social login"
-            )
-
-    if google_client_type == "client":
+    try:
         body_bytes = await request.body()
         auth_code = jsonable_encoder(body_bytes)
 
-        try:
-            idinfo = id_token.verify_oauth2_token(
-                auth_code, requests.Request(), GOOGLE_CLIENT_ID
-            )
+        credentials = client.credentials_from_clientsecrets_and_code(
+            GOOGLE_CLIENT_SECRETS_JSON, ["profile", "email"], auth_code
+        )
 
-            # Or, if multiple clients access the backend server:
-            # idinfo = id_token.verify_oauth2_token(token, requests.Request())
-            # if idinfo['aud'] not in [CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]:
-            #     raise ValueError('Could not verify audience.')
+        http_auth = credentials.authorize(httplib2.Http())
 
-            if idinfo["iss"] not in [
-                "accounts.google.com",
-                "https://accounts.google.com",
-            ]:
-                raise ValueError("Wrong issuer.")
+        email = credentials.id_token["email"]
 
-            # If auth request is from a G Suite domain:
-            # if idinfo['hd'] != GSUITE_DOMAIN_NAME:
-            #     raise ValueError('Wrong hosted domain.')
+        print("credentials refresh token:", credentials.refresh_token)
 
-            if idinfo["email"] and idinfo["email_verified"]:
-                email = idinfo.get("email")
-
-            else:
-                raise HTTPException(
-                    status_code=400, detail="Unable to validate social login"
-                )
-
-        except:
-            raise HTTPException(
-                status_code=400, detail="Unable to validate social login"
-            )
+    except Exception as E:
+        print(E)
+        raise HTTPException(status_code=400, detail="Unable to validate social login")
 
     authenticated_user = authenticate_user_email(fake_users_db, email)
+
+    print("id token:", credentials.id_token)
+    print("sub:", credentials.id_token["sub"])
+    print("email:", credentials.id_token["email"])
+    print("name:", credentials.id_token.get("name", None))
+    print("picture:", credentials.id_token.get("picture", None))
+    print("given_name:", credentials.id_token.get("given_name", None))
+    print("family_name:", credentials.id_token.get("family_name", None))
 
     if not authenticated_user:
         raise HTTPException(status_code=400, detail="Incorrect email address")
@@ -306,14 +278,6 @@ async def swap_token(request: Request = None):
 
     print({"access_token": token, "token_type": "bearer"})
 
-    # response.set_cookie(
-    #     COOKIE_AUTHORIZATION_NAME,
-    #     value=f"Bearer {token}",
-    #     domain=API_DOMAIN,
-    #     httponly=True,
-    #     max_age=1800,
-    #     expires=1800,
-    # )
     return response
 
 
