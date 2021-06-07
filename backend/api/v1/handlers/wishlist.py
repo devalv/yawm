@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """Wishlist rest-api handlers."""
 
-import uuid
-
 from fastapi import APIRouter, Response, status
 
 from fastapi_pagination.ext.gino import paginate
 
+from pydantic import UUID4
 
 from core.database.models.wishlist import Wishlist  # noqa: I100
 from core.schemas import (
@@ -27,7 +26,7 @@ async def list_wishlist():
 
 
 @wishlist_router.get("/wishlist/{id}", response_model=WishlistDataModel)
-async def get_wishlist(id: uuid.UUID):  # noqa: A002
+async def get_wishlist(id: UUID4):  # noqa: A002
     """API for getting a wishlist."""
     return await Wishlist.get_or_404(id)
 
@@ -39,9 +38,7 @@ async def create_wishlist(wishlist: WishlistDataCreateModel):
 
 
 @wishlist_router.put("/wishlist/{id}", response_model=WishlistDataModel)
-async def update_wishlist(
-    id: uuid.UUID, wishlist: WishlistDataUpdateModel  # noqa: A002
-):
+async def update_wishlist(id: UUID4, wishlist: WishlistDataUpdateModel):  # noqa: A002
     """API for updating a wishlist."""
     wishlist_obj = await Wishlist.get_or_404(id)
     await wishlist_obj.update(**wishlist.data.non_null_attributes).apply()
@@ -51,7 +48,7 @@ async def update_wishlist(
 @wishlist_router.delete(
     "/wishlist/{id}", response_class=Response, status_code=status.HTTP_204_NO_CONTENT
 )
-async def delete_wishlist(id: uuid.UUID):  # noqa: A002
+async def delete_wishlist(id: UUID4):  # noqa: A002
     """API for deleting a wishlist."""
     wishlist = await Wishlist.get_or_404(id)
     await wishlist.delete()

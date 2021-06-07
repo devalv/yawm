@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Wishlist rest-api handlers."""
 
-import uuid
-
 from fastapi import APIRouter, Response, status
 
 from fastapi_pagination.ext.gino import paginate
+
+from pydantic import UUID4
 
 from core.database.models.wishlist import Wishlist, WishlistProducts  # noqa: I100
 from core.schemas import (  # noqa: I100
@@ -24,7 +24,7 @@ wishlist_product_router = APIRouter(
 @wishlist_product_router.get(
     "/wishlist/{id}/products", response_model=JsonApiPage[WishlistProductsModel]
 )
-async def list_wishlist_products(id: uuid.UUID):  # noqa: A002
+async def list_wishlist_products(id: UUID4):  # noqa: A002
     """API for getting all related products."""
     wishlist = await Wishlist.get_or_404(id)
     return await paginate(wishlist.products)
@@ -34,7 +34,7 @@ async def list_wishlist_products(id: uuid.UUID):  # noqa: A002
     "/wishlist/{id}/products", response_model=WishlistProductsDataModel
 )
 async def create_wishlist_product(
-    id: uuid.UUID, product: WishlistProductsDataCreateModel  # noqa: A002
+    id: UUID4, product: WishlistProductsDataCreateModel  # noqa: A002
 ):
     """API for adding existing product to a existing wishlist."""
     wishlist = await Wishlist.get_or_404(id)
@@ -45,7 +45,7 @@ async def create_wishlist_product(
     "/wishlist/{id}/products/{pw_id}", response_model=WishlistProductsDataModel
 )
 async def update_wishlist_product(
-    id: uuid.UUID, pw_id: uuid.UUID, pwm: WishlistProductsDataUpdateModel  # noqa: A002
+    id: UUID4, pw_id: UUID4, pwm: WishlistProductsDataUpdateModel  # noqa: A002
 ):
     """API for updating product associated to a wishlist."""
     await Wishlist.get_or_404(id)
@@ -59,7 +59,7 @@ async def update_wishlist_product(
     response_class=Response,
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def delete_wishlist_product(id: uuid.UUID, pw_id: uuid.UUID):  # noqa: A002
+async def delete_wishlist_product(id: UUID4, pw_id: UUID4):  # noqa: A002
     """API for removing product from wishlist."""
     await Wishlist.get_or_404(id)
     wishlist_product = await WishlistProducts.get_or_404(pw_id)

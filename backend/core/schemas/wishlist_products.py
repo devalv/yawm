@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """Pydantic wishlist products models."""
 
-import uuid
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, UUID4
 
 from core.utils import (  # noqa: I100
     JsonApiDataPydanticCreateBaseModel,
@@ -21,8 +20,8 @@ class WishlistProductsAttributesModel(BaseModel):
 
     # TODO: JSON:API related?
 
-    wishlist_id: uuid.UUID
-    product_id: uuid.UUID
+    wishlist_id: UUID4
+    product_id: UUID4
     reserved: bool
     substitutable: bool
 
@@ -32,7 +31,7 @@ class WishlistProductsCreateAttributesModel(BaseModel):
 
     # TODO: JSON:API related?
 
-    product_id: uuid.UUID
+    product_id: UUID4
     reserved: bool
     substitutable: bool
 
@@ -42,7 +41,7 @@ class WishlistProductsUpdateAttributesModel(BaseModel):
 
     # TODO: JSON:API related?
 
-    product_id: Optional[uuid.UUID]
+    product_id: Optional[UUID4]
     reserved: Optional[bool]
     substitutable: Optional[bool]
 
