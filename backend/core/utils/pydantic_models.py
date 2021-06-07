@@ -4,10 +4,9 @@
 The main idea is to have a standard format for model interfaces.
 """
 
-import uuid
 from abc import abstractmethod
 
-from pydantic import BaseModel
+from pydantic import BaseModel, UUID4
 
 
 class JsonApiPydanticAttributesBaseModel(BaseModel):
@@ -67,7 +66,7 @@ class JsonApiPydanticModel(JsonApiPydanticCreateBaseModel):
     for other response_models use JsonApiDataPydanticModel instead.
     """
 
-    id: uuid.UUID  # noqa: A002, A003, VNE003
+    id: UUID4  # noqa: A002, A003, VNE003
 
     class Config:  # noqa: D106
         orm_mode = True

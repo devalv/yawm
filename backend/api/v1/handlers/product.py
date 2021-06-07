@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Product rest-api handlers."""
 
-import uuid
-
 from fastapi import APIRouter, Response, status
 
 from fastapi_pagination.ext.gino import paginate
+
+from pydantic import UUID4
 
 from core.database.models.wishlist import Product  # noqa: I100
 from core.schemas import (
@@ -26,7 +26,7 @@ async def list_products():
 
 
 @product_router.get("/product/{id}", response_model=ProductDataModel)
-async def get_product(id: uuid.UUID):  # noqa: A002
+async def get_product(id: UUID4):  # noqa: A002
     """API for getting a product."""
     return await Product.get_or_404(id)
 
@@ -38,7 +38,7 @@ async def create_product(product: ProductDataCreateModel):
 
 
 @product_router.put("/product/{id}", response_model=ProductDataModel)
-async def update_product(id: uuid.UUID, product: ProductDataUpdateModel):  # noqa: A002
+async def update_product(id: UUID4, product: ProductDataUpdateModel):  # noqa: A002
     """API for updating a product."""
     product_obj = await Product.get_or_404(id)
     await product_obj.update(**product.data.non_null_attributes).apply()
@@ -48,7 +48,7 @@ async def update_product(id: uuid.UUID, product: ProductDataUpdateModel):  # noq
 @product_router.delete(
     "/product/{id}", response_class=Response, status_code=status.HTTP_204_NO_CONTENT
 )
-async def delete_product(id: uuid.UUID):  # noqa: A002
+async def delete_product(id: UUID4):  # noqa: A002
     """API for deleting a product."""
     product = await Product.get_or_404(id)
     await product.delete()
