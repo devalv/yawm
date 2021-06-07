@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""ORM Models for Security/Auth entities.
+"""ORM Models for Auth entities.
 
 There is no JsonApiGinoModel because of hidden.
 """
@@ -9,7 +9,7 @@ from uuid import uuid4
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
-from . import db
+from .. import db
 
 
 class User(db.Model):
