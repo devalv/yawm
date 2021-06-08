@@ -21,6 +21,8 @@ from .wishlist_products import (
     WishlistProductsModel,
 )
 
+# from .security import UserModel  # noqa: E800
+
 __all__ = [
     "ProductModel",
     "ProductDataCreateModel",
@@ -36,4 +38,5 @@ __all__ = [
     "WishlistProductsDataUpdateModel",
     "ExtractUrlModelDataOutModel",
     "ExtractUrlDataInModel",
+    # "UserModel",  # noqa: E800
 ]
