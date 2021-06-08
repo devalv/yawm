@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
-"""ORM Models for Auth entities.
-
-There is no JsonApiGinoModel because of hidden.
-"""
+"""ORM Models for Auth entities."""
 
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
+from core.utils import JsonApiGinoModel  # noqa: I100
+
 from .. import db
 
 
-class User(db.Model):
+class User(db.Model, JsonApiGinoModel):
     """Yep, this is a User table."""
 
     __tablename__ = "user"
