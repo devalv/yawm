@@ -4,31 +4,69 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, UUID4
+from pydantic import BaseModel
+
+from core.utils import (  # noqa: I100
+    JsonApiCreateBaseModel,
+    JsonApiDBModel,
+    JsonApiDataCreateBaseModel,
+    JsonApiDataDBModel,
+    JsonApiDataUpdateBaseModel,
+    JsonApiUpdateBaseModel,
+)
 
 
-class BaseUserModel(BaseModel):
+class BaseUserAttributesModel(BaseModel):
     """Base User model."""
 
-    ext_id: Optional[str] = None
     disabled = Optional[bool] = False
     superuser = Optional[bool] = False
-    created = Optional[datetime] = None
     username = Optional[str] = None
     given_name = Optional[str] = None
     family_name = Optional[str] = None
     full_name = Optional[str] = None
 
 
-# TODO: JSON:API schemas?
-# TODO: create user model
-# TODO: update user model
+class UserCreateAttributesModel(BaseUserAttributesModel):
+    """User attributes creation serializer."""
+
+    ext_id: str
+    username: str
+
+
+class UserCreateModel(JsonApiCreateBaseModel):
+    """User creation serializer."""
+
+    type: str = "user"  # noqa: A003, VNE003
+    attributes = UserCreateAttributesModel
+
+
+class UserDataCreateModel(JsonApiDataCreateBaseModel):
+    """User data creation serializer."""
+
+    data: UserCreateModel
+
+
+class UserUpdateModel(BaseUserAttributesModel):
+    """User attributes update serializer."""
+
+
+class UserUpdateModel(JsonApiUpdateBaseModel):
+    """User update serializer."""
+
+    type: str = "user"  # noqa: A003, VNE003
+    attributes = UserUpdateModel
+
+
+class UserDataUpdateModel(JsonApiDataUpdateBaseModel):
+    """User data update serializer."""
+
+    data: UserUpdateModel
 
 
 class BaseUserDB(BaseModel):
-    """Database row model."""
+    """User database row attributes model."""
 
-    id: UUID4  # noqa: A003, VNE003
     ext_id: str
     disabled = bool
     superuser = bool
@@ -38,5 +76,14 @@ class BaseUserDB(BaseModel):
     family_name = str
     full_name = str
 
-    class Config:  # noqa: D106
-        orm_mode = True
+
+class UserDBModel(JsonApiDBModel):
+    """User serializer."""
+
+    attributes: BaseUserDB
+
+
+class UserDBDataModel(JsonApiDataDBModel):
+    """User data model."""
+
+    data: UserDBModel
