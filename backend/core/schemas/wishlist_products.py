@@ -6,12 +6,12 @@ from typing import Optional
 from pydantic import BaseModel, UUID4
 
 from core.utils import (  # noqa: I100
-    JsonApiDataPydanticCreateBaseModel,
-    JsonApiDataPydanticModel,
-    JsonApiDataPydanticUpdateBaseModel,
-    JsonApiPydanticCreateBaseModel,
-    JsonApiPydanticModel,
-    JsonApiPydanticUpdateBaseModel,
+    JsonApiCreateBaseModel,
+    JsonApiDBModel,
+    JsonApiDataCreateBaseModel,
+    JsonApiDataDBModel,
+    JsonApiDataUpdateBaseModel,
+    JsonApiUpdateBaseModel,
 )
 
 
@@ -46,39 +46,39 @@ class WishlistProductsUpdateAttributesModel(BaseModel):
     substitutable: Optional[bool]
 
 
-class WishlistProductsModel(JsonApiPydanticModel):
+class WishlistProductsModel(JsonApiDBModel):
     """Wishlist products serializer."""
 
     attributes: WishlistProductsAttributesModel
 
 
-class WishlistProductsDataModel(JsonApiDataPydanticModel):
+class WishlistProductsDataModel(JsonApiDataDBModel):
     """Wishlist products data model."""
 
     data: WishlistProductsModel
 
 
-class WishlistProductsCreateModel(JsonApiPydanticCreateBaseModel):
+class WishlistProductsCreateModel(JsonApiCreateBaseModel):
     """Wishlist products creation serializer."""
 
     type: str = "wishlist_products"  # noqa: A003, VNE003
     attributes: WishlistProductsCreateAttributesModel
 
 
-class WishlistProductsDataCreateModel(JsonApiDataPydanticCreateBaseModel):
+class WishlistProductsDataCreateModel(JsonApiDataCreateBaseModel):
     """Wishlist products data creation serializer."""
 
     data: WishlistProductsCreateModel
 
 
-class WishlistProductsUpdateModel(JsonApiPydanticUpdateBaseModel):
+class WishlistProductsUpdateModel(JsonApiUpdateBaseModel):
     """Wishlist products update serializer."""
 
     type: str = "wishlist_products"  # noqa: A003, VNE003
     attributes: WishlistProductsUpdateAttributesModel
 
 
-class WishlistProductsDataUpdateModel(JsonApiDataPydanticUpdateBaseModel):
+class WishlistProductsDataUpdateModel(JsonApiDataUpdateBaseModel):
     """Wishlist products data update serializer."""
 
     data: WishlistProductsUpdateModel

@@ -6,12 +6,12 @@ from typing import Optional
 from pydantic import BaseModel, HttpUrl
 
 from core.utils import (  # noqa: I100
-    JsonApiDataPydanticCreateBaseModel,
-    JsonApiDataPydanticModel,
-    JsonApiDataPydanticUpdateBaseModel,
-    JsonApiPydanticCreateBaseModel,
-    JsonApiPydanticModel,
-    JsonApiPydanticUpdateBaseModel,
+    JsonApiCreateBaseModel,
+    JsonApiDBModel,
+    JsonApiDataCreateBaseModel,
+    JsonApiDataDBModel,
+    JsonApiDataUpdateBaseModel,
+    JsonApiUpdateBaseModel,
 )
 
 
@@ -30,39 +30,39 @@ class ProductUpdateAttributesModel(BaseModel):
     name2: Optional[str]
 
 
-class ProductModel(JsonApiPydanticModel):
+class ProductModel(JsonApiDBModel):
     """Product serializer."""
 
     attributes: ProductAttributesModel
 
 
-class ProductDataModel(JsonApiDataPydanticModel):
+class ProductDataModel(JsonApiDataDBModel):
     """Product data model."""
 
     data: ProductModel
 
 
-class ProductCreateModel(JsonApiPydanticCreateBaseModel):
+class ProductCreateModel(JsonApiCreateBaseModel):
     """Product creation serializer."""
 
     type: str = "product"  # noqa: A003, VNE003
     attributes: ProductAttributesModel
 
 
-class ProductDataCreateModel(JsonApiDataPydanticCreateBaseModel):
+class ProductDataCreateModel(JsonApiDataCreateBaseModel):
     """Product data creation serializer."""
 
     data: ProductCreateModel
 
 
-class ProductUpdateModel(JsonApiPydanticUpdateBaseModel):
+class ProductUpdateModel(JsonApiUpdateBaseModel):
     """Product update serializer."""
 
     type: str = "product"  # noqa: A003, VNE003
     attributes: ProductUpdateAttributesModel
 
 
-class ProductDataUpdateModel(JsonApiDataPydanticUpdateBaseModel):
+class ProductDataUpdateModel(JsonApiDataUpdateBaseModel):
     """Project data update serializer."""
 
     data: ProductUpdateModel
