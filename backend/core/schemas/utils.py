@@ -6,8 +6,8 @@ from typing import Optional
 from pydantic import BaseModel, HttpUrl
 
 from core.utils.pydantic_models import (  # noqa: I100
-    JsonApiDataPydanticCreateBaseModel,
-    JsonApiPydanticCreateBaseModel,
+    JsonApiCreateBaseModel,
+    JsonApiDataCreateBaseModel,
 )
 
 
@@ -23,21 +23,21 @@ class ExtractUrlAttributesOutModel(BaseModel):
     h1: Optional[str]
 
 
-class ExtractUrlInModel(JsonApiPydanticCreateBaseModel):
+class ExtractUrlInModel(JsonApiCreateBaseModel):
     """Extract url creation serializer."""
 
     type: str = "utils"  # noqa: A003, VNE003
     attributes: ExtractUrlAttributesInModel
 
 
-class ExtractUrlOutModel(JsonApiPydanticCreateBaseModel):
+class ExtractUrlOutModel(JsonApiCreateBaseModel):
     """Extract url response serializer."""
 
     type: str = "utils"  # noqa: A003, VNE003
     attributes: ExtractUrlAttributesOutModel
 
 
-class ExtractUrlDataInModel(JsonApiDataPydanticCreateBaseModel):
+class ExtractUrlDataInModel(JsonApiDataCreateBaseModel):
     """Extract url data creation serializer."""
 
     data: ExtractUrlInModel

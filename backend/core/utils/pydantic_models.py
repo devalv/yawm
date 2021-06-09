@@ -9,7 +9,7 @@ from abc import abstractmethod
 from pydantic import BaseModel, UUID4
 
 
-class JsonApiPydanticAttributesBaseModel(BaseModel):
+class JsonApiAttributesBaseModel(BaseModel):
     """Abstract attributes pydantic model."""
 
     @abstractmethod
@@ -17,11 +17,11 @@ class JsonApiPydanticAttributesBaseModel(BaseModel):
         """Main model should be redefined."""
 
 
-class JsonApiPydanticCreateBaseModel(BaseModel):
+class JsonApiCreateBaseModel(BaseModel):
     """Pydantic BaseModel extra utilities."""
 
     type: str  # noqa: A002, A003, VNE003
-    attributes: JsonApiPydanticAttributesBaseModel
+    attributes: JsonApiAttributesBaseModel
 
     @property
     def validated_attributes(self):
@@ -45,25 +45,25 @@ class JsonApiPydanticCreateBaseModel(BaseModel):
         return result
 
 
-class JsonApiDataPydanticCreateBaseModel(BaseModel):
+class JsonApiDataCreateBaseModel(BaseModel):
     """Pydantic JSON:API data creation model."""
 
-    data: JsonApiPydanticCreateBaseModel
+    data: JsonApiCreateBaseModel
 
 
-class JsonApiPydanticUpdateBaseModel(JsonApiPydanticCreateBaseModel):
+class JsonApiUpdateBaseModel(JsonApiCreateBaseModel):
     """Pydantic update model."""
 
 
-class JsonApiDataPydanticUpdateBaseModel(JsonApiDataPydanticCreateBaseModel):
+class JsonApiDataUpdateBaseModel(JsonApiDataCreateBaseModel):
     """Pydantic JSON:API data update model."""
 
 
-class JsonApiPydanticModel(JsonApiPydanticCreateBaseModel):
+class JsonApiDBModel(JsonApiCreateBaseModel):
     """Pydantic object model.
 
     It`s a proper response_model for JsonApiPage,
-    for other response_models use JsonApiDataPydanticModel instead.
+    for other response_models use JsonApiDataDBModel instead.
     """
 
     id: UUID4  # noqa: A002, A003, VNE003
@@ -72,10 +72,10 @@ class JsonApiPydanticModel(JsonApiPydanticCreateBaseModel):
         orm_mode = True
 
 
-class JsonApiDataPydanticModel(BaseModel):
+class JsonApiDataDBModel(BaseModel):
     """JSON:API says that `data` key must be on a response."""
 
-    data: JsonApiPydanticModel
+    data: JsonApiDBModel
 
     class Config:  # noqa: D106
         orm_mode = True
