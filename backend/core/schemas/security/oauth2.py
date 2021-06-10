@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Pydantic security models."""
+"""Pydantic oauth2 models."""
 
 from pydantic import BaseModel
 

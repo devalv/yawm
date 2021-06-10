@@ -2,11 +2,11 @@
 """Security rest-api handlers."""
 
 from typing import Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta  # noqa: I100
 
-from jwt import PyJWTError, decode as jwt_decode, encode as jwt_encode
+from jwt import PyJWTError, decode as jwt_decode, encode as jwt_encode  # noqa: F401
 
-from fastapi import Depends, HTTPException, APIRouter
+from fastapi import Depends, HTTPException, APIRouter  # noqa: F401, I101, I100
 from fastapi.encoders import jsonable_encoder
 from fastapi.security.oauth2 import (
     OAuth2,
@@ -15,24 +15,34 @@ from fastapi.security.oauth2 import (
 )
 
 from starlette.status import HTTP_403_FORBIDDEN
-from starlette.responses import RedirectResponse, JSONResponse, HTMLResponse
-from starlette.requests import Request
+from starlette.responses import (  # noqa: F401, I101, I100
+    RedirectResponse,  # noqa: F401, I101, I100
+    JSONResponse,  # noqa: F401, I101, I100
+    HTMLResponse,  # noqa: F401, I101, I100
+)  # noqa: F401, I101, I100
+from starlette.requests import Request  # noqa: F401, I101, I100
 
-import httplib2
-from oauth2client import client
-from google.oauth2 import id_token
-from google.auth.transport import requests
+import httplib2  # noqa: F401, I101, I100
 
-from core.schemas.security import User, TokenData, Token
-from core.config import (
+from oauth2client import client  # noqa: F401, I101, I100
+
+from google.oauth2 import id_token  # noqa: F401, I101, I100
+from google.auth.transport import requests  # noqa: F401, I101, I100
+
+from core.config import (  # noqa: I100
+    ACCESS_TOKEN_EXPIRE_MIN,
+    ALGORITHM,
     API_DOMAIN,
     API_PORT,
-    SECRET_KEY,
-    ALGORITHM,
-    GOOGLE_CLIENT_SECRETS_JSON,
     GOOGLE_CLIENT_ID,
-    ACCESS_TOKEN_EXPIRE_MIN,
+    GOOGLE_CLIENT_SECRETS_JSON,
+    SECRET_KEY,
 )
+from core.schemas.security import (  # noqa: F401, I101, I100
+    UserDBModel,  # noqa: F401, I101, I100
+    TokenData,  # noqa: F401, I101, I100
+    Token,  # noqa: F401, I101, I100
+)  # noqa: F401, I101, I100
 
 
 security_router = APIRouter(prefix="", redirect_slashes=True, tags=["auth"])
@@ -123,8 +133,8 @@ fake_users_db = {
 }
 
 
-class OAuth2PasswordBearerCookie(OAuth2):
-    def __init__(
+class OAuth2PasswordBearerCookie(OAuth2):  # noqa: D101
+    def __init__(  # noqa: D107
         self,
         tokenUrl: str,
         scheme_name: str = None,
@@ -136,26 +146,18 @@ class OAuth2PasswordBearerCookie(OAuth2):
         flows = OAuthFlowsModel(password={"tokenUrl": tokenUrl, "scopes": scopes})
         super().__init__(flows=flows, scheme_name=scheme_name, auto_error=auto_error)
 
-    async def __call__(self, request: Request) -> Optional[str]:
+    async def __call__(self, request: Request) -> Optional[str]:  # noqa: D102
         header_authorization: str = request.headers.get("Authorization")
         # cookie_authorization: str = request.cookies.get("Authorization")
 
         header_scheme, header_param = get_authorization_scheme_param(
             header_authorization
         )
-        # cookie_scheme, cookie_param = get_authorization_scheme_param(
-        #     cookie_authorization
-        # )
 
         if header_scheme.lower() == "bearer":
             authorization = True
             scheme = header_scheme
             param = header_param
-
-        # elif cookie_scheme.lower() == "bearer":
-        #     authorization = True
-        #     scheme = cookie_scheme
-        #     param = cookie_param
 
         else:
             authorization = False

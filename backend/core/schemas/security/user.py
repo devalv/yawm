@@ -19,12 +19,12 @@ from core.utils import (  # noqa: I100
 class BaseUserAttributesModel(BaseModel):
     """Base User model."""
 
-    disabled = Optional[bool] = False
-    superuser = Optional[bool] = False
-    username = Optional[str] = None
-    given_name = Optional[str] = None
-    family_name = Optional[str] = None
-    full_name = Optional[str] = None
+    disabled: Optional[bool]
+    superuser: Optional[bool]
+    username: Optional[str]
+    given_name: Optional[str]
+    family_name: Optional[str]
+    full_name: Optional[str]
 
 
 class UserCreateAttributesModel(BaseUserAttributesModel):

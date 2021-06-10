@@ -7,6 +7,7 @@ from .product import (
     ProductDataUpdateModel,
     ProductModel,
 )
+from .security import Token, TokenData, UserDBModel
 from .utils import ExtractUrlDataInModel, ExtractUrlModelDataOutModel
 from .wishlist import (
     WishlistDataCreateModel,
@@ -21,7 +22,6 @@ from .wishlist_products import (
     WishlistProductsModel,
 )
 
-# from .security import UserModel  # noqa: E800
 
 __all__ = [
     "ProductModel",
@@ -38,5 +38,7 @@ __all__ = [
     "WishlistProductsDataUpdateModel",
     "ExtractUrlModelDataOutModel",
     "ExtractUrlDataInModel",
-    # "UserModel",  # noqa: E800
+    "UserDBModel",
+    "Token",
+    "TokenData",
 ]
