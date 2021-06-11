@@ -7,7 +7,14 @@ from .product import (
     ProductDataUpdateModel,
     ProductModel,
 )
-from .security import Token, TokenData, UserDBModel
+from .security import (
+    Token,
+    TokenData,
+    UserDBDataModel,
+    UserDBModel,
+    UserDataCreateModel,
+    UserDataUpdateModel,
+)
 from .utils import ExtractUrlDataInModel, ExtractUrlModelDataOutModel
 from .wishlist import (
     WishlistDataCreateModel,
@@ -39,6 +46,9 @@ __all__ = [
     "ExtractUrlModelDataOutModel",
     "ExtractUrlDataInModel",
     "UserDBModel",
+    "UserDBDataModel",
+    "UserDataCreateModel",
+    "UserDataUpdateModel",
     "Token",
     "TokenData",
 ]

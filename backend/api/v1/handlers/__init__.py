@@ -2,10 +2,10 @@
 """Wishlist rest-api handlers."""
 
 from .product import product_router
+from .security import security_router
 from .utils import utils_router
 from .wishlist import wishlist_router
 from .wishlist_product import wishlist_product_router
-from .security import security_router
 
 
 __all__ = (
