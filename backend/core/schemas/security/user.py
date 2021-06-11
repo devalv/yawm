@@ -19,12 +19,12 @@ from core.utils import (  # noqa: I100
 class BaseUserAttributesModel(BaseModel):
     """Base User model."""
 
-    disabled: Optional[bool]
-    superuser: Optional[bool]
-    username: Optional[str]
-    given_name: Optional[str]
-    family_name: Optional[str]
-    full_name: Optional[str]
+    disabled: Optional[bool] = False
+    superuser: Optional[bool] = False
+    username: Optional[str] = None
+    given_name: Optional[str] = None
+    family_name: Optional[str] = None
+    full_name: Optional[str] = None
 
 
 class UserCreateAttributesModel(BaseUserAttributesModel):
@@ -38,7 +38,7 @@ class UserCreateModel(JsonApiCreateBaseModel):
     """User creation serializer."""
 
     type: str = "user"  # noqa: A003, VNE003
-    attributes = UserCreateAttributesModel
+    attributes: UserCreateAttributesModel
 
 
 class UserDataCreateModel(JsonApiDataCreateBaseModel):
@@ -55,7 +55,7 @@ class UserUpdateModel(JsonApiUpdateBaseModel):
     """User update serializer."""
 
     type: str = "user"  # noqa: A003, VNE003
-    attributes = UserUpdateModel
+    attributes: UserUpdateModel
 
 
 class UserDataUpdateModel(JsonApiDataUpdateBaseModel):
@@ -68,13 +68,13 @@ class BaseUserDB(BaseModel):
     """User database row attributes model."""
 
     ext_id: str
-    disabled = bool
-    superuser = bool
-    created = datetime
-    username = str
-    given_name = str
-    family_name = str
-    full_name = str
+    disabled: bool
+    superuser: bool
+    created: datetime
+    username: str
+    given_name: str
+    family_name: str
+    full_name: str
 
 
 class UserDBModel(JsonApiDBModel):

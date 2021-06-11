@@ -9,10 +9,10 @@ from fastapi_pagination import add_pagination
 from core.database.models import db  # noqa: I100
 from .v1 import (  # noqa: I201
     product_router,
+    security_router,
     utils_router,
     wishlist_product_router,
     wishlist_router,
-    security_router,
 )
 
 

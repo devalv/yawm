@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Wishlist api tests."""
+
 from core.database import ProductGinoModel, WishlistGinoModel
 
 import pytest

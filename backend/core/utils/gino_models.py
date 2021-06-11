@@ -7,7 +7,7 @@ from inspect import iscoroutinefunction
 class JsonApiGinoModel:
     """Gino db Model extra utilities."""
 
-    __attrs_to_skip = frozenset(("attributes", "id", "data"))
+    __attrs_to_skip = frozenset(("attributes", "id", "data", "type"))
     __crud_base_methods = frozenset(("update", "query", "create", "select", "delete"))
 
     @property

@@ -3,10 +3,10 @@
 
 from .handlers import (
     product_router,
+    security_router,
     utils_router,
     wishlist_product_router,
     wishlist_router,
-    security_router,
 )
 
 
