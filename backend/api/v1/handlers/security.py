@@ -1,48 +1,44 @@
 # -*- coding: utf-8 -*-
 """Security rest-api handlers."""
 
+from datetime import datetime, timedelta
 from typing import Optional
-from datetime import datetime, timedelta  # noqa: I100
 
-from jwt import PyJWTError, decode as jwt_decode, encode as jwt_encode  # noqa: F401
-
-from fastapi import Depends, HTTPException, APIRouter  # noqa: F401, I101, I100
+from fastapi import Depends, APIRouter, HTTPException, status
+from fastapi.security import OpenIdConnect
 from fastapi.encoders import jsonable_encoder
-from fastapi.security.oauth2 import (
-    OAuth2,
-    OAuthFlowsModel,
-    get_authorization_scheme_param,
-)
+from jose import JWTError, jwt
 
 from starlette.status import HTTP_403_FORBIDDEN
-from starlette.responses import (  # noqa: F401, I101, I100
-    RedirectResponse,  # noqa: F401, I101, I100
-    JSONResponse,  # noqa: F401, I101, I100
-    HTMLResponse,  # noqa: F401, I101, I100
-)  # noqa: F401, I101, I100
-from starlette.requests import Request  # noqa: F401, I101, I100
+from starlette.responses import (
+    RedirectResponse,
+    JSONResponse,
+    HTMLResponse,
+)
+from starlette.requests import Request
 
-import httplib2  # noqa: F401, I101, I100
+import httplib2
 
-from oauth2client import client  # noqa: F401, I101, I100
+from oauth2client import client
 
-from google.oauth2 import id_token  # noqa: F401, I101, I100
-from google.auth.transport import requests  # noqa: F401, I101, I100
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
-from core.config import (  # noqa: I100
+from core.config import (
     ACCESS_TOKEN_EXPIRE_MIN,
-    ALGORITHM,
     API_DOMAIN,
     API_PORT,
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRETS_JSON,
-    SECRET_KEY,
+    ALGORITHM,
 )
-from core.schemas.security import (  # noqa: F401, I101, I100
-    UserDBModel,  # noqa: F401, I101, I100
-    TokenData,  # noqa: F401, I101, I100
-    Token,  # noqa: F401, I101, I100
-)  # noqa: F401, I101, I100
+from core.schemas.security import (
+    UserDBModel,
+    TokenData,
+    Token,
+)
+
+from core.services.auth import get_current_active_user, create_access_token, get_yoba_active_user
 
 
 security_router = APIRouter(prefix="", redirect_slashes=True, tags=["auth"])
@@ -51,6 +47,7 @@ API_LOCATION = f"http://{API_DOMAIN}:{API_PORT}"
 SWAP_TOKEN_ENDPOINT = "/api/v1/swap_token"
 SUCCESS_ROUTE = "/api/v1/users/me"
 ERROR_ROUTE = "/api/v1/login_error"
+
 google_login_javascript_server = f"""<!DOCTYPE html>
 <html itemscope itemtype="http://schema.org/Article">
 <head>
@@ -82,6 +79,7 @@ google_login_javascript_server = f"""<!DOCTYPE html>
 </script>
 <script>
 function signInCallback(authResult) {{
+  console.log(authResult);
   if (authResult['code']) {{
 
     // Hide the sign-in button now that the user is authorized, for example:
@@ -105,7 +103,6 @@ function signInCallback(authResult) {{
 
       processData: false,
       data: authResult['code']
-
     }});
   }} else {{
     // There was an error.
@@ -117,112 +114,6 @@ function signInCallback(authResult) {{
 
 </body>
 </html>"""
-fake_users_db = {
-    "nemuku": {
-        "username": "nemuku",
-        "full_name": "Aleksei Deviatkin",
-        "email": "nemuku@gmail.com",
-        "disabled": False,
-    },
-    "devyatkin.dev": {
-        "username": "devyatkin.dev",
-        "full_name": "Aleksei Deviatkin",
-        "email": "devyatkin.dev@gmail.com",
-        "disabled": False,
-    },
-}
-
-
-class OAuth2PasswordBearerCookie(OAuth2):  # noqa: D101
-    def __init__(  # noqa: D107
-        self,
-        tokenUrl: str,
-        scheme_name: str = None,
-        scopes: dict = None,
-        auto_error: bool = True,
-    ):
-        if not scopes:
-            scopes = {}
-        flows = OAuthFlowsModel(password={"tokenUrl": tokenUrl, "scopes": scopes})
-        super().__init__(flows=flows, scheme_name=scheme_name, auto_error=auto_error)
-
-    async def __call__(self, request: Request) -> Optional[str]:  # noqa: D102
-        header_authorization: str = request.headers.get("Authorization")
-        # cookie_authorization: str = request.cookies.get("Authorization")
-
-        header_scheme, header_param = get_authorization_scheme_param(
-            header_authorization
-        )
-
-        if header_scheme.lower() == "bearer":
-            authorization = True
-            scheme = header_scheme
-            param = header_param
-
-        else:
-            authorization = False
-
-        if not authorization or scheme.lower() != "bearer":
-            if self.auto_error:
-                raise HTTPException(
-                    status_code=HTTP_403_FORBIDDEN, detail="Not authenticated"
-                )
-            else:
-                return None
-        return param
-
-
-# oauth2_scheme = OAuth2PasswordBearerCookie(tokenUrl="/token")
-
-
-def get_user_by_email(db, email: str):
-    for username, value in db.items():
-        if value.get("email") == email:
-            user_dict = db[username]
-            return User(**user_dict)
-
-
-def authenticate_user_email(fake_db, email: str):
-    user = get_user_by_email(fake_db, email)
-    if not user:
-        return False
-    return user
-
-
-def create_access_token(*, data: dict, expires_delta: timedelta = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt_encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
-
-
-# async def get_current_user(token: str = Depends(oauth2_scheme)):
-#     # TODO: read from token header
-#     credentials_exception = HTTPException(
-#         status_code=HTTP_403_FORBIDDEN, detail="Could not validate credentials"
-#     )
-#     try:
-#         payload = jwt_decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-#         email: str = payload.get("sub")
-#         if email is None:
-#             raise credentials_exception
-#         token_data = TokenData(email=email)
-#     except PyJWTError:
-#         raise credentials_exception
-#     user = get_user_by_email(fake_users_db, email=token_data.email)
-#     if user is None:
-#         raise credentials_exception
-#     return user
-
-
-# async def get_current_active_user(current_user: User = Depends(get_current_user)):
-#     if current_user.disabled:
-#         raise HTTPException(status_code=400, detail="Inactive user")
-#     return current_user
 
 
 @security_router.get("/google_login_server", tags=["security"])
@@ -237,7 +128,7 @@ async def swap_token(request: Request = None):
 
     # TODO: use for extra client checking?
     # google_client_type = request.headers.get("X-Google-OAuth2-Type")
-
+    print('swap token')
     try:
         body_bytes = await request.body()
         auth_code = jsonable_encoder(body_bytes)
@@ -247,8 +138,9 @@ async def swap_token(request: Request = None):
         )
 
         http_auth = credentials.authorize(httplib2.Http())
-
-        email = credentials.id_token["email"]
+        print('http auth:', http_auth)
+        print('credentials id:', credentials.id_token)
+        google_user_id = credentials.id_token["sub"]
 
         print("credentials refresh token:", credentials.refresh_token)
 
@@ -256,7 +148,7 @@ async def swap_token(request: Request = None):
         print(E)
         raise HTTPException(status_code=400, detail="Unable to validate social login")
 
-    authenticated_user = authenticate_user_email(fake_users_db, email)
+    authenticated_user = await get_current_active_user(google_user_id)
 
     print("id token:", credentials.id_token)
     print("sub:", credentials.id_token["sub"])
@@ -271,14 +163,21 @@ async def swap_token(request: Request = None):
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MIN)
     access_token = create_access_token(
-        data={"sub": authenticated_user.email}, expires_delta=access_token_expires
+        data={"sub": authenticated_user.ext_id,
+              "username": authenticated_user.username,
+              },
+        expires_delta=access_token_expires
     )
 
     token = jsonable_encoder(access_token)
 
-    response = JSONResponse({"access_token": token, "token_type": "bearer"})
+    response = JSONResponse({"access_token": token, "token_type": "bearer",               "alg": ALGORITHM,
+              "typ": "JWT"})
 
-    print({"access_token": token, "token_type": "bearer"})
+    print({"token": token,
+           "token_type": "bearer",
+           "alg": ALGORITHM,
+           "typ": "JWT"})
 
     return response
 
@@ -288,18 +187,9 @@ async def login_error():
     return "Something went wrong logging in!"
 
 
-# @security_router.get("/logout", tags=["security"])
-# async def route_logout_and_remove_cookie():
-#     # TODO: invalidate token
-#     response = RedirectResponse(url="/")
-#     return response
-
-
-# @security_router.get("/users/me/", response_model=User, tags=["users"])
-# async def read_users_me(current_user: User = Depends(get_current_active_user)):
-#     return current_user
-#
-#
-# @security_router.get("/users/me/items/", tags=["users"])
-# async def read_own_items(current_user: User = Depends(get_current_active_user)):
-#     return [{"item_id": "Foo", "owner": current_user.username}]
+@security_router.get(f"{SUCCESS_ROUTE}", response_model=UserDBModel)
+async def read_users_me(current_user: UserDBModel = Depends(get_yoba_active_user)):
+    print('Read users')
+    print('current user')
+    print(current_user)
+    return current_user
