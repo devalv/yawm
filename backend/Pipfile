@@ -15,14 +15,12 @@ psycopg2-binary = "*"
 python-multipart = "*"
 fastapi-pagination = {extras = ["gino"], version = "*"}
 httpx = "*"
-# security
 google-api-python-client = "*"
 google-auth = "*"
 google-auth-oauthlib = "*"
 google-auth-httplib2 = "*"
-
-pyjwt = "*"
 oauth2client = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
 
 [dev-packages]
 coverage = "==5.3.*"
