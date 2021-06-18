@@ -72,9 +72,9 @@ class BaseUserDB(BaseModel):
     superuser: bool
     created: datetime
     username: str
-    given_name: str
-    family_name: str
-    full_name: str
+    given_name: Optional[str]
+    family_name: Optional[str]
+    full_name: Optional[str]
 
 
 class UserDBModel(JsonApiDBModel):
@@ -87,3 +87,8 @@ class UserDBDataModel(JsonApiDataDBModel):
     """User data model."""
 
     data: UserDBModel
+
+    @property
+    def disabled(self):
+        """Interface for UserGinoModel.disabled."""
+        return self.data.attributes.disabled
