@@ -6,6 +6,7 @@ from fastapi import FastAPI
 
 from fastapi_pagination import add_pagination
 
+from core.config import SWAP_TOKEN_ENDPOINT, GOOGLE_CLIENT_ID, GOOGLE_SCOPES
 from core.database.models import db  # noqa: I100
 from .v1 import (  # noqa: I201
     product_router,
@@ -18,7 +19,13 @@ from .v1 import (  # noqa: I201
 
 def get_app():
     """Just simple application initialization."""
-    application = FastAPI(title="Yet another wishlist maker", version="0.2.0")
+    application = FastAPI(title="Yet another wishlist maker",
+                          version="0.2.0",
+                          swagger_ui_oauth2_redirect_url=SWAP_TOKEN_ENDPOINT,
+                          swagger_ui_init_oauth={
+                              "clientId": GOOGLE_CLIENT_ID,
+                              # "scopes": GOOGLE_SCOPES
+                          })
     db.init_app(application)
     return application
 
