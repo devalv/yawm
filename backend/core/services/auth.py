@@ -5,100 +5,34 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security.oauth2 import (
-    OAuth2,
-    OAuthFlowsModel,
-    get_authorization_scheme_param,
-)
 from jose import JWTError, jwt
 
 from core.config import SECRET_KEY, ALGORITHM
 from core.database import UserGinoModel
 from core.schemas import UserDBDataModel, TokenData
-
-from starlette.requests import Request
 from typing import Optional
 from datetime import datetime, timedelta
 
-# import jwt
-# # from jwt import PyJWTError
 
-from fastapi import Depends, FastAPI, HTTPException
-from fastapi.encoders import jsonable_encoder
-from fastapi.security.oauth2 import (
-    OAuth2,
-    OAuthFlowsModel,
-    get_authorization_scheme_param,
+from fastapi import Depends, HTTPException
+
+from core.config import API_DOMAIN, API_PORT, SWAP_TOKEN_ENDPOINT, GOOGLE_SCOPES, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, LOGIN_ENDPOINT
+
+from fastapi.security.oauth2 import OAuth2AuthorizationCodeBearer
+
+google_auth_url = f"https://accounts.google.com/o/oauth2/v2/auth"
+
+# OAuthFlowImplicit
+# OAuth2AuthorizationCodeBearer
+# OAuth2
+
+oauth2_scheme = OAuth2AuthorizationCodeBearer(
+    # authorizationUrl=google_auth_url,
+    # tokenUrl="https://www.googleapis.com/oauth2/v4/token",
+    authorizationUrl=LOGIN_ENDPOINT,
+    tokenUrl=SWAP_TOKEN_ENDPOINT,
+    scopes=GOOGLE_SCOPES
 )
-from fastapi.openapi.docs import get_swagger_ui_html
-from fastapi.openapi.utils import get_openapi
-
-from starlette.status import HTTP_403_FORBIDDEN
-from starlette.responses import RedirectResponse, JSONResponse, HTMLResponse
-from starlette.requests import Request
-
-from pydantic import BaseModel
-
-import httplib2
-from oauth2client import client
-from google.oauth2 import id_token
-from google.auth.transport import requests
-
-
-class OAuth2PasswordBearerCookie(OAuth2):
-    def __init__(
-        self,
-        tokenUrl: str,
-        scheme_name: str = None,
-        scopes: dict = None,
-        auto_error: bool = True,
-    ):
-        if not scopes:
-            scopes = {}
-        flows = OAuthFlowsModel(password={"tokenUrl": tokenUrl, "scopes": scopes})
-        super().__init__(flows=flows, scheme_name=scheme_name, auto_error=auto_error)
-
-    async def __call__(self, request: Request) -> Optional[str]:
-        print('calling yoba')
-        print('request headers:', request.headers)
-        header_authorization: str = request.headers.get("Authorization")
-        cookie_authorization: str = request.cookies.get("Authorization")
-
-        header_scheme, header_param = get_authorization_scheme_param(
-            header_authorization
-        )
-        cookie_scheme, cookie_param = get_authorization_scheme_param(
-            cookie_authorization
-        )
-
-        if header_scheme.lower() == "bearer":
-            authorization = True
-            scheme = header_scheme
-            param = header_param
-
-        # elif cookie_scheme.lower() == "bearer":
-        #     authorization = True
-        #     scheme = cookie_scheme
-        #     param = cookie_param
-
-        else:
-            authorization = False
-
-        print('header scheme:', header_scheme)
-        print('header_param:', header_param)
-
-        if not authorization or scheme.lower() != "bearer":
-            if self.auto_error:
-                raise HTTPException(
-                    status_code=HTTP_403_FORBIDDEN, detail="Not authenticated"
-                )
-            else:
-                return None
-        print('Auth passed')
-        return param
-
-
-oauth2_scheme = OAuth2PasswordBearerCookie(tokenUrl="/token")
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
@@ -143,6 +77,7 @@ async def get_current_active_user(ext_id: str):
     if user is None or user.disabled:
         raise credentials_exception
     print('return user')
+    # TODO: new user registtration
     return user
 
 
@@ -154,9 +89,7 @@ async def get_current_active_user(ext_id: str):
 
 
 async def get_yoba_user(token: str = Depends(oauth2_scheme)):
-# async def get_yoba_user(token: str):
-    # print('token is:', args)
-    # print('token is:', kwargs)
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

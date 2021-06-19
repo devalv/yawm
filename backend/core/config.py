@@ -48,3 +48,15 @@ GOOGLE_CLIENT_ID = config("GOOGLE_CLIENT_ID", default=None)
 GOOGLE_CLIENT_SECRETS_JSON = config("GOOGLE_CLIENT_SECRETS_JSON", default=None)
 # crawler User-Agent
 CRAWLER_USER_AGENT = config("CRAWLER_USER_AGENT", default="yawm-api")
+# new
+LOGIN_ENDPOINT = "/api/v1/login"
+SWAP_TOKEN_ENDPOINT = "/api/v1/swap_token"
+GOOGLE_SCOPES = {"https://www.googleapis.com/auth/userinfo.email": "default",
+                 "https://www.googleapis.com/auth/userinfo.profile": "default",
+                 "openid": "default"}
+GOOGLE_CLIENT_SECRET="N-Saf3yWc9_XKPt9ubcrAa_W"
+# TODO: keys should be replaced from time to time
+GOOGLE_CERT_KEYS = {
+    "19fe2a7b6795239606ca0a750794a7bd9fd95961": "0YudnviuwNdcCoXEMwMlJWhxWYpmAeRXQ8Df5bCVf5xFVEmL5am_2TTWRwRf34vqJuoGpyf3S7zJeJv8I2Lyvmpw33LReREkObCt1up17JGw5_d9K2Mf59EnnPkd7YUGklUxje8rxILiThiPdEaF8P5pRee",
+    "6a1d26d992be7a4b689bdce1911f4e9adc75d9f1": "y4D9be-o8MKZZYpr9GgmqNFw_pH0a7jPDWG1zYMwFUVSDCY30WsBADGRkDWKKWTgVQ9vzZdjPh1WsffBMD71ghn06Uhx8lCbxemM64N9VGBmlLN26aeu-zJAVblbEjnTh35r-LXD6TKdQcvm3CDvR3oTZ4j1x5G-Yil5JKevvbJ8Wu98VIqgTjx-RQf-EqTau9btxzCEzxw5LxD_De9tK3j82vo7FXWHZ5XmoY6TvQfJHZD0oT6tQgqtgCN1a_C9xV3oOnSStBW9V35buQX3cMYf1la7M3pzsk7HrlQP6YTnQEts8U8LewzcBUwAgkTcVigUx6oWNLfaBJZ4bwgBBQ"
+}

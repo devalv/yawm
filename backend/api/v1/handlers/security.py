@@ -8,6 +8,7 @@ from fastapi import Depends, APIRouter, HTTPException, status
 from fastapi.security import OpenIdConnect
 from fastapi.encoders import jsonable_encoder
 from jose import JWTError, jwt
+from fastapi.responses import RedirectResponse
 
 from starlette.status import HTTP_403_FORBIDDEN
 from starlette.responses import (
@@ -19,8 +20,6 @@ from starlette.requests import Request
 
 import httplib2
 
-from oauth2client import client
-
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
@@ -31,6 +30,9 @@ from core.config import (
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRETS_JSON,
     ALGORITHM,
+    SWAP_TOKEN_ENDPOINT,
+    LOGIN_ENDPOINT,
+    GOOGLE_SCOPES
 )
 from core.schemas.security import (
     UserDBModel,
@@ -44,81 +46,33 @@ from core.services.auth import get_current_active_user, create_access_token, get
 security_router = APIRouter(prefix="", redirect_slashes=True, tags=["auth"])
 
 API_LOCATION = f"http://{API_DOMAIN}:{API_PORT}"
-SWAP_TOKEN_ENDPOINT = "/api/v1/swap_token"
+
 SUCCESS_ROUTE = "/api/v1/users/me"
 ERROR_ROUTE = "/api/v1/login_error"
 
-google_login_javascript_server = f"""<!DOCTYPE html>
-<html itemscope itemtype="http://schema.org/Article">
-<head>
-    <meta charset="UTF-8">
-    <title>Google Login</title>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
-    </script>
-    <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer>
-    </script>
-    <script>
-    function start() {{
-      gapi.load('auth2', function() {{
-        auth2 = gapi.auth2.init({{
-          client_id: '{GOOGLE_CLIENT_ID}',
-          // Scopes to request in addition to 'profile' and 'email'
-          // scope: 'additional_scope'
-        }});
-      }});
-    }}
-  </script>
-</head>
-<body>
-<button id="signinButton">Sign in with Google</button>
-<script>
-  $('#signinButton').click(function() {{
-    // signInCallback defined in step 6.
-    auth2.grantOfflineAccess().then(signInCallback);
-  }});
-</script>
-<script>
-function signInCallback(authResult) {{
-  console.log(authResult);
-  if (authResult['code']) {{
 
-    // Hide the sign-in button now that the user is authorized, for example:
-    $('#signinButton').attr('style', 'display: none');
+@security_router.get(f"{LOGIN_ENDPOINT}")
+async def login():
+    print('start login')
+    import google.oauth2.credentials
+    import google_auth_oauthlib.flow
 
-    // Send the code to the server
-    $.ajax({{
-      type: 'POST',
-      url: '{API_LOCATION}{SWAP_TOKEN_ENDPOINT}',
-      // Always include an `X-Requested-With` header in every AJAX request,
-      // to protect against CSRF attacks.
-      headers: {{
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-Google-OAuth2-Type': 'server'
-      }},
-      contentType: 'application/octet-stream; charset=utf-8',
-      success: function(result) {{
-          location.href = '{API_LOCATION}{SUCCESS_ROUTE}'
-        // Handle or verify the server response.
-      }},
+    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+        GOOGLE_CLIENT_SECRETS_JSON,
+        scopes=[
+                "https://www.googleapis.com/auth/userinfo.profile"])
+    print('A1')
+    flow.redirect_uri = f"{API_LOCATION}{SWAP_TOKEN_ENDPOINT}"
+    print('A2')
 
-      processData: false,
-      data: authResult['code']
-    }});
-  }} else {{
-    // There was an error.
-    console.log(e)
-    location.href = '{API_LOCATION}{ERROR_ROUTE}'
-  }}
-}}
-</script>
-
-</body>
-</html>"""
-
-
-@security_router.get("/google_login_server", tags=["security"])
-def google_login_server():
-    return HTMLResponse(google_login_javascript_server)
+    authorization_url, state = flow.authorization_url(
+        # Enable offline access so that you can refresh an access token without
+        # re-prompting the user for permission. Recommended for web server apps.
+        access_type='offline',
+        # Enable incremental authorization. Recommended as a best practice.
+        include_granted_scopes='false')
+    print('A3')
+    return RedirectResponse(url=authorization_url)
 
 
 @security_router.post(f"{SWAP_TOKEN_ENDPOINT}", response_model=Token, tags=["security"])
@@ -129,35 +83,67 @@ async def swap_token(request: Request = None):
     # TODO: use for extra client checking?
     # google_client_type = request.headers.get("X-Google-OAuth2-Type")
     print('swap token')
-    try:
-        body_bytes = await request.body()
-        auth_code = jsonable_encoder(body_bytes)
+    print('SWAPSWAPSWAP')
 
-        credentials = client.credentials_from_clientsecrets_and_code(
-            GOOGLE_CLIENT_SECRETS_JSON, ["profile", "email"], auth_code
-        )
+    print('request:', request)
+    import google.oauth2.credentials
+    import google_auth_oauthlib.flow
+    from google.auth import crypt
+    from google.auth import jwt
 
-        http_auth = credentials.authorize(httplib2.Http())
-        print('http auth:', http_auth)
-        print('credentials id:', credentials.id_token)
-        google_user_id = credentials.id_token["sub"]
+    # state = flask.session['state']
 
-        print("credentials refresh token:", credentials.refresh_token)
+    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+        GOOGLE_CLIENT_SECRETS_JSON,
+        scopes=[
+                "https://www.googleapis.com/auth/userinfo.profile"])
+    flow.redirect_uri = flow.redirect_uri = f"{API_LOCATION}{SWAP_TOKEN_ENDPOINT}"
 
-    except Exception as E:
-        print(E)
-        raise HTTPException(status_code=400, detail="Unable to validate social login")
+    # Use the authorization server's response to fetch the OAuth 2.0 tokens.
+    body_bytes = await request.body()
+    body_uni = jsonable_encoder(body_bytes)
+    for el in body_uni.split("&"):
+        if el.startswith("code="):
+            auth_code = el.replace("code=", "").replace("%2F", "/")
+
+    print('auth code:', auth_code)
+    # print('auth code:', auth_code)
+    # auth_code = auth_code.replace("%2F", "/")
+    # print('auth code:', auth_code)
+
+    # flow.fetch_token(code=auth_code)
+    flow.fetch_token(code=auth_code)
+    print('token fetched')
+    # Store credentials in the session.
+    # ACTION ITEM: In a production app, you likely want to save these
+    #              credentials in a persistent database instead.
+    credentials = flow.credentials
+
+    cred_dict = {
+        'token': credentials.token,
+        'refresh_token': credentials.refresh_token,
+        'token_uri': credentials.token_uri,
+        'client_id': credentials.client_id,
+        'client_secret': credentials.client_secret,
+        'scopes': credentials.scopes}
+
+    # raise ValueError
+    # authenticated_user = await get_current_active_user(google_user_id)
+    #
+    print('cred dict:', cred_dict)
+
+    print('id token', credentials.id_token)
+    # TODO: token validation https://developers.google.com/identity/protocols/oauth2/openid-connect
+    from core.config import GOOGLE_CERT_KEYS
+    # TODO: add aud check
+    # claims = jwt.decode(credentials.id_token, certs=GOOGLE_CERT_KEYS)
+    claims = jwt.decode(credentials.id_token, certs=GOOGLE_CERT_KEYS, verify=False)
+
+    print('decoded:', claims)
+    google_user_id = claims['sub']
 
     authenticated_user = await get_current_active_user(google_user_id)
-
-    print("id token:", credentials.id_token)
-    print("sub:", credentials.id_token["sub"])
-    print("email:", credentials.id_token["email"])
-    print("name:", credentials.id_token.get("name", None))
-    print("picture:", credentials.id_token.get("picture", None))
-    print("given_name:", credentials.id_token.get("given_name", None))
-    print("family_name:", credentials.id_token.get("family_name", None))
-
+    print('authenticated user:', authenticated_user)
     if not authenticated_user:
         raise HTTPException(status_code=400, detail="Incorrect email address")
 
@@ -168,17 +154,19 @@ async def swap_token(request: Request = None):
               },
         expires_delta=access_token_expires
     )
-
+    print('access token:', access_token)
     token = jsonable_encoder(access_token)
+    print('token:', token)
 
-    response = JSONResponse({"access_token": token, "token_type": "bearer",               "alg": ALGORITHM,
-              "typ": "JWT"})
+    response = JSONResponse(
+        {"access_token": token, "token_type": "bearer", "alg": ALGORITHM,
+         "typ": "JWT"})
 
     print({"token": token,
            "token_type": "bearer",
            "alg": ALGORITHM,
            "typ": "JWT"})
-
+    # return
     return response
 
 
