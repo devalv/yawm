@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """Authentication system."""
 
-from datetime import datetime, timedelta
-from typing import Optional
-
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
+from fastapi.security.oauth2 import OAuth2AuthorizationCodeBearer, OAuth2, OAuthFlowsModel, get_authorization_scheme_param
 from jose import JWTError, jwt
 
 from core.config import SECRET_KEY, ALGORITHM
@@ -14,24 +12,14 @@ from typing import Optional
 from datetime import datetime, timedelta
 
 
-from fastapi import Depends, HTTPException
-
-from core.config import API_DOMAIN, API_PORT, SWAP_TOKEN_ENDPOINT, GOOGLE_SCOPES, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, LOGIN_ENDPOINT
-
-from fastapi.security.oauth2 import OAuth2AuthorizationCodeBearer
+from core.config import SWAP_TOKEN_ENDPOINT, LOGIN_ENDPOINT
 
 google_auth_url = f"https://accounts.google.com/o/oauth2/v2/auth"
 
-# OAuthFlowImplicit
-# OAuth2AuthorizationCodeBearer
-# OAuth2
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
-    # authorizationUrl=google_auth_url,
-    # tokenUrl="https://www.googleapis.com/oauth2/v4/token",
     authorizationUrl=LOGIN_ENDPOINT,
     tokenUrl=SWAP_TOKEN_ENDPOINT,
-    scopes=GOOGLE_SCOPES
 )
 
 
@@ -73,11 +61,9 @@ async def get_current_active_user(ext_id: str):
     #     raise credentials_exception
 
     user = await UserGinoModel.query.where(UserGinoModel.ext_id == ext_id).gino.first()
-    print('user:', user)
     if user is None or user.disabled:
         raise credentials_exception
-    print('return user')
-    # TODO: new user registtration
+    # TODO: new user registration
     return user
 
 
