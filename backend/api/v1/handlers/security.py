@@ -3,14 +3,13 @@
 
 from datetime import timedelta
 
-from fastapi import Depends, APIRouter, HTTPException, status
+from fastapi import Depends, APIRouter, HTTPException, status, Form
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import RedirectResponse, JSONResponse
 
-from starlette.requests import Request
-
-import google_auth_oauthlib.flow
-from google.auth import jwt
+from google_auth_oauthlib.flow import Flow as GFlow
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 from core.config import (
     ACCESS_TOKEN_EXPIRE_MIN,
@@ -21,15 +20,14 @@ from core.config import (
     SWAP_TOKEN_ENDPOINT,
     LOGIN_ENDPOINT,
     GOOGLE_SCOPES,
-    GOOGLE_CERT_KEYS
 )
-from core.schemas.security import (
-    UserDBModel,
-    TokenData,
-    Token,
-)
+from core.schemas.security import UserDBModel, Token
 
-from core.services.auth import get_current_active_user, create_access_token, get_yoba_active_user
+from core.services.auth import (
+    get_current_active_user,
+    create_access_token,
+    get_yoba_active_user,
+)
 
 
 security_router = APIRouter(prefix="", redirect_slashes=True, tags=["auth"])
@@ -42,82 +40,66 @@ ERROR_ROUTE = "/api/v1/login_error"
 
 @security_router.get(f"{LOGIN_ENDPOINT}")
 async def login(state: str):
-    print('incoming state:', state)
-    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        GOOGLE_CLIENT_SECRETS_JSON,
-        scopes=GOOGLE_SCOPES)
+    flow = GFlow.from_client_secrets_file(
+        GOOGLE_CLIENT_SECRETS_JSON, scopes=GOOGLE_SCOPES
+    )
     flow.redirect_uri = f"{API_LOCATION}{SWAP_TOKEN_ENDPOINT}"
-
-    authorization_url, yboa_state = flow.authorization_url(
-        access_type='offline',
-        # response_type='code',
-        state=state,
-        include_granted_scopes='true')
-
-    print('Login state:', yboa_state)
+    authorization_url, frontend_state = flow.authorization_url(
+        access_type="offline", state=state, include_granted_scopes="true"
+    )
 
     return RedirectResponse(url=authorization_url)
 
 
 @security_router.post(f"{SWAP_TOKEN_ENDPOINT}", response_model=Token, tags=["security"])
-async def swap_token(request: Request = None):
+async def swap_token(code: str = Form(...)):
+
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    # TODO: refresh token in the system
     # TODO: 500err when page need to be reloaded
-    # if not request.headers.get("X-Requested-With"):
-    #     raise HTTPException(status_code=400, detail="Incorrect headers")
 
-    # TODO: use for extra client checking?
-    # google_client_type = request.headers.get("X-Google-OAuth2-Type")
-
-    # TODO: Auth WarningAuthorization may be unsafe, passed state was changed in
-    #  server Passed state wasn't returned from auth server
-
-    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
-        GOOGLE_CLIENT_SECRETS_JSON,
-        scopes=GOOGLE_SCOPES)
+    # Get authentication code
+    flow = GFlow.from_client_secrets_file(
+        GOOGLE_CLIENT_SECRETS_JSON, scopes=GOOGLE_SCOPES
+    )
     flow.redirect_uri = f"{API_LOCATION}{SWAP_TOKEN_ENDPOINT}"
 
-    # Use the authorization server's response to fetch the OAuth 2.0 tokens.
-    body_bytes = await request.body()
-    body_uni = jsonable_encoder(body_bytes)
-    # TODO: set response type only as code
-    for el in body_uni.split("&"):
-        if el.startswith("code="):
-            auth_code = el.replace("code=", "").replace("%2F", "/")
-
-    flow.fetch_token(code=auth_code)
-
+    flow.fetch_token(code=code)
     credentials = flow.credentials
-    print(dir(credentials))
 
-    claims = jwt.decode(credentials.id_token, certs=GOOGLE_CERT_KEYS, verify=True)
+    # token validation
+    try:
+        id_info = id_token.verify_oauth2_token(
+            credentials.id_token, requests.Request(), credentials.client_id
+        )
 
-    google_user_id = claims['sub']
+        google_user_id = id_info["sub"]
+    except ValueError:
+        raise credentials_exception
 
+    # another section
     authenticated_user = await get_current_active_user(google_user_id)
-    print('authenticated user:', authenticated_user)
-
     if not authenticated_user:
-        raise HTTPException(status_code=400, detail="Incorrect email address")
-
+        # TODO: user registration?
+        raise HTTPException(status_code=400, detail="Incorrect user id")
+    # generate system token for a user
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MIN)
     access_token = create_access_token(
-        data={"sub": authenticated_user.ext_id,
-              "username": authenticated_user.username,
-              },
-        expires_delta=access_token_expires
+        data={
+            "sub": authenticated_user.ext_id,
+            "username": authenticated_user.username,
+        },
+        expires_delta=access_token_expires,
     )
     token = jsonable_encoder(access_token)
-
     response = JSONResponse(
-        {"access_token": token,
-         "token_type": "bearer",
-         "alg": ALGORITHM,
-         "typ": "JWT"})
-
-    print({"token": token,
-           "token_type": "bearer",
-           "alg": ALGORITHM,
-           "typ": "JWT"})
+        {"access_token": token, "token_type": "bearer", "alg": ALGORITHM, "typ": "JWT"}
+    )
 
     return response
 
