@@ -2,7 +2,12 @@
 """Authentication system."""
 
 from fastapi import Depends, HTTPException, status, Request
-from fastapi.security.oauth2 import OAuth2AuthorizationCodeBearer, OAuth2, OAuthFlowsModel, get_authorization_scheme_param
+from fastapi.security.oauth2 import (
+    OAuth2AuthorizationCodeBearer,
+    OAuth2,
+    OAuthFlowsModel,
+    get_authorization_scheme_param,
+)
 from jose import JWTError, jwt
 
 from core.config import SECRET_KEY, ALGORITHM
@@ -18,8 +23,7 @@ google_auth_url = f"https://accounts.google.com/o/oauth2/v2/auth"
 
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
-    authorizationUrl=LOGIN_ENDPOINT,
-    tokenUrl=SWAP_TOKEN_ENDPOINT,
+    authorizationUrl=LOGIN_ENDPOINT, tokenUrl=SWAP_TOKEN_ENDPOINT
 )
 
 
@@ -36,8 +40,8 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 async def get_current_active_user(ext_id: str):
     # TODO: token validation should be later
-    print('get current user')
-    print('user ext id:', ext_id)
+    print("get current user")
+    print("user ext id:", ext_id)
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -81,16 +85,16 @@ async def get_yoba_user(token: str = Depends(oauth2_scheme)):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    print('A')
+    print("A")
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         ext_id: str = payload.get("sub")
         if ext_id is None:
             raise credentials_exception
         token_data = TokenData(ext_id=ext_id)
-        print('B')
+        print("B")
     except JWTError as ex:
-        print('hwt err:', ex)
+        print("hwt err:", ex)
         raise credentials_exception
     user = await UserGinoModel.query.where(UserGinoModel.ext_id == ext_id).gino.first()
     if user is None:
@@ -99,7 +103,7 @@ async def get_yoba_user(token: str = Depends(oauth2_scheme)):
 
 
 async def get_yoba_active_user(current_user: UserDBDataModel = Depends(get_yoba_user)):
-    print('ABC')
+    print("ABC")
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user

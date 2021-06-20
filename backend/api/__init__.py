@@ -19,15 +19,16 @@ from .v1 import (  # noqa: I201
 
 def get_app():
     """Just simple application initialization."""
-    application = FastAPI(title="Yet another wishlist maker",
-                          version="0.2.0",
-                          swagger_ui_oauth2_redirect_url=SWAP_TOKEN_ENDPOINT,
-                          swagger_ui_init_oauth={
-                              "clientId": "please keep this value",
-                              "clientSecret": "please keep this value",
-                              "appName": "Yet another wishlist maker"
-                          }
-                          )
+    application = FastAPI(
+        title="Yet another wishlist maker",
+        version="0.2.0",
+        swagger_ui_oauth2_redirect_url=SWAP_TOKEN_ENDPOINT,
+        swagger_ui_init_oauth={
+            "clientId": "please keep this value",
+            "clientSecret": "please keep this value",
+            "appName": "Yet another wishlist maker",
+        },
+    )
     db.init_app(application)
     return application
 
