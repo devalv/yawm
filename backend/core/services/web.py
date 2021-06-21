@@ -163,8 +163,15 @@ async def get_product_name(url: str, chunk_size: int = 100) -> str:
     Note:
         If response will be empty - product name will be None.
     """
-    async with httpx.AsyncClient(headers={"User-Agent": CRAWLER_USER_AGENT}) as client:
-        async with client.stream("GET", url) as response:
-            response_iter = response.aiter_text
-            page_parser = PageParser(chunk_iter=response_iter, chunk_size=chunk_size)
-            return await page_parser.get_value()
+    try:
+        async with httpx.AsyncClient(
+            headers={"User-Agent": CRAWLER_USER_AGENT}
+        ) as client:
+            async with client.stream("GET", url) as response:
+                response_iter = response.aiter_text
+                page_parser = PageParser(
+                    chunk_iter=response_iter, chunk_size=chunk_size
+                )
+                return await page_parser.get_value()
+    except httpx.RequestError:
+        return
