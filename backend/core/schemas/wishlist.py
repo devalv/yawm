@@ -3,7 +3,7 @@
 
 from pydantic import BaseModel
 
-from core.utils import (  # noqa: I100
+from core.utils import (
     JsonApiCreateBaseModel,
     JsonApiDBModel,
     JsonApiDataCreateBaseModel,

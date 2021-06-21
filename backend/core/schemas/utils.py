@@ -5,7 +5,7 @@ from typing import Optional
 
 from pydantic import BaseModel, HttpUrl
 
-from core.utils.pydantic_models import (  # noqa: I100
+from core.utils.pydantic_models import (
     JsonApiCreateBaseModel,
     JsonApiDataCreateBaseModel,
 )

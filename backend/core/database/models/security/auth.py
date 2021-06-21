@@ -6,7 +6,7 @@ from uuid import uuid4
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
-from core.utils import JsonApiGinoModel  # noqa: I100
+from core.utils import JsonApiGinoModel
 
 from .. import db
 
