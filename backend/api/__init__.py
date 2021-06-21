@@ -45,7 +45,10 @@ def configure_routes(application: FastAPI):
 
 def get_versioned_app(application: FastAPI) -> VersionedFastAPI:
     return VersionedFastAPI(
-        application, version_format="{major}", prefix_format="/api/v{major}"
+        application,
+        version_format="{major}",
+        prefix_format="/api/v{major}",
+        swagger_ui_oauth2_redirect_url=SWAP_TOKEN_ENDPOINT,
     )
 
 

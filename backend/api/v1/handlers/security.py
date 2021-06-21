@@ -21,7 +21,6 @@ from core.config import (
     API_PORT,
     GOOGLE_CLIENT_SECRETS_JSON,
     GOOGLE_SCOPES,
-    LOGIN_ENDPOINT,
     SWAP_TOKEN_ENDPOINT,
 )
 from core.schemas.security import Token, UserDBModel
@@ -39,7 +38,7 @@ SUCCESS_ROUTE = "/api/v1/users/me"
 ERROR_ROUTE = "/api/v1/login_error"
 
 
-@security_router.get(f"{LOGIN_ENDPOINT}")
+@security_router.get("/login")
 @version(1)
 async def login(state: str):  # noqa: D103
     flow = GFlow.from_client_secrets_file(
@@ -53,7 +52,7 @@ async def login(state: str):  # noqa: D103
     return RedirectResponse(url=authorization_url)
 
 
-@security_router.post(f"{SWAP_TOKEN_ENDPOINT}", response_model=Token, tags=["security"])
+@security_router.post("/swap_token", response_model=Token, tags=["security"])
 @version(1)
 async def swap_token(code: str = Form(...)):  # noqa: B008, D103
 
