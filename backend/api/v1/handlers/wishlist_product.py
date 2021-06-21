@@ -5,6 +5,8 @@ from fastapi import APIRouter, Response, status
 
 from fastapi_pagination.ext.gino import paginate
 
+from fastapi_versioning import version
+
 from pydantic import UUID4
 
 from core.database.models.wishlist import Wishlist, WishlistProducts
@@ -16,14 +18,13 @@ from core.schemas import (
 )
 from core.utils import JsonApiPage
 
-wishlist_product_router = APIRouter(
-    prefix="/api/v1", redirect_slashes=True, tags=["wishlist-products"]
-)
+wishlist_product_router = APIRouter(redirect_slashes=True, tags=["wishlist-products"])
 
 
 @wishlist_product_router.get(
     "/wishlist/{id}/products", response_model=JsonApiPage[WishlistProductsModel]
 )
+@version(1)
 async def list_wishlist_products(id: UUID4):  # noqa: A002
     """API for getting all related products."""
     wishlist = await Wishlist.get_or_404(id)
@@ -33,6 +34,7 @@ async def list_wishlist_products(id: UUID4):  # noqa: A002
 @wishlist_product_router.post(
     "/wishlist/{id}/products", response_model=WishlistProductsDataModel
 )
+@version(1)
 async def create_wishlist_product(
     id: UUID4, product: WishlistProductsDataCreateModel  # noqa: A002
 ):
@@ -44,6 +46,7 @@ async def create_wishlist_product(
 @wishlist_product_router.put(
     "/wishlist/{id}/products/{pw_id}", response_model=WishlistProductsDataModel
 )
+@version(1)
 async def update_wishlist_product(
     id: UUID4, pw_id: UUID4, pwm: WishlistProductsDataUpdateModel  # noqa: A002
 ):
@@ -59,6 +62,7 @@ async def update_wishlist_product(
     response_class=Response,
     status_code=status.HTTP_204_NO_CONTENT,
 )
+@version(1)
 async def delete_wishlist_product(id: UUID4, pw_id: UUID4):  # noqa: A002
     """API for removing product from wishlist."""
     await Wishlist.get_or_404(id)
