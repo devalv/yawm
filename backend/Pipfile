@@ -19,6 +19,7 @@ google-auth = "*"
 google-auth-oauthlib = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
 fastapi-versioning = "*"
+uvloop = "*"
 
 [dev-packages]
 coverage = "==5.*"
