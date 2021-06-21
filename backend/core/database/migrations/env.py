@@ -7,7 +7,7 @@ from alembic import context
 
 from sqlalchemy import engine_from_config, pool
 
-from core.config import DB_DSN  # noqa: I100
+from core.config import DB_DSN
 from core.database import db as target_metadata
 
 

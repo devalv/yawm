@@ -3,7 +3,7 @@
 
 import uvicorn
 
-from core import config  # noqa: I100
+from core import config
 
 
 if __name__ == "__main__":

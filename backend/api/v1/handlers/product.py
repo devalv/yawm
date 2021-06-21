@@ -7,14 +7,14 @@ from fastapi_pagination.ext.gino import paginate
 
 from pydantic import UUID4
 
-from core.database.models.wishlist import Product  # noqa: I100
+from core.database.models.wishlist import Product
 from core.schemas import (
     ProductDataCreateModel,
     ProductDataModel,
     ProductDataUpdateModel,
     ProductModel,
 )
-from core.utils import JsonApiPage  # noqa: I100
+from core.utils import JsonApiPage
 
 product_router = APIRouter(prefix="/api/v1", redirect_slashes=True, tags=["product"])
 

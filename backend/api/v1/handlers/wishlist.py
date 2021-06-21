@@ -7,14 +7,14 @@ from fastapi_pagination.ext.gino import paginate
 
 from pydantic import UUID4
 
-from core.database.models.wishlist import Wishlist  # noqa: I100
+from core.database.models.wishlist import Wishlist
 from core.schemas import (
     WishlistDataCreateModel,
     WishlistDataModel,
     WishlistDataUpdateModel,
     WishlistModel,
 )
-from core.utils import JsonApiPage  # noqa: I100
+from core.utils import JsonApiPage
 
 wishlist_router = APIRouter(prefix="/api/v1", redirect_slashes=True, tags=["wishlist"])
 

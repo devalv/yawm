@@ -3,7 +3,7 @@
 
 import httpx
 
-from core.config import CRAWLER_USER_AGENT  # noqa: I100
+from core.config import CRAWLER_USER_AGENT
 
 
 class PageParser:

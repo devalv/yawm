@@ -3,12 +3,9 @@
 
 from fastapi import APIRouter
 
-from core.schemas import (  # noqa: I100
-    ExtractUrlDataInModel,
-    ExtractUrlModelDataOutModel,
-)
-from core.services import get_product_name  # noqa: I100
-from core.database import ProductGinoModel  # noqa: I100
+from core.database import ProductGinoModel
+from core.schemas import ExtractUrlDataInModel, ExtractUrlModelDataOutModel
+from core.services import get_product_name
 
 utils_router = APIRouter(prefix="/api/v1", redirect_slashes=True, tags=["utils"])
 

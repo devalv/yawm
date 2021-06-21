@@ -10,7 +10,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from starlette import status
 from starlette.exceptions import HTTPException
 
-from core.utils import JsonApiGinoModel  # noqa: I100
+from core.utils import JsonApiGinoModel
 
 from . import db
 
