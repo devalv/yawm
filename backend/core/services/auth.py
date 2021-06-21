@@ -83,7 +83,7 @@ async def get_yoba_user(token: str = Depends(oauth2_scheme)):  # noqa
 
 
 async def get_yoba_active_user(  # noqa
-    current_user: UserDBDataModel = Depends(get_yoba_user)  # noqa
+    current_user: UserDBDataModel = Depends(get_yoba_user),  # noqa
 ):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")

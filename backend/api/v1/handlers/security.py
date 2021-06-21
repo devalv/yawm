@@ -109,6 +109,6 @@ async def login_error():  # noqa: D103
 
 @security_router.get(f"{SUCCESS_ROUTE}", response_model=UserDBModel)
 async def read_users_me(  # noqa: D103
-    current_user: UserDBModel = Depends(get_yoba_active_user)  # noqa: B008
+    current_user: UserDBModel = Depends(get_yoba_active_user),  # noqa: B008
 ):
     return current_user
