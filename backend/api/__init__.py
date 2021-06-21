@@ -6,6 +6,8 @@ from fastapi import FastAPI
 
 from fastapi_pagination import add_pagination
 
+from fastapi_versioning import VersionedFastAPI
+
 from core.config import SWAP_TOKEN_ENDPOINT
 from core.database.models import db
 from .v1 import (  # noqa: I201
@@ -17,9 +19,9 @@ from .v1 import (  # noqa: I201
 )
 
 
-def get_app():
+def get_app() -> FastAPI:
     """Just simple application initialization."""
-    application = FastAPI(
+    return FastAPI(
         title="Yet another wishlist maker",
         version="0.2.0",
         swagger_ui_oauth2_redirect_url=SWAP_TOKEN_ENDPOINT,
@@ -29,21 +31,32 @@ def get_app():
             "appName": "Yet another wishlist maker",
         },
     )
-    db.init_app(application)
-    return application
 
 
-def configure(application: FastAPI):
+def configure_routes(application: FastAPI):
     """Configure application."""
     application.include_router(wishlist_router)
     application.include_router(product_router)
     application.include_router(wishlist_product_router)
     application.include_router(utils_router)
     application.include_router(security_router)
+    add_pagination(application)
+
+
+def get_versioned_app(application: FastAPI) -> VersionedFastAPI:
+    return VersionedFastAPI(
+        application, version_format="{major}", prefix_format="/api/v{major}"
+    )
+
+
+def configure_db(application: FastAPI):
+    db.init_app(application)
 
 
 app = get_app()
-configure(application=app)
-add_pagination(app)
+configure_routes(application=app)
+app = get_versioned_app(application=app)
+configure_db(app)
+
 
 __all__ = ["app", "db"]

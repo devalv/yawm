@@ -7,6 +7,8 @@ from fastapi import APIRouter, Depends, Form, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, RedirectResponse
 
+from fastapi_versioning import version
+
 from google.auth.transport import requests
 from google.oauth2 import id_token
 
@@ -30,7 +32,7 @@ from core.services.auth import (
 )
 
 
-security_router = APIRouter(prefix="", redirect_slashes=True, tags=["auth"])
+security_router = APIRouter(redirect_slashes=True, tags=["auth"])
 
 API_LOCATION = f"http://{API_DOMAIN}:{API_PORT}"
 SUCCESS_ROUTE = "/api/v1/users/me"
@@ -38,6 +40,7 @@ ERROR_ROUTE = "/api/v1/login_error"
 
 
 @security_router.get(f"{LOGIN_ENDPOINT}")
+@version(1)
 async def login(state: str):  # noqa: D103
     flow = GFlow.from_client_secrets_file(
         GOOGLE_CLIENT_SECRETS_JSON, scopes=GOOGLE_SCOPES
@@ -51,6 +54,7 @@ async def login(state: str):  # noqa: D103
 
 
 @security_router.post(f"{SWAP_TOKEN_ENDPOINT}", response_model=Token, tags=["security"])
+@version(1)
 async def swap_token(code: str = Form(...)):  # noqa: B008, D103
 
     credentials_exception = HTTPException(
@@ -103,11 +107,13 @@ async def swap_token(code: str = Form(...)):  # noqa: B008, D103
 
 
 @security_router.get(f"{ERROR_ROUTE}", tags=["security"])
+@version(1)
 async def login_error():  # noqa: D103
     return "Something went wrong logging in!"
 
 
 @security_router.get(f"{SUCCESS_ROUTE}", response_model=UserDBModel)
+@version(1)
 async def read_users_me(  # noqa: D103
     current_user: UserDBModel = Depends(get_yoba_active_user),  # noqa: B008
 ):
