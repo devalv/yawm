@@ -10,10 +10,8 @@ from jose import JWTError, jwt
 
 from core.config import ALGORITHM, LOGIN_ENDPOINT, SECRET_KEY, SWAP_TOKEN_ENDPOINT
 from core.database import UserGinoModel
-from core.schemas import TokenData, UserDBDataModel
+from core.schemas import TokenData
 
-
-google_auth_url = "https://accounts.google.com/o/oauth2/v2/auth"
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl=LOGIN_ENDPOINT, tokenUrl=SWAP_TOKEN_ENDPOINT
@@ -33,6 +31,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None): 
 
 async def get_current_active_user(ext_id: str):  # noqa
     # TODO: token validation should be later
+    # TODO: return UserDBDataModel
+    print("incoming ext_id:", ext_id)  # noqa: T001
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -63,6 +64,7 @@ async def get_current_active_user(ext_id: str):  # noqa
 
 
 async def get_yoba_user(token: str = Depends(oauth2_scheme)):  # noqa
+    # TODO: validate token
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -77,14 +79,6 @@ async def get_yoba_user(token: str = Depends(oauth2_scheme)):  # noqa
     except JWTError as ex:  # noqa
         raise credentials_exception
     user = await UserGinoModel.query.where(UserGinoModel.ext_id == ext_id).gino.first()
-    if user is None:
+    if user is None or user.disabled:
         raise credentials_exception
     return user
-
-
-async def get_yoba_active_user(  # noqa
-    current_user: UserDBDataModel = Depends(get_yoba_user),  # noqa
-):
-    if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
