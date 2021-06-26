@@ -3,9 +3,9 @@
 
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, Form, HTTPException, status
+from fastapi import APIRouter, Form, HTTPException, status
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse
 
 from fastapi_versioning import version
 
@@ -17,39 +17,20 @@ from google_auth_oauthlib.flow import Flow as GFlow
 from core.config import (
     ACCESS_TOKEN_EXPIRE_MIN,
     ALGORITHM,
-    API_DOMAIN,
-    API_PORT,
+    API_LOCATION,
     GOOGLE_CLIENT_SECRETS_JSON,
     GOOGLE_SCOPES,
     SWAP_TOKEN_ENDPOINT,
 )
-from core.schemas.security import Token, UserDBModel
-from core.services.auth import (
-    create_access_token,
-    get_current_active_user,
-    get_yoba_active_user,
-)
+from core.schemas.security import Token
+from core.services.security import create_access_token, get_current_active_user
 
 
 security_router = APIRouter(redirect_slashes=True, tags=["auth"])
 
-API_LOCATION = f"http://{API_DOMAIN}:{API_PORT}"
-SUCCESS_ROUTE = "/api/v1/users/me"
-ERROR_ROUTE = "/api/v1/login_error"
 
-
-@security_router.get("/login")
-@version(1)
-async def login(state: str):  # noqa: D103
-    flow = GFlow.from_client_secrets_file(
-        GOOGLE_CLIENT_SECRETS_JSON, scopes=GOOGLE_SCOPES
-    )
-    flow.redirect_uri = f"{API_LOCATION}{SWAP_TOKEN_ENDPOINT}"
-    authorization_url, frontend_state = flow.authorization_url(
-        access_type="offline", state=state, include_granted_scopes="true"
-    )
-
-    return RedirectResponse(url=authorization_url)
+# TODO: refresh_token == security
+# TODO: swap_token == security
 
 
 @security_router.post("/swap_token", response_model=Token, tags=["security"])
@@ -103,17 +84,3 @@ async def swap_token(code: str = Form(...)):  # noqa: B008, D103
     return JSONResponse(
         {"access_token": token, "token_type": "bearer", "alg": ALGORITHM, "typ": "JWT"}
     )
-
-
-@security_router.get(f"{ERROR_ROUTE}", tags=["security"])
-@version(1)
-async def login_error():  # noqa: D103
-    return "Something went wrong logging in!"
-
-
-@security_router.get(f"{SUCCESS_ROUTE}", response_model=UserDBModel)
-@version(1)
-async def read_users_me(  # noqa: D103
-    current_user: UserDBModel = Depends(get_yoba_active_user),  # noqa: B008
-):
-    return current_user

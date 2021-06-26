@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """Pydantic security models."""
 
+from .auth import UserDBDataModel, UserDBModel, UserDataCreateModel, UserDataUpdateModel
 from .oauth2 import Token, TokenData
-from .user import UserDBDataModel, UserDBModel, UserDataCreateModel, UserDataUpdateModel
 
 
 __all__ = [
