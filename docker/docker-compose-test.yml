@@ -27,6 +27,9 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_DATABASE=${DB_DATABASE}
+      - API_HOST=${API_HOST}
+      - API_PORT=${API_PORT}
+      - API_PROTOCOL=${API_PROTOCOL}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - OAUTHLIB_INSECURE_TRANSPORT=1
     working_dir: /opt/yawm/app
