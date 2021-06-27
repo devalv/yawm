@@ -36,8 +36,7 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRETS_JSON=${GOOGLE_CLIENT_SECRETS_JSON}
-      - GOOGLE_VALID_ISS_1=${GOOGLE_VALID_ISS_1}
-      - GOOGLE_VALID_ISS_2=${GOOGLE_VALID_ISS_2}
+      - GOOGLE_USERINFO_SCOPE=${GOOGLE_USERINFO_SCOPE}
       - OAUTHLIB_INSECURE_TRANSPORT=1
     working_dir: /opt/yawm/app
     command: sh -c "sleep 3 && pipenv run alembic upgrade head && pipenv run python -m main"
