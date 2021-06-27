@@ -8,8 +8,9 @@ from .product import (
     ProductModel,
 )
 from .security import (
+    AccessToken,
+    GoogleIdInfo,
     Token,
-    TokenData,
     UserDBDataModel,
     UserDBModel,
     UserDataCreateModel,
@@ -50,5 +51,6 @@ __all__ = [
     "UserDataCreateModel",
     "UserDataUpdateModel",
     "Token",
-    "TokenData",
+    "AccessToken",
+    "GoogleIdInfo",
 ]
