@@ -27,6 +27,8 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_DATABASE=${DB_DATABASE}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - OAUTHLIB_INSECURE_TRANSPORT=1
     working_dir: /opt/yawm/app
     command: sh -c "sleep 3 && pipenv install --dev && pipenv run python -m pytest"
     depends_on:
