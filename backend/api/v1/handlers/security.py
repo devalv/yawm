@@ -10,6 +10,8 @@ from google.oauth2 import id_token
 
 from google_auth_oauthlib.flow import Flow as GFlow
 
+from oauthlib.oauth2 import OAuth2Error
+
 from core.config import (
     ALGORITHM,
     API_LOCATION,
@@ -19,32 +21,27 @@ from core.config import (
 )
 from core.schemas.security import GoogleIdInfo, Token
 from core.services.security import get_or_create_user
-from core.utils import CREDENTIALS_EX
+from core.utils import CREDENTIALS_EX, NOT_IMPLEMENTED_EX, OAUTH2_EX
 
 
 security_router = APIRouter(redirect_slashes=True, tags=["auth"])
 
 
-# TODO: refresh_token == security
-# TODO: swap_token == security
-
-
 @security_router.post("/swap_token", response_model=Token, tags=["security"])
 @version(1)
-async def swap_token(code: str = Form(...)):  # noqa: B008, D103
-    # TODO: return Token
-    # TODO: refresh token in the system
-    # TODO: 500err when page need to be reloaded
-
+async def swap_token(code: str = Form(...)):  # noqa: B008
+    """Check Google Auth code and create access token."""
     # Get authentication code
     flow = GFlow.from_client_secrets_file(
         GOOGLE_CLIENT_SECRETS_JSON, scopes=GOOGLE_SCOPES
     )
     flow.redirect_uri = f"{API_LOCATION}{SWAP_TOKEN_ENDPOINT}"
-
-    flow.fetch_token(code=code)
-    credentials = flow.credentials
-
+    try:
+        flow.fetch_token(code=code)
+    except OAuth2Error:
+        raise OAUTH2_EX
+    else:
+        credentials = flow.credentials
     # token validation
     try:
         # TODO: change requests.Request() to httpx.Request or local validation
@@ -54,16 +51,21 @@ async def swap_token(code: str = Form(...)):  # noqa: B008, D103
         id_info = GoogleIdInfo(**id_info)
     except ValueError:
         raise CREDENTIALS_EX
-
-    # another section
+    # get user object
     authenticated_user = await get_or_create_user(id_info)
-
     # generate system token for a user
     token = authenticated_user.create_access_token()
-
+    # TODO: refresh token
     return {
         "access_token": token,
         "token_type": "bearer",
         "alg": ALGORITHM,
         "typ": "JWT",
     }
+
+
+@security_router.post("/refresh_token", response_model=Token, tags=["security"])
+@version(1)
+async def refresh_token(token: str):  # noqa: B008
+    # TODO: 0.2 or 0.3?
+    raise NOT_IMPLEMENTED_EX
