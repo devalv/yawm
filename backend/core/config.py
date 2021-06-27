@@ -39,6 +39,9 @@ DB_RETRY_INTERVAL = config("DB_RETRY_INTERVAL", cast=int, default=1)
 # uvicorn
 API_HOST = config("API_HOST", default="127.0.0.1")
 API_PORT = config("API_PORT", cast=int, default=8000)
+API_DOMAIN = config("API_DOMAIN", default="localhost")
+API_PROTOCOL = config("API_PROTOCOL", default="https")
+API_LOCATION = f"{API_PROTOCOL}://{API_DOMAIN}:{API_PORT}"
 # crawler User-Agent
 CRAWLER_USER_AGENT = config("CRAWLER_USER_AGENT", default="yawm-api")
 # Google OAuth2 configuration
@@ -47,13 +50,8 @@ GOOGLE_CLIENT_SECRETS_JSON = config("GOOGLE_CLIENT_SECRETS_JSON", default=None)
 GOOGLE_USERINFO_SCOPE = config("GOOGLE_USERINFO_SCOPE", default=None)
 GOOGLE_SCOPES = [GOOGLE_USERINFO_SCOPE]
 # security
-API_DOMAIN = config("API_DOMAIN", default=None)
+LOGIN_ENDPOINT = "/api/v1/login"
+SWAP_TOKEN_ENDPOINT = "/api/v1/swap_token"
 SECRET_KEY = config("SECRET_KEY", default=None)
 ALGORITHM = config("ALGORITHM", default="HS256")
 ACCESS_TOKEN_EXPIRE_MIN = config("ACCESS_TOKEN_EXPIRE_MIN", default=30)
-
-# TODO: use env or remove
-API_LOCATION = f"http://{API_DOMAIN}:{API_PORT}"
-LOGIN_ENDPOINT = "/api/v1/login"
-SWAP_TOKEN_ENDPOINT = "/api/v1/swap_token"
-SUCCESS_ROUTE = "/api/v1/users/me"
