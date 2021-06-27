@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 """Security rest-api handlers."""
 
-from datetime import timedelta
-
-from fastapi import APIRouter, Form, HTTPException, status
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Form
 
 from fastapi_versioning import version
 
@@ -15,15 +11,15 @@ from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow as GFlow
 
 from core.config import (
-    ACCESS_TOKEN_EXPIRE_MIN,
     ALGORITHM,
     API_LOCATION,
     GOOGLE_CLIENT_SECRETS_JSON,
     GOOGLE_SCOPES,
     SWAP_TOKEN_ENDPOINT,
 )
-from core.schemas.security import Token
-from core.services.security import create_access_token, get_current_active_user
+from core.schemas.security import GoogleIdInfo, Token
+from core.services.security import get_or_create_user
+from core.utils import CREDENTIALS_EX
 
 
 security_router = APIRouter(redirect_slashes=True, tags=["auth"])
@@ -36,13 +32,7 @@ security_router = APIRouter(redirect_slashes=True, tags=["auth"])
 @security_router.post("/swap_token", response_model=Token, tags=["security"])
 @version(1)
 async def swap_token(code: str = Form(...)):  # noqa: B008, D103
-
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
+    # TODO: return Token
     # TODO: refresh token in the system
     # TODO: 500err when page need to be reloaded
 
@@ -57,30 +47,23 @@ async def swap_token(code: str = Form(...)):  # noqa: B008, D103
 
     # token validation
     try:
-        # TODO: change requests.Request() to httpx.Request
+        # TODO: change requests.Request() to httpx.Request or local validation
         id_info = id_token.verify_oauth2_token(
             credentials.id_token, requests.Request(), credentials.client_id
         )
-
-        google_user_id = id_info["sub"]
+        id_info = GoogleIdInfo(**id_info)
     except ValueError:
-        raise credentials_exception
+        raise CREDENTIALS_EX
 
     # another section
-    authenticated_user = await get_current_active_user(google_user_id)
-    if not authenticated_user:
-        # TODO: user registration?
-        raise HTTPException(status_code=400, detail="Incorrect user id")
+    authenticated_user = await get_or_create_user(id_info)
+
     # generate system token for a user
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MIN)
-    access_token = create_access_token(
-        data={
-            "sub": authenticated_user.ext_id,
-            "username": authenticated_user.username,
-        },
-        expires_delta=access_token_expires,
-    )
-    token = jsonable_encoder(access_token)
-    return JSONResponse(
-        {"access_token": token, "token_type": "bearer", "alg": ALGORITHM, "typ": "JWT"}
-    )
+    token = authenticated_user.create_access_token()
+
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "alg": ALGORITHM,
+        "typ": "JWT",
+    }

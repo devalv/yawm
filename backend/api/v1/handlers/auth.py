@@ -16,7 +16,8 @@ from core.config import (
     SWAP_TOKEN_ENDPOINT,
 )
 from core.schemas.security import UserDBModel
-from core.services.security import get_yoba_user
+from core.services.security import get_current_user
+
 
 auth_router = APIRouter(redirect_slashes=True, tags=["auth"])
 
@@ -50,6 +51,6 @@ async def login_error():  # noqa: D103
 @auth_router.get(f"{SUCCESS_ROUTE}", response_model=UserDBModel)
 @version(1)
 async def read_users_me(  # noqa: D103
-    current_user: UserDBModel = Depends(get_yoba_user),  # noqa: B008
+    current_user: UserDBModel = Depends(get_current_user),  # noqa: B008
 ):
     return current_user

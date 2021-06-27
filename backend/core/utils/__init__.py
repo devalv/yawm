@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Project extra utils."""
 
+from .exceptions import CREDENTIALS_EX
 from .fastapi_pagination import JsonApiPage
 from .gino_models import JsonApiGinoModel
 from .pydantic_models import (
@@ -12,6 +13,7 @@ from .pydantic_models import (
     JsonApiUpdateBaseModel,
 )
 
+
 __all__ = [
     "JsonApiPage",
     "JsonApiGinoModel",
@@ -21,4 +23,5 @@ __all__ = [
     "JsonApiDataDBModel",
     "JsonApiCreateBaseModel",
     "JsonApiUpdateBaseModel",
+    "CREDENTIALS_EX",
 ]

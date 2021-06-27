@@ -2,6 +2,7 @@
 """Project API (version 1)."""
 
 from .handlers import (
+    auth_router,
     product_router,
     security_router,
     utils_router,
@@ -11,6 +12,7 @@ from .handlers import (
 
 
 __all__ = (
+    "auth_router",
     "product_router",
     "wishlist_product_router",
     "wishlist_router",
