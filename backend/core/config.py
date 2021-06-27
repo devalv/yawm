@@ -42,19 +42,18 @@ API_PORT = config("API_PORT", cast=int, default=8000)
 # crawler User-Agent
 CRAWLER_USER_AGENT = config("CRAWLER_USER_AGENT", default="yawm-api")
 # Google OAuth2 configuration
-GOOGLE_CLIENT_ID = config("GOOGLE_CLIENT_ID")
-GOOGLE_CLIENT_SECRETS_JSON = config("GOOGLE_CLIENT_SECRETS_JSON")
-GOOGLE_SCOPES = ["https://www.googleapis.com/auth/userinfo.profile"]
+GOOGLE_CLIENT_ID = config("GOOGLE_CLIENT_ID", default=None)
+GOOGLE_CLIENT_SECRETS_JSON = config("GOOGLE_CLIENT_SECRETS_JSON", default=None)
+GOOGLE_USERINFO_SCOPE = config("GOOGLE_USERINFO_SCOPE", default=None)
+GOOGLE_SCOPES = [GOOGLE_USERINFO_SCOPE]
 # security
 API_DOMAIN = config("API_DOMAIN", default=None)
 SECRET_KEY = config("SECRET_KEY", default=None)
 ALGORITHM = config("ALGORITHM", default="HS256")
 ACCESS_TOKEN_EXPIRE_MIN = config("ACCESS_TOKEN_EXPIRE_MIN", default=30)
 
+# TODO: use env or remove
 API_LOCATION = f"http://{API_DOMAIN}:{API_PORT}"
-# TODO: use env
-
-# new
 LOGIN_ENDPOINT = "/api/v1/login"
 SWAP_TOKEN_ENDPOINT = "/api/v1/swap_token"
 SUCCESS_ROUTE = "/api/v1/users/me"
