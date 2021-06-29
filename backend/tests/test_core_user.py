@@ -3,17 +3,16 @@
 
 from datetime import datetime
 
+import pytest
 from asyncpg.pgproto.pgproto import UUID as UUID_PG
 
 from core.database import UserGinoModel
 from core.schemas import (
-    UserDBModel,
-    UserDBDataModel,
     UserDataCreateModel,
     UserDataUpdateModel,
+    UserDBDataModel,
+    UserDBModel,
 )
-
-import pytest
 
 pytestmark = [
     pytest.mark.asyncio,

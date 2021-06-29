@@ -10,7 +10,6 @@ from .handlers import (
     wishlist_router,
 )
 
-
 __all__ = (
     "auth_router",
     "product_router",

@@ -4,9 +4,7 @@
 from uuid import uuid4
 
 from asyncpg.exceptions import ForeignKeyViolationError
-
 from sqlalchemy.dialects.postgresql import UUID
-
 from starlette import status
 from starlette.exceptions import HTTPException
 

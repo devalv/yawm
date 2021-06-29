@@ -6,7 +6,7 @@ The main idea is to have a standard format for model interfaces.
 
 from abc import abstractmethod
 
-from pydantic import BaseModel, UUID4
+from pydantic import UUID4, BaseModel
 
 
 class JsonApiAttributesBaseModel(BaseModel):

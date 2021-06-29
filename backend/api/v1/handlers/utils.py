@@ -2,7 +2,6 @@
 """Utils rest-api handlers."""
 
 from fastapi import APIRouter
-
 from fastapi_versioning import version
 
 from core.database import ProductGinoModel

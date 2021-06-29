@@ -8,7 +8,6 @@ from .utils import utils_router
 from .wishlist import wishlist_router
 from .wishlist_product import wishlist_product_router
 
-
 __all__ = (
     "auth_router",
     "product_router",

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """PageParser tests."""
 
+import httpx  # noqa: F401
+import pytest
+
 from core.database import ProductGinoModel
 from core.services import get_product_name
-
-import pytest
-import httpx  # noqa: F401
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.api_full]
 

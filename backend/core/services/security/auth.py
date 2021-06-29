@@ -3,14 +3,12 @@
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security.oauth2 import OAuth2AuthorizationCodeBearer
-
 from jose import JWTError
 
 from core.config import LOGIN_ENDPOINT, SWAP_TOKEN_ENDPOINT
 from core.database import UserGinoModel
 from core.schemas import AccessToken, GoogleIdInfo
 from core.utils import CREDENTIALS_EX
-
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl=LOGIN_ENDPOINT, tokenUrl=SWAP_TOKEN_ENDPOINT

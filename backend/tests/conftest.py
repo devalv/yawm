@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """Common project fixtures."""
 
-from ..api import app
-
+import pytest
 from async_asgi_testclient import TestClient
 
-import pytest
+from ..api import app
 
 
 @pytest.fixture

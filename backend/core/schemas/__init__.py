@@ -11,10 +11,10 @@ from .security import (
     AccessToken,
     GoogleIdInfo,
     Token,
-    UserDBDataModel,
-    UserDBModel,
     UserDataCreateModel,
     UserDataUpdateModel,
+    UserDBDataModel,
+    UserDBModel,
 )
 from .utils import ExtractUrlDataInModel, ExtractUrlModelDataOutModel
 from .wishlist import (
@@ -29,7 +29,6 @@ from .wishlist_products import (
     WishlistProductsDataUpdateModel,
     WishlistProductsModel,
 )
-
 
 __all__ = [
     "ProductModel",

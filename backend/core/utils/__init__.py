@@ -6,13 +6,12 @@ from .fastapi_pagination import JsonApiPage
 from .gino_models import JsonApiGinoModel
 from .pydantic_models import (
     JsonApiCreateBaseModel,
-    JsonApiDBModel,
     JsonApiDataCreateBaseModel,
     JsonApiDataDBModel,
     JsonApiDataUpdateBaseModel,
+    JsonApiDBModel,
     JsonApiUpdateBaseModel,
 )
-
 
 __all__ = [
     "JsonApiPage",

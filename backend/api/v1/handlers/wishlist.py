@@ -2,11 +2,8 @@
 """Wishlist rest-api handlers."""
 
 from fastapi import APIRouter, Response, status
-
 from fastapi_pagination.ext.gino import paginate
-
 from fastapi_versioning import version
-
 from pydantic import UUID4
 
 from core.database.models.wishlist import Wishlist

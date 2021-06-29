@@ -3,9 +3,7 @@
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import RedirectResponse
-
 from fastapi_versioning import version
-
 from google_auth_oauthlib.flow import Flow as GFlow
 
 from core.config import (
@@ -17,7 +15,6 @@ from core.config import (
 from core.schemas.security import UserDBModel
 from core.services.security import get_current_user
 from core.utils import NOT_IMPLEMENTED_EX
-
 
 auth_router = APIRouter(redirect_slashes=True, tags=["auth"])
 
