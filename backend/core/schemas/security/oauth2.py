@@ -6,8 +6,7 @@ from typing import Optional
 from uuid import uuid4
 
 from jose import jwt
-
-from pydantic import BaseModel, EmailStr, SecretStr, UUID4, conint, constr, validator
+from pydantic import UUID4, BaseModel, EmailStr, SecretStr, conint, constr, validator
 
 from core.config import ALGORITHM, GOOGLE_CLIENT_ID, SECRET_KEY
 

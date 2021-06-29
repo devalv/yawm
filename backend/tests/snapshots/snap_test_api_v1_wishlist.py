@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from snapshottest import Snapshot
 
-
 snapshots = Snapshot()
 
 snapshots["TestEmptyWishlist.test_empty_wishlist_full_update 1"] = {

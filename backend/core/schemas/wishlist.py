@@ -5,10 +5,10 @@ from pydantic import BaseModel
 
 from core.utils import (
     JsonApiCreateBaseModel,
-    JsonApiDBModel,
     JsonApiDataCreateBaseModel,
     JsonApiDataDBModel,
     JsonApiDataUpdateBaseModel,
+    JsonApiDBModel,
     JsonApiUpdateBaseModel,
 )
 

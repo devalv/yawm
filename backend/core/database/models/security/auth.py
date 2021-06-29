@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 
 from jose import jwt
-
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 

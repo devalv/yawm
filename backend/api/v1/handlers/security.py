@@ -2,14 +2,10 @@
 """Security rest-api handlers."""
 
 from fastapi import APIRouter, Form
-
 from fastapi_versioning import version
-
 from google.auth.transport import requests
 from google.oauth2 import id_token
-
 from google_auth_oauthlib.flow import Flow as GFlow
-
 from oauthlib.oauth2 import OAuth2Error
 
 from core.config import (
@@ -22,7 +18,6 @@ from core.config import (
 from core.schemas.security import GoogleIdInfo, Token
 from core.services.security import get_or_create_user
 from core.utils import CREDENTIALS_EX, NOT_IMPLEMENTED_EX, OAUTH2_EX
-
 
 security_router = APIRouter(redirect_slashes=True, tags=["auth"])
 

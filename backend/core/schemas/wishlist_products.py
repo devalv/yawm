@@ -3,14 +3,14 @@
 
 from typing import Optional
 
-from pydantic import BaseModel, UUID4
+from pydantic import UUID4, BaseModel
 
 from core.utils import (
     JsonApiCreateBaseModel,
-    JsonApiDBModel,
     JsonApiDataCreateBaseModel,
     JsonApiDataDBModel,
     JsonApiDataUpdateBaseModel,
+    JsonApiDBModel,
     JsonApiUpdateBaseModel,
 )
 

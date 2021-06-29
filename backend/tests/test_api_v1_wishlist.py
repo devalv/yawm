@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Wishlist api tests."""
 
-from core.database import ProductGinoModel, WishlistGinoModel
-
 import pytest
+
+from core.database import ProductGinoModel, WishlistGinoModel
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.api_full]
 

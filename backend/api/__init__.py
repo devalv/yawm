@@ -3,13 +3,12 @@
 
 
 from fastapi import FastAPI
-
 from fastapi_pagination import add_pagination
-
 from fastapi_versioning import VersionedFastAPI
 
 from core.config import SWAP_TOKEN_ENDPOINT
 from core.database.models import db
+
 from .v1 import (  # noqa: I201
     auth_router,
     product_router,
