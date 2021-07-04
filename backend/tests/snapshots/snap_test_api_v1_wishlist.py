@@ -69,13 +69,13 @@ snapshots["TestProduct.test_product_paginator_limit 1"] = {
             "type": "product",
         },
     ],
-    "page": 0,
+    "page": 1,
     "size": 5,
     "total": 9,
     "links": {
-        "first": "/api/v1/product?size=5&page=0",
-        "last": "/api/v1/product?size=5&page=1",
-        "next": "/api/v1/product?size=5&page=1",
+        "first": "/api/v1/product?size=5&page=1",
+        "last": "/api/v1/product?size=5&page=2",
+        "next": "/api/v1/product?size=5&page=2",
         "prev": None,
         "self": "/api/v1/product?size=5",
     },
@@ -137,12 +137,12 @@ snapshots["TestProduct.test_products 1"] = {
             "type": "product",
         },
     ],
-    "page": 0,
+    "page": 1,
     "size": 50,
     "total": 9,
     "links": {
-        "first": "/api/v1/product?page=0",
-        "last": "/api/v1/product?page=0",
+        "first": "/api/v1/product?page=1",
+        "last": "/api/v1/product?page=1",
         "next": None,
         "prev": None,
         "self": "/api/v1/product",
@@ -352,14 +352,14 @@ snapshots["TestProductPaginator.test_default_paginator 1"] = {
             "type": "product",
         },
     ],
-    "page": 0,
+    "page": 1,
     "size": 50,
     "total": 149,
 }
 
 snapshots["TestProductPaginator.test_empty_page_reduced_qs_paginator 1"] = {
     "data": [],
-    "page": 15,
+    "page": 16,
     "size": 10,
     "total": 149,
 }
@@ -567,7 +567,7 @@ snapshots["TestProductPaginator.test_first_page_paginator 1"] = {
             "type": "product",
         },
     ],
-    "page": 0,
+    "page": 1,
     "size": 50,
     "total": 149,
 }
@@ -771,7 +771,7 @@ snapshots["TestProductPaginator.test_last_page_paginator 1"] = {
             "type": "product",
         },
     ],
-    "page": 2,
+    "page": 3,
     "size": 50,
     "total": 149,
 }
@@ -815,7 +815,7 @@ snapshots["TestProductPaginator.test_last_page_reduced_qs_paginator 1"] = {
             "type": "product",
         },
     ],
-    "page": 14,
+    "page": 15,
     "size": 10,
     "total": 149,
 }
@@ -1023,7 +1023,7 @@ snapshots["TestProductPaginator.test_next_page_paginator 1"] = {
             "type": "product",
         },
     ],
-    "page": 1,
+    "page": 2,
     "size": 50,
     "total": 149,
 }
@@ -1071,7 +1071,7 @@ snapshots["TestProductPaginator.test_reduced_qs_paginator 1"] = {
             "type": "product",
         },
     ],
-    "page": 0,
+    "page": 1,
     "size": 10,
     "total": 149,
 }
@@ -1279,14 +1279,14 @@ snapshots["TestWPPaginator.test_default_paginator 1"] = {
             "type": "wishlist_products",
         },
     ],
-    "page": 0,
+    "page": 1,
     "size": 50,
     "total": 149,
 }
 
 snapshots["TestWPPaginator.test_empty_page_reduced_qs_paginator 1"] = {
     "data": [],
-    "page": 15,
+    "page": 16,
     "size": 10,
     "total": 149,
 }
@@ -1494,7 +1494,7 @@ snapshots["TestWPPaginator.test_first_page_paginator 1"] = {
             "type": "wishlist_products",
         },
     ],
-    "page": 0,
+    "page": 1,
     "size": 50,
     "total": 149,
 }
@@ -1698,7 +1698,7 @@ snapshots["TestWPPaginator.test_last_page_paginator 1"] = {
             "type": "wishlist_products",
         },
     ],
-    "page": 2,
+    "page": 3,
     "size": 50,
     "total": 149,
 }
@@ -1742,7 +1742,7 @@ snapshots["TestWPPaginator.test_last_page_reduced_qs_paginator 1"] = {
             "type": "wishlist_products",
         },
     ],
-    "page": 14,
+    "page": 15,
     "size": 10,
     "total": 149,
 }
@@ -1950,7 +1950,7 @@ snapshots["TestWPPaginator.test_next_page_paginator 1"] = {
             "type": "wishlist_products",
         },
     ],
-    "page": 1,
+    "page": 2,
     "size": 50,
     "total": 149,
 }
@@ -1998,7 +1998,7 @@ snapshots["TestWPPaginator.test_reduced_qs_paginator 1"] = {
             "type": "wishlist_products",
         },
     ],
-    "page": 0,
+    "page": 1,
     "size": 10,
     "total": 149,
 }
@@ -2056,14 +2056,14 @@ snapshots["TestWishlistPaginator.test_default_paginator 1"] = {
         {"attributes": {"name": "test49"}, "type": "wishlist"},
         {"attributes": {"name": "test50"}, "type": "wishlist"},
     ],
-    "page": 0,
+    "page": 1,
     "size": 50,
     "total": 149,
 }
 
 snapshots["TestWishlistPaginator.test_empty_page_reduced_qs_paginator 1"] = {
     "data": [],
-    "page": 15,
+    "page": 16,
     "size": 10,
     "total": 149,
 }
@@ -2121,7 +2121,7 @@ snapshots["TestWishlistPaginator.test_first_page_paginator 1"] = {
         {"attributes": {"name": "test49"}, "type": "wishlist"},
         {"attributes": {"name": "test50"}, "type": "wishlist"},
     ],
-    "page": 0,
+    "page": 1,
     "size": 50,
     "total": 149,
 }
@@ -2178,7 +2178,7 @@ snapshots["TestWishlistPaginator.test_last_page_paginator 1"] = {
         {"attributes": {"name": "test148"}, "type": "wishlist"},
         {"attributes": {"name": "test149"}, "type": "wishlist"},
     ],
-    "page": 2,
+    "page": 3,
     "size": 50,
     "total": 149,
 }
@@ -2195,7 +2195,7 @@ snapshots["TestWishlistPaginator.test_last_page_reduced_qs_paginator 1"] = {
         {"attributes": {"name": "test148"}, "type": "wishlist"},
         {"attributes": {"name": "test149"}, "type": "wishlist"},
     ],
-    "page": 14,
+    "page": 15,
     "size": 10,
     "total": 149,
 }
@@ -2253,7 +2253,7 @@ snapshots["TestWishlistPaginator.test_next_page_paginator 1"] = {
         {"attributes": {"name": "test99"}, "type": "wishlist"},
         {"attributes": {"name": "test100"}, "type": "wishlist"},
     ],
-    "page": 1,
+    "page": 2,
     "size": 50,
     "total": 149,
 }
@@ -2271,7 +2271,7 @@ snapshots["TestWishlistPaginator.test_reduced_qs_paginator 1"] = {
         {"attributes": {"name": "test9"}, "type": "wishlist"},
         {"attributes": {"name": "test10"}, "type": "wishlist"},
     ],
-    "page": 0,
+    "page": 1,
     "size": 10,
     "total": 149,
 }
