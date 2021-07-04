@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Auth rest-api handlers."""
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from fastapi.responses import RedirectResponse
 from fastapi_versioning import version
 from google_auth_oauthlib.flow import Flow as GFlow
@@ -14,7 +14,6 @@ from core.config import (
 )
 from core.schemas.security import UserDBModel
 from core.services.security import get_current_user
-from core.utils import NOT_IMPLEMENTED_EX
 
 auth_router = APIRouter(redirect_slashes=True, tags=["auth"])
 
@@ -33,12 +32,10 @@ async def login(state: str):
     return RedirectResponse(url=authorization_url)
 
 
-@auth_router.get("/logout", tags=["auth"])
+@auth_router.get("/logout", status_code=status.HTTP_204_NO_CONTENT, tags=["auth"])
 @version(1)
 async def logout(current_user: UserDBModel = Depends(get_current_user)):  # noqa: B008
-    # TODO: logout
-    # TODO: 0.2 or 0.3?
-    raise NOT_IMPLEMENTED_EX
+    await current_user.delete_refresh_token()
 
 
 @auth_router.get("/user/info", response_model=UserDBModel)
