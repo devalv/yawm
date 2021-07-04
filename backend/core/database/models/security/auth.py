@@ -73,7 +73,18 @@ class User(db.Model, JsonApiGinoModel):
         """Delete for a user existing refresh token."""
         return await TokenInfo.delete.where(TokenInfo.user_id == self.id).gino.status()
 
-    async def token(self):
+    async def create_token(self):
+        acc_token = self.create_access_token()
+        ref_token = await self.create_refresh_token()
+        return {
+            "access_token": acc_token,
+            "refresh_token": ref_token,
+            "token_type": "bearer",
+            "alg": ALGORITHM,
+            "typ": "JWT",
+        }
+
+    async def token_info(self):
         """Get user existing token information."""
         return await TokenInfo.get(self.id)
 

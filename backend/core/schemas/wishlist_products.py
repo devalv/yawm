@@ -18,7 +18,7 @@ from core.utils import (
 class WishlistProductsAttributesModel(BaseModel):
     """Wishlist products attributes serializer."""
 
-    # TODO: JSON:API related?
+    # TODO: @devalv 0.3 JSON:API related?
 
     wishlist_id: UUID4
     product_id: UUID4
@@ -29,7 +29,7 @@ class WishlistProductsAttributesModel(BaseModel):
 class WishlistProductsCreateAttributesModel(BaseModel):
     """Wishlist products create attributes serializer."""
 
-    # TODO: JSON:API related?
+    # TODO: @devalv 0.3 JSON:API related?
 
     product_id: UUID4
     reserved: bool
@@ -39,7 +39,7 @@ class WishlistProductsCreateAttributesModel(BaseModel):
 class WishlistProductsUpdateAttributesModel(BaseModel):
     """Wishlist products update attributes serializer."""
 
-    # TODO: JSON:API related?
+    # TODO: @devalv 0.3 JSON:API related?
 
     product_id: Optional[UUID4]
     reserved: Optional[bool]
