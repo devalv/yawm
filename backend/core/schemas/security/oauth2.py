@@ -11,7 +11,7 @@ from pydantic import UUID4, BaseModel, EmailStr, SecretStr, conint, constr, vali
 from core.config import ALGORITHM, GOOGLE_CLIENT_ID, SECRET_KEY
 
 
-class AccessToken(BaseModel):
+class RefreshToken(BaseModel):
     id: UUID4  # noqa: A003, VNE003
     username: str
     exp: conint(gt=datetime.utcnow().timestamp())
@@ -26,7 +26,7 @@ class AccessToken(BaseModel):
         return cls(**decoded_token)
 
 
-class RefreshToken(AccessToken):
+class AccessToken(RefreshToken):
     pass
 
 

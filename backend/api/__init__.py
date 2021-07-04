@@ -10,7 +10,6 @@ from core.config import SWAP_TOKEN_ENDPOINT
 from core.database.models import db
 
 from .v1 import (  # noqa: I201
-    auth_router,
     product_router,
     security_router,
     utils_router,
@@ -40,7 +39,6 @@ def configure_routes(application: FastAPI):
     application.include_router(wishlist_product_router)
     application.include_router(utils_router)
     application.include_router(security_router)
-    application.include_router(auth_router)
     add_pagination(application)
 
 
