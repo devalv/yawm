@@ -11,7 +11,7 @@ uvicorn = "==0.*"
 ujson = "==4.*"
 gino-starlette = "==0.*"
 alembic = "==1.*"
-psycopg2-binary = "==2.8.6"
+psycopg2-binary = "*"
 python-multipart = "*"
 fastapi-pagination = {extras = ["gino"], version = "*"}
 httpx = "*"

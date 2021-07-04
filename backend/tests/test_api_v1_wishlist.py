@@ -516,7 +516,7 @@ class PaginatorValidator:
             pagination_url_prefix = f"{url}?page="
 
         # validate pagination links values
-        assert links["first"] == f"{pagination_url_prefix}0"
+        assert links["first"] == f"{pagination_url_prefix}1"
 
         if self_page_num is not None:
             try:
@@ -588,8 +588,8 @@ class TestWPPaginator(PaginatorValidator):
         self.validate_links(
             response_json_data.pop("links"),
             url=api_url,
-            last_page_num=2,
-            next_page_num=1,
+            last_page_num=3,
+            next_page_num=2,
             prev_page_num=None,
             self_page_num=None,
         )
@@ -602,17 +602,17 @@ class TestWPPaginator(PaginatorValidator):
         api_url = f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products"
 
         # open next paginator page
-        response = await api_client.get(api_url, query_string=dict(page=1))
+        response = await api_client.get(api_url, query_string=dict(page=2))
         assert response.status_code == 200
         response_json_data = response.json()
         # check pagination links
         self.validate_links(
             response_json_data.pop("links"),
             url=api_url,
-            last_page_num=2,
-            next_page_num=2,
-            prev_page_num=0,
-            self_page_num=1,
+            last_page_num=3,
+            next_page_num=3,
+            prev_page_num=1,
+            self_page_num=2,
         )
         # check response data
         self.validate_response(response_json_data)
@@ -623,7 +623,7 @@ class TestWPPaginator(PaginatorValidator):
         api_url = f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products"
 
         # open first paginator page
-        response = await api_client.get(api_url, query_string=dict(page=0))
+        response = await api_client.get(api_url, query_string=dict(page=1))
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
@@ -631,10 +631,10 @@ class TestWPPaginator(PaginatorValidator):
         self.validate_links(
             response_json_data.pop("links"),
             url=api_url,
-            last_page_num=2,
-            next_page_num=1,
+            last_page_num=3,
+            next_page_num=2,
             prev_page_num=None,
-            self_page_num=0,
+            self_page_num=1,
         )
         # assert response data
         snapshot.assert_match(response_json_data)
@@ -644,7 +644,7 @@ class TestWPPaginator(PaginatorValidator):
         api_url = f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products"
 
         # open last paginator page
-        response = await api_client.get(api_url, query_string=dict(page=2))
+        response = await api_client.get(api_url, query_string=dict(page=3))
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
@@ -652,10 +652,10 @@ class TestWPPaginator(PaginatorValidator):
         self.validate_links(
             response_json_data.pop("links"),
             url=api_url,
-            last_page_num=2,
+            last_page_num=3,
             next_page_num=None,
-            prev_page_num=1,
-            self_page_num=2,
+            prev_page_num=2,
+            self_page_num=3,
         )
         # assert response data
         snapshot.assert_match(response_json_data)
@@ -674,8 +674,8 @@ class TestWPPaginator(PaginatorValidator):
         self.validate_links(
             response_json_data.pop("links"),
             url=f"{api_url}",
-            last_page_num=14,
-            next_page_num=1,
+            last_page_num=15,
+            next_page_num=2,
             prev_page_num=None,
             self_page_num=None,
             size=10,
@@ -690,30 +690,6 @@ class TestWPPaginator(PaginatorValidator):
         api_url = f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products"
 
         # open last page with reduced QS size
-        response = await api_client.get(api_url, query_string=dict(page=14, size=10))
-
-        assert response.status_code == 200
-        response_json_data = response.json()
-        self.validate_response(response_json_data)
-        # check pagination links
-        self.validate_links(
-            response_json_data.pop("links"),
-            url=api_url,
-            size=10,
-            last_page_num=14,
-            next_page_num=None,
-            prev_page_num=13,
-            self_page_num=14,
-        )
-        snapshot.assert_match(response_json_data)
-
-    @pytest.mark.api_full
-    async def test_empty_page_reduced_qs_paginator(
-        self, snapshot, api_client, ew_1, wp_149
-    ):
-        api_url = f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products"
-
-        # open empty page with reduced QS size
         response = await api_client.get(api_url, query_string=dict(page=15, size=10))
 
         assert response.status_code == 200
@@ -724,10 +700,34 @@ class TestWPPaginator(PaginatorValidator):
             response_json_data.pop("links"),
             url=api_url,
             size=10,
-            last_page_num=14,
+            last_page_num=15,
             next_page_num=None,
             prev_page_num=14,
             self_page_num=15,
+        )
+        snapshot.assert_match(response_json_data)
+
+    @pytest.mark.api_full
+    async def test_empty_page_reduced_qs_paginator(
+        self, snapshot, api_client, ew_1, wp_149
+    ):
+        api_url = f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products"
+
+        # open empty page with reduced QS size
+        response = await api_client.get(api_url, query_string=dict(page=16, size=10))
+
+        assert response.status_code == 200
+        response_json_data = response.json()
+        self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            size=10,
+            last_page_num=15,
+            next_page_num=None,
+            prev_page_num=15,
+            self_page_num=16,
         )
         snapshot.assert_match(response_json_data)
 
@@ -756,8 +756,8 @@ class TestProductPaginator(PaginatorValidator):
         self.validate_links(
             response_json_data.pop("links"),
             url=api_url,
-            last_page_num=2,
-            next_page_num=1,
+            last_page_num=3,
+            next_page_num=2,
             prev_page_num=None,
             self_page_num=None,
         )
@@ -768,46 +768,6 @@ class TestProductPaginator(PaginatorValidator):
         api_url = f"{API_URL_PREFIX}/product"
 
         # open next paginator page
-        response = await api_client.get(api_url, query_string=dict(page=1))
-        assert response.status_code == 200
-        response_json_data = response.json()
-        self.validate_response(response_json_data)
-        # check pagination links
-        self.validate_links(
-            response_json_data.pop("links"),
-            url=api_url,
-            last_page_num=2,
-            next_page_num=2,
-            prev_page_num=0,
-            self_page_num=1,
-        )
-        snapshot.assert_match(response_json_data)
-
-    @pytest.mark.api_full
-    async def test_first_page_paginator(self, snapshot, api_client, products_149):
-        api_url = f"{API_URL_PREFIX}/product"
-
-        # open first paginator page
-        response = await api_client.get(api_url, query_string=dict(page=0))
-        assert response.status_code == 200
-        response_json_data = response.json()
-        self.validate_response(response_json_data)
-        # check pagination links
-        self.validate_links(
-            response_json_data.pop("links"),
-            url=api_url,
-            last_page_num=2,
-            next_page_num=1,
-            prev_page_num=None,
-            self_page_num=0,
-        )
-        snapshot.assert_match(response_json_data)
-
-    @pytest.mark.api_full
-    async def test_last_page_paginator(self, snapshot, api_client, products_149):
-        api_url = f"{API_URL_PREFIX}/product"
-
-        # open last paginator page
         response = await api_client.get(api_url, query_string=dict(page=2))
         assert response.status_code == 200
         response_json_data = response.json()
@@ -816,10 +776,50 @@ class TestProductPaginator(PaginatorValidator):
         self.validate_links(
             response_json_data.pop("links"),
             url=api_url,
-            last_page_num=2,
-            next_page_num=None,
+            last_page_num=3,
+            next_page_num=3,
             prev_page_num=1,
             self_page_num=2,
+        )
+        snapshot.assert_match(response_json_data)
+
+    @pytest.mark.api_full
+    async def test_first_page_paginator(self, snapshot, api_client, products_149):
+        api_url = f"{API_URL_PREFIX}/product"
+
+        # open first paginator page
+        response = await api_client.get(api_url, query_string=dict(page=1))
+        assert response.status_code == 200
+        response_json_data = response.json()
+        self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            last_page_num=3,
+            next_page_num=2,
+            prev_page_num=None,
+            self_page_num=1,
+        )
+        snapshot.assert_match(response_json_data)
+
+    @pytest.mark.api_full
+    async def test_last_page_paginator(self, snapshot, api_client, products_149):
+        api_url = f"{API_URL_PREFIX}/product"
+
+        # open last paginator page
+        response = await api_client.get(api_url, query_string=dict(page=3))
+        assert response.status_code == 200
+        response_json_data = response.json()
+        self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            last_page_num=3,
+            next_page_num=None,
+            prev_page_num=2,
+            self_page_num=3,
         )
         snapshot.assert_match(response_json_data)
 
@@ -838,8 +838,8 @@ class TestProductPaginator(PaginatorValidator):
             response_json_data.pop("links"),
             url=api_url,
             size=10,
-            last_page_num=14,
-            next_page_num=1,
+            last_page_num=15,
+            next_page_num=2,
             prev_page_num=None,
             self_page_num=None,
         )
@@ -852,30 +852,6 @@ class TestProductPaginator(PaginatorValidator):
         api_url = f"{API_URL_PREFIX}/product"
 
         # open last page with reduced QS size
-        response = await api_client.get(api_url, query_string=dict(page=14, size=10))
-
-        assert response.status_code == 200
-        response_json_data = response.json()
-        self.validate_response(response_json_data)
-        # check pagination links
-        self.validate_links(
-            response_json_data.pop("links"),
-            url=api_url,
-            size=10,
-            last_page_num=14,
-            next_page_num=None,
-            prev_page_num=13,
-            self_page_num=14,
-        )
-        snapshot.assert_match(response_json_data)
-
-    @pytest.mark.api_full
-    async def test_empty_page_reduced_qs_paginator(
-        self, snapshot, api_client, products_149
-    ):
-        api_url = f"{API_URL_PREFIX}/product"
-
-        # open empty page with reduced QS size
         response = await api_client.get(api_url, query_string=dict(page=15, size=10))
 
         assert response.status_code == 200
@@ -886,10 +862,34 @@ class TestProductPaginator(PaginatorValidator):
             response_json_data.pop("links"),
             url=api_url,
             size=10,
-            last_page_num=14,
+            last_page_num=15,
             next_page_num=None,
             prev_page_num=14,
             self_page_num=15,
+        )
+        snapshot.assert_match(response_json_data)
+
+    @pytest.mark.api_full
+    async def test_empty_page_reduced_qs_paginator(
+        self, snapshot, api_client, products_149
+    ):
+        api_url = f"{API_URL_PREFIX}/product"
+
+        # open empty page with reduced QS size
+        response = await api_client.get(api_url, query_string=dict(page=16, size=10))
+
+        assert response.status_code == 200
+        response_json_data = response.json()
+        self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            size=10,
+            last_page_num=15,
+            next_page_num=None,
+            prev_page_num=15,
+            self_page_num=16,
         )
         snapshot.assert_match(response_json_data)
 
@@ -918,8 +918,8 @@ class TestWishlistPaginator(PaginatorValidator):
         self.validate_links(
             response_json_data.pop("links"),
             url=api_url,
-            last_page_num=2,
-            next_page_num=1,
+            last_page_num=3,
+            next_page_num=2,
             prev_page_num=None,
             self_page_num=None,
         )
@@ -930,7 +930,7 @@ class TestWishlistPaginator(PaginatorValidator):
         api_url = f"{API_URL_PREFIX}/wishlist"
 
         # open next paginator page
-        response = await api_client.get(api_url, query_string=dict(page=1))
+        response = await api_client.get(api_url, query_string=dict(page=2))
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
@@ -938,10 +938,10 @@ class TestWishlistPaginator(PaginatorValidator):
         self.validate_links(
             response_json_data.pop("links"),
             url=api_url,
-            last_page_num=2,
-            next_page_num=2,
-            prev_page_num=0,
-            self_page_num=1,
+            last_page_num=3,
+            next_page_num=3,
+            prev_page_num=1,
+            self_page_num=2,
         )
         snapshot.assert_match(response_json_data)
 
@@ -952,7 +952,7 @@ class TestWishlistPaginator(PaginatorValidator):
         api_url = f"{API_URL_PREFIX}/wishlist"
 
         # open first paginator page
-        response = await api_client.get(api_url, query_string=dict(page=0))
+        response = await api_client.get(api_url, query_string=dict(page=1))
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
@@ -960,10 +960,10 @@ class TestWishlistPaginator(PaginatorValidator):
         self.validate_links(
             response_json_data.pop("links"),
             url=api_url,
-            last_page_num=2,
-            next_page_num=1,
+            last_page_num=3,
+            next_page_num=2,
             prev_page_num=None,
-            self_page_num=0,
+            self_page_num=1,
         )
         snapshot.assert_match(response_json_data)
 
@@ -972,7 +972,7 @@ class TestWishlistPaginator(PaginatorValidator):
         api_url = f"{API_URL_PREFIX}/wishlist"
 
         # open last paginator page
-        response = await api_client.get(api_url, query_string=dict(page=2))
+        response = await api_client.get(api_url, query_string=dict(page=3))
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
@@ -980,10 +980,10 @@ class TestWishlistPaginator(PaginatorValidator):
         self.validate_links(
             response_json_data.pop("links"),
             url=api_url,
-            last_page_num=2,
+            last_page_num=3,
             next_page_num=None,
-            prev_page_num=1,
-            self_page_num=2,
+            prev_page_num=2,
+            self_page_num=3,
         )
         snapshot.assert_match(response_json_data)
 
@@ -1004,8 +1004,8 @@ class TestWishlistPaginator(PaginatorValidator):
             response_json_data.pop("links"),
             url=api_url,
             size=10,
-            last_page_num=14,
-            next_page_num=1,
+            last_page_num=15,
+            next_page_num=2,
             prev_page_num=None,
             self_page_num=None,
         )
@@ -1018,30 +1018,6 @@ class TestWishlistPaginator(PaginatorValidator):
         api_url = f"{API_URL_PREFIX}/wishlist"
 
         # open last page with reduced QS size
-        response = await api_client.get(api_url, query_string=dict(page=14, size=10))
-
-        assert response.status_code == 200
-        response_json_data = response.json()
-        self.validate_response(response_json_data)
-        # check pagination links
-        self.validate_links(
-            response_json_data.pop("links"),
-            url=api_url,
-            size=10,
-            last_page_num=14,
-            next_page_num=None,
-            prev_page_num=13,
-            self_page_num=14,
-        )
-        snapshot.assert_match(response_json_data)
-
-    @pytest.mark.api_full
-    async def test_empty_page_reduced_qs_paginator(
-        self, snapshot, api_client, empty_wishlists_149
-    ):
-        api_url = f"{API_URL_PREFIX}/wishlist"
-
-        # open empty page with reduced QS size
         response = await api_client.get(api_url, query_string=dict(page=15, size=10))
 
         assert response.status_code == 200
@@ -1052,9 +1028,33 @@ class TestWishlistPaginator(PaginatorValidator):
             response_json_data.pop("links"),
             url=api_url,
             size=10,
-            last_page_num=14,
+            last_page_num=15,
             next_page_num=None,
             prev_page_num=14,
             self_page_num=15,
+        )
+        snapshot.assert_match(response_json_data)
+
+    @pytest.mark.api_full
+    async def test_empty_page_reduced_qs_paginator(
+        self, snapshot, api_client, empty_wishlists_149
+    ):
+        api_url = f"{API_URL_PREFIX}/wishlist"
+
+        # open empty page with reduced QS size
+        response = await api_client.get(api_url, query_string=dict(page=16, size=10))
+
+        assert response.status_code == 200
+        response_json_data = response.json()
+        self.validate_response(response_json_data)
+        # check pagination links
+        self.validate_links(
+            response_json_data.pop("links"),
+            url=api_url,
+            size=10,
+            last_page_num=15,
+            next_page_num=None,
+            prev_page_num=15,
+            self_page_num=16,
         )
         snapshot.assert_match(response_json_data)
