@@ -10,7 +10,12 @@ from jose import jwt
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
-from core.config import ACCESS_TOKEN_EXPIRE_MIN, ALGORITHM, SECRET_KEY
+from core.config import (
+    ACCESS_TOKEN_EXPIRE_MIN,
+    ALGORITHM,
+    REFRESH_TOKEN_EXPIRE_DAYS,
+    SECRET_KEY,
+)
 from core.utils import CREDENTIALS_EX, JsonApiGinoModel
 
 from .. import db
@@ -25,7 +30,9 @@ class User(db.Model, JsonApiGinoModel):
     ext_id = db.Column(db.Unicode(length=255), nullable=False, unique=True)
     disabled = db.Column(db.Boolean(), nullable=False, default=False)
     superuser = db.Column(db.Boolean(), nullable=False, default=False)
-    created = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    created = db.Column(
+        db.DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
     username = db.Column(db.Unicode(length=255), nullable=False, index=True)
     given_name = db.Column(db.Unicode(length=255), nullable=True)
     family_name = db.Column(db.Unicode(length=255), nullable=True)
@@ -48,6 +55,19 @@ class User(db.Model, JsonApiGinoModel):
             "username": self.username,
         }
         return jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+
+    def create_refresh_token(self):
+        """Create for a user new refresh token."""
+        token_data = {
+            "exp": datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
+            "id": self.id_str,
+            "username": self.username,
+        }
+        return jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+
+    async def token(self):
+        """Get user existing token information."""
+        return await TokenInfo.get(self.id)
 
     @classmethod
     async def insert_or_update_by_ext_id(
@@ -80,3 +100,17 @@ class User(db.Model, JsonApiGinoModel):
         else:
             raise CREDENTIALS_EX
         return user_obj
+
+
+class TokenInfo(db.Model):
+    """Token information, such as user to whom token was claimed."""
+
+    __tablename__ = "token_info"
+
+    user_id = db.Column(
+        UUID(), db.ForeignKey(User.id, ondelete="CASCADE"), primary_key=True
+    )
+    refresh_token = db.Column(db.Unicode(), nullable=False, index=True)
+    created = db.Column(
+        db.DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
