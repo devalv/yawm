@@ -9,7 +9,6 @@ from google_auth_oauthlib.flow import Flow as GFlow
 from oauthlib.oauth2 import OAuth2Error
 
 from core.config import (
-    ALGORITHM,
     API_LOCATION,
     GOOGLE_CLIENT_SECRETS_JSON,
     GOOGLE_SCOPES,
@@ -39,7 +38,7 @@ async def swap_token(code: str = Form(...)):  # noqa: B008
         credentials = flow.credentials
     # token validation
     try:
-        # TODO: change requests.Request() to httpx.Request or local validation
+        # TODO: @devalv 0.3 change requests.Request() to httpx.Request or local validation
         id_info = id_token.verify_oauth2_token(
             credentials.id_token, requests.Request(), credentials.client_id
         )
@@ -49,15 +48,7 @@ async def swap_token(code: str = Form(...)):  # noqa: B008
     # get user object
     authenticated_user = await get_or_create_user(id_info)
     # generate system token for a user
-    acc_token = authenticated_user.create_access_token()
-    ref_token = await authenticated_user.create_refresh_token()
-    return {
-        "access_token": acc_token,
-        "refresh_token": ref_token,
-        "token_type": "bearer",
-        "alg": ALGORITHM,
-        "typ": "JWT",
-    }
+    return await authenticated_user.create_token()
 
 
 @security_router.post("/refresh_token", response_model=Token, tags=["security"])
