@@ -59,7 +59,7 @@ async def swap_token(code: str = Form(...)):  # noqa: B008
 @security_router.post("/refresh_access_token", response_model=Token, tags=["security"])
 @version(1)
 async def refresh_access_token(
-    current_user: UserDBModel = Depends(get_user_for_refresh)  # noqa: B008
+    current_user: UserDBModel = Depends(get_user_for_refresh),  # noqa: B008
 ):
     return await current_user.create_token()
 
