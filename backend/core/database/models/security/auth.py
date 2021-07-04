@@ -56,14 +56,22 @@ class User(db.Model, JsonApiGinoModel):
         }
         return jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
 
-    def create_refresh_token(self):
+    async def create_refresh_token(self):
         """Create for a user new refresh token."""
         token_data = {
             "exp": datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
             "id": self.id_str,
             "username": self.username,
         }
-        return jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+        token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+        async with db.transaction():
+            await TokenInfo.delete.where(TokenInfo.user_id == self.id).gino.status()
+            await TokenInfo.create(user_id=self.id, refresh_token=token)
+        return token
+
+    async def delete_refresh_token(self):
+        """Delete for a user existing refresh token."""
+        return await TokenInfo.delete.where(TokenInfo.user_id == self.id).gino.status()
 
     async def token(self):
         """Get user existing token information."""
