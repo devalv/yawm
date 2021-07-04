@@ -49,10 +49,11 @@ async def swap_token(code: str = Form(...)):  # noqa: B008
     # get user object
     authenticated_user = await get_or_create_user(id_info)
     # generate system token for a user
-    token = authenticated_user.create_access_token()
-    # TODO: refresh token
+    acc_token = authenticated_user.create_access_token()
+    ref_token = await authenticated_user.create_refresh_token()
     return {
-        "access_token": token,
+        "access_token": acc_token,
+        "refresh_token": ref_token,
         "token_type": "bearer",
         "alg": ALGORITHM,
         "typ": "JWT",

@@ -26,8 +26,13 @@ class AccessToken(BaseModel):
         return cls(**decoded_token)
 
 
+class RefreshToken(AccessToken):
+    pass
+
+
 class Token(BaseModel):
     access_token: str
+    refresh_token: str
     token_type: str
     alg: str
     typ: str

@@ -53,3 +53,4 @@ SWAP_TOKEN_ENDPOINT = "/api/v1/swap_token"
 SECRET_KEY = config("SECRET_KEY", default=None)
 ALGORITHM = config("ALGORITHM", default="HS256")
 ACCESS_TOKEN_EXPIRE_MIN = config("ACCESS_TOKEN_EXPIRE_MIN", default=30)
+REFRESH_TOKEN_EXPIRE_DAYS = config("REFRESH_TOKEN_EXPIRE_DAYS", default=7)
