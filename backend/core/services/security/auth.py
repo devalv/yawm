@@ -7,7 +7,7 @@ from jose import JWTError
 
 from core.config import LOGIN_ENDPOINT, SWAP_TOKEN_ENDPOINT
 from core.database import UserGinoModel
-from core.schemas import AccessToken, GoogleIdInfo
+from core.schemas import AccessToken, GoogleIdInfo, RefreshToken
 from core.utils import CREDENTIALS_EX
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
@@ -44,6 +44,22 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):  # noqa: B008
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
             )
+    except (JWTError, ValueError):
+        raise CREDENTIALS_EX
+    return user
+
+
+async def get_user_for_refresh(token: str):
+    try:
+        token_info = RefreshToken.decode_and_create(token=token)
+        user = await UserGinoModel.get(token_info.id)
+        if user is None or user.disabled:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
+            )
+        token_valid = await user.token_is_valid(token)
+        if not token_valid:
+            raise CREDENTIALS_EX
     except (JWTError, ValueError):
         raise CREDENTIALS_EX
     return user

@@ -88,6 +88,11 @@ class User(db.Model, JsonApiGinoModel):
         """Get user existing token information."""
         return await TokenInfo.get(self.id)
 
+    async def token_is_valid(self, token: str) -> bool:
+        """Checking that the token matches the issued one."""
+        token_info = await self.token_info()
+        return token_info and token_info.refresh_token == token
+
     @classmethod
     async def insert_or_update_by_ext_id(
         cls,

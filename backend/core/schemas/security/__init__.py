@@ -2,7 +2,7 @@
 """Pydantic security models."""
 
 from .auth import UserDataCreateModel, UserDataUpdateModel, UserDBDataModel, UserDBModel
-from .oauth2 import AccessToken, GoogleIdInfo, Token
+from .oauth2 import AccessToken, GoogleIdInfo, RefreshToken, Token
 
 __all__ = [
     "UserDBModel",
@@ -11,5 +11,6 @@ __all__ = [
     "UserDataUpdateModel",
     "Token",
     "AccessToken",
+    "RefreshToken",
     "GoogleIdInfo",
 ]

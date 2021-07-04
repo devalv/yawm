@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 """Security rest-api handlers."""
 
-from fastapi import APIRouter, Form
+from fastapi import APIRouter, Depends, Form, status
+from fastapi.responses import RedirectResponse
 from fastapi_versioning import version
 from google.auth.transport import requests
 from google.oauth2 import id_token
@@ -14,11 +15,15 @@ from core.config import (
     GOOGLE_SCOPES,
     SWAP_TOKEN_ENDPOINT,
 )
-from core.schemas.security import GoogleIdInfo, Token
-from core.services.security import get_or_create_user
-from core.utils import CREDENTIALS_EX, NOT_IMPLEMENTED_EX, OAUTH2_EX
+from core.schemas import GoogleIdInfo, Token, UserDBModel
+from core.services.security import (
+    get_current_user,
+    get_or_create_user,
+    get_user_for_refresh,
+)
+from core.utils import CREDENTIALS_EX, OAUTH2_EX
 
-security_router = APIRouter(redirect_slashes=True, tags=["auth"])
+security_router = APIRouter(redirect_slashes=True, tags=["security"])
 
 
 @security_router.post("/swap_token", response_model=Token, tags=["security"])
@@ -51,8 +56,37 @@ async def swap_token(code: str = Form(...)):  # noqa: B008
     return await authenticated_user.create_token()
 
 
-@security_router.post("/refresh_token", response_model=Token, tags=["security"])
+@security_router.post("/refresh_access_token", response_model=Token, tags=["security"])
 @version(1)
-async def refresh_token(token: str):  # noqa: B008
-    # TODO: 0.2 or 0.3?
-    raise NOT_IMPLEMENTED_EX
+async def refresh_access_token(
+    current_user: UserDBModel = Depends(get_user_for_refresh)  # noqa: B008
+):
+    return await current_user.create_token()
+
+
+@security_router.get("/login", tags=["auth"])
+@version(1)
+async def login(state: str):
+    flow = GFlow.from_client_secrets_file(
+        GOOGLE_CLIENT_SECRETS_JSON, scopes=GOOGLE_SCOPES
+    )
+    flow.redirect_uri = f"{API_LOCATION}{SWAP_TOKEN_ENDPOINT}"
+    authorization_url, frontend_state = flow.authorization_url(
+        access_type="offline", state=state, include_granted_scopes="true"
+    )
+
+    return RedirectResponse(url=authorization_url)
+
+
+@security_router.get("/logout", status_code=status.HTTP_204_NO_CONTENT, tags=["auth"])
+@version(1)
+async def logout(current_user: UserDBModel = Depends(get_current_user)):  # noqa: B008
+    await current_user.delete_refresh_token()
+
+
+@security_router.get("/user/info", response_model=UserDBModel)
+@version(1)
+async def user_info(
+    current_user: UserDBModel = Depends(get_current_user),  # noqa: B008
+):
+    return current_user
