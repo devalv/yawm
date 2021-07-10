@@ -23,34 +23,8 @@ pytestmark = [
 
 
 @pytest.fixture
-async def user_mock():
-    return {
-        "ext_id": "5" * 100,
-        "disabled": False,
-        "superuser": False,
-        "username": "user_mock",
-        "given_name": "given_mock",
-        "family_name": "family_mock",
-        "full_name": "full_mock",
-    }
-
-
-@pytest.fixture
 async def user_shortened_mock():
     return {"ext_id": "2" * 100, "username": "user_mock"}
-
-
-@pytest.fixture
-async def user_extra_mock():
-    return {
-        "ext_id": "1" * 100,
-        "disabled": False,
-        "superuser": True,
-        "username": "user_mock",
-        "given_name": "given_mock",
-        "family_name": "family_mock",
-        "full_name": "full_mock",
-    }
 
 
 @pytest.fixture
@@ -59,13 +33,13 @@ async def user_shortened_ser_mock(user_shortened_mock):
 
 
 @pytest.fixture
-async def user_extra_ser_mock(user_extra_mock):
-    return {"data": {"attributes": user_extra_mock}}
+async def user_extra_ser_mock(user_admin_mock):
+    return {"data": {"attributes": user_admin_mock}}
 
 
 @pytest.fixture
-async def users_1(user_extra_mock):
-    return await UserGinoModel.create(**user_extra_mock)
+async def single_admin(user_admin_mock):
+    return await UserGinoModel.create(**user_admin_mock)
 
 
 class TestUserDB:
@@ -100,33 +74,33 @@ class TestUserDB:
         await user_obj.delete()
 
     @pytest.mark.api_base
-    async def test_user_extra_create(self, api_client, user_extra_mock):
-        user_obj = await UserGinoModel.create(**user_extra_mock)
-        assert user_obj.ext_id == user_extra_mock["ext_id"]
-        assert user_obj.disabled == user_extra_mock["disabled"]
-        assert user_obj.superuser == user_extra_mock["superuser"]
-        assert user_obj.username == user_extra_mock["username"]
-        assert user_obj.given_name == user_extra_mock["given_name"]
-        assert user_obj.full_name == user_extra_mock["full_name"]
-        assert user_obj.family_name == user_extra_mock["family_name"]
+    async def test_user_extra_create(self, api_client, user_admin_mock):
+        user_obj = await UserGinoModel.create(**user_admin_mock)
+        assert user_obj.ext_id == user_admin_mock["ext_id"]
+        assert user_obj.disabled == user_admin_mock["disabled"]
+        assert user_obj.superuser == user_admin_mock["superuser"]
+        assert user_obj.username == user_admin_mock["username"]
+        assert user_obj.given_name == user_admin_mock["given_name"]
+        assert user_obj.full_name == user_admin_mock["full_name"]
+        assert user_obj.family_name == user_admin_mock["family_name"]
         assert isinstance(user_obj.created, datetime)
         assert isinstance(user_obj.id, UUID_PG)
         await user_obj.delete()
 
     @pytest.mark.api_base
-    async def test_user_get(self, api_client, users_1):
-        assert isinstance(users_1.data["id"], UUID_PG)
-        assert users_1.data["id"] == users_1.id
-        assert users_1.data["type"] == "user"
-        attributes = users_1.data["attributes"]
+    async def test_user_get(self, api_client, single_admin):
+        assert isinstance(single_admin.data["id"], UUID_PG)
+        assert single_admin.data["id"] == single_admin.id
+        assert single_admin.data["type"] == "user"
+        attributes = single_admin.data["attributes"]
         assert isinstance(attributes["created"], datetime)
-        assert attributes["created"] == users_1.created
-        assert attributes["ext_id"] == users_1.ext_id
-        assert attributes["family_name"] == users_1.family_name
-        assert attributes["full_name"] == users_1.full_name
-        assert attributes["given_name"] == users_1.given_name
-        assert attributes["superuser"] == users_1.superuser
-        assert attributes["username"] == users_1.username
+        assert attributes["created"] == single_admin.created
+        assert attributes["ext_id"] == single_admin.ext_id
+        assert attributes["family_name"] == single_admin.family_name
+        assert attributes["full_name"] == single_admin.full_name
+        assert attributes["given_name"] == single_admin.given_name
+        assert attributes["superuser"] == single_admin.superuser
+        assert attributes["username"] == single_admin.username
         assert "type" not in attributes
 
 
@@ -134,20 +108,20 @@ class TestUserPydantic:
     """User pydantic serializer tests."""
 
     @pytest.mark.api_base
-    async def test_user_serializer_get(self, api_client, users_1):
-        serializer = UserDBDataModel.from_orm(users_1)
+    async def test_user_serializer_get(self, api_client, single_admin):
+        serializer = UserDBDataModel.from_orm(single_admin)
         assert isinstance(serializer, UserDBDataModel)
         assert isinstance(serializer.data, UserDBModel)
-        assert serializer.data.id == users_1.id
-        assert serializer.data.type == users_1.type
-        assert serializer.data.attributes.ext_id == users_1.ext_id
-        assert serializer.data.attributes.disabled == users_1.disabled
-        assert serializer.data.attributes.superuser == users_1.superuser
-        assert serializer.data.attributes.created == users_1.created
-        assert serializer.data.attributes.username == users_1.username
-        assert serializer.data.attributes.given_name == users_1.given_name
-        assert serializer.data.attributes.family_name == users_1.family_name
-        assert serializer.data.attributes.full_name == users_1.full_name
+        assert serializer.data.id == single_admin.id
+        assert serializer.data.type == single_admin.type
+        assert serializer.data.attributes.ext_id == single_admin.ext_id
+        assert serializer.data.attributes.disabled == single_admin.disabled
+        assert serializer.data.attributes.superuser == single_admin.superuser
+        assert serializer.data.attributes.created == single_admin.created
+        assert serializer.data.attributes.username == single_admin.username
+        assert serializer.data.attributes.given_name == single_admin.given_name
+        assert serializer.data.attributes.family_name == single_admin.family_name
+        assert serializer.data.attributes.full_name == single_admin.full_name
 
     @pytest.mark.api_base
     async def test_user_serializer_short_create(
@@ -194,11 +168,11 @@ class TestUserPydantic:
 
     @pytest.mark.api_base
     async def test_user_serializer_update(
-        self, api_client, users_1, user_shortened_ser_mock
+        self, api_client, single_admin, user_shortened_ser_mock
     ):
         serializer = UserDataUpdateModel.parse_obj(user_shortened_ser_mock)
         assert isinstance(serializer, UserDataUpdateModel)
         assert serializer.data.type == "user"
-        await users_1.update(**serializer.data.validated_attributes).apply()
-        assert users_1.disabled is False
-        assert users_1.superuser is False
+        await single_admin.update(**serializer.data.validated_attributes).apply()
+        assert single_admin.disabled is False
+        assert single_admin.superuser is False
