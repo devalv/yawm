@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """User core tests."""
-
+import os
 from datetime import datetime
 
 import pytest
@@ -179,6 +179,9 @@ class TestUserPydantic:
         assert single_admin.superuser is False
 
 
+@pytest.mark.skipif(
+    os.environ.get("PLATFORM", "GITHUB") == "GITHUB", reason="Only for a local docker."
+)
 class TestUserToken:
     """User token tests."""
 
