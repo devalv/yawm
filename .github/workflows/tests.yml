@@ -18,7 +18,7 @@ jobs:
       DB_PASSWORD: test_pass
       DB_DATABASE: test_db
       PYTHONPATH: /opt/yawm/app
-      GITHUB: True
+      GITHUB: true
       API_HOST: 0.0.0.0
       API_PORT: 8000
       API_DOMAIN: localhost
