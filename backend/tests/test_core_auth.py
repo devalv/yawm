@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Core auth tests."""
+import os
 from datetime import datetime, timedelta
 from random import randint
 
@@ -25,9 +26,6 @@ pytestmark = [
     pytest.mark.security,
 ]
 
-
-# TODO: @devalv TokenInfo.save hash for refresh token
-# TODO: @devalv mark non-github tests
 
 API_URL_PREFIX = "/api/v1"
 
@@ -138,6 +136,7 @@ async def single_admin_auth_headers(single_admin_access_token):
     return {"Authorization": f"Bearer {single_admin_access_token}"}
 
 
+@pytest.mark.skipif(os.environ.get("GITHUB", False), reason="Only for a local docker.")
 class TestGoogleIdInfoPydantic:
     """Pydantic model tests."""
 
@@ -194,6 +193,7 @@ class TestGoogleIdInfoPydantic:
             assert False
 
 
+@pytest.mark.skipif(os.environ.get("GITHUB", False), reason="Only for a local docker.")
 class TestGOCUser:
     """Get or create (GOC) user tests."""
 
@@ -226,6 +226,7 @@ class TestGOCUser:
         assert user_object.family_name == google_id_info.family_name
 
 
+@pytest.mark.skipif(os.environ.get("GITHUB", False), reason="Only for a local docker.")
 class TestGCUser:
     """Get current (GC) user tests."""
 
@@ -260,6 +261,7 @@ class TestGCUser:
             assert False
 
 
+@pytest.mark.skipif(os.environ.get("GITHUB", False), reason="Only for a local docker.")
 class TestGUserFR:
     """Get user (GU) for refresh tests."""
 
@@ -308,6 +310,7 @@ class TestGUserFR:
             assert False
 
 
+@pytest.mark.skipif(os.environ.get("GITHUB", False), reason="Only for a local docker.")
 async def test_login(api_client):
 
     resp = await api_client.get(
@@ -317,6 +320,7 @@ async def test_login(api_client):
     assert resp.status_code == status.HTTP_307_TEMPORARY_REDIRECT
 
 
+@pytest.mark.skipif(os.environ.get("GITHUB", False), reason="Only for a local docker.")
 async def test_logout(api_client, single_admin_auth_headers):
     resp = await api_client.get(
         f"{API_URL_PREFIX}/logout", headers=single_admin_auth_headers
@@ -324,11 +328,13 @@ async def test_logout(api_client, single_admin_auth_headers):
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
+@pytest.mark.skipif(os.environ.get("GITHUB", False), reason="Only for a local docker.")
 async def test_logout_2(api_client):
     resp = await api_client.get(f"{API_URL_PREFIX}/logout")
     assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
+@pytest.mark.skipif(os.environ.get("GITHUB", False), reason="Only for a local docker.")
 class TestUserInfo:
     """Authenticated user attributes tests."""
 
@@ -354,6 +360,7 @@ class TestUserInfo:
         assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
+@pytest.mark.skipif(os.environ.get("GITHUB", False), reason="Only for a local docker.")
 async def test_refresh_access_token(api_client, single_admin_refresh_token):
     resp = await api_client.post(
         f"{API_URL_PREFIX}/refresh_access_token",
@@ -365,6 +372,7 @@ async def test_refresh_access_token(api_client, single_admin_refresh_token):
     assert "refresh_token" in resp_data
 
 
+@pytest.mark.skipif(os.environ.get("GITHUB", False), reason="Only for a local docker.")
 async def test_refresh_access_token_with_bad_token(api_client):
     resp = await api_client.post(
         f"{API_URL_PREFIX}/refresh_access_token", query_string={"token": "qwe"}
