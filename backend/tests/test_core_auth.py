@@ -4,8 +4,9 @@ from datetime import datetime, timedelta
 from random import randint
 
 import pytest
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from jose import jwt
+from pydantic import ValidationError
 
 from core.config import ACCESS_TOKEN_EXPIRE_MIN, ALGORITHM, GOOGLE_CLIENT_ID
 from core.database import TokenInfoGinoModel, UserGinoModel
@@ -23,6 +24,12 @@ pytestmark = [
     pytest.mark.auth,
     pytest.mark.security,
 ]
+
+
+# TODO: @devalv TokenInfo.save hash for refresh token
+# TODO: @devalv mark non-github tests
+
+API_URL_PREFIX = "/api/v1"
 
 
 @pytest.fixture
@@ -124,6 +131,67 @@ async def single_disabled_refresh_token(
 ) -> str:
     await single_admin.update(disabled=True).apply()
     return single_admin_refresh_token
+
+
+@pytest.fixture
+async def single_admin_auth_headers(single_admin_access_token):
+    return {"Authorization": f"Bearer {single_admin_access_token}"}
+
+
+class TestGoogleIdInfoPydantic:
+    """Pydantic model tests."""
+
+    def test_with_email(self):
+        serializer = GoogleIdInfo(
+            email="jeff@mail.ru",
+            aud=GOOGLE_CLIENT_ID,
+            sub="1",
+            iat=datetime.utcnow().timestamp(),
+            exp=(datetime.utcnow() + timedelta(days=1)).timestamp(),
+            iss="accounts.google.com",
+        )
+        assert isinstance(serializer, GoogleIdInfo)
+        assert serializer.username == "jeff"
+
+    def test_aud(self):
+        try:
+            GoogleIdInfo(
+                aud=123,
+                sub="1",
+                iat=datetime.utcnow().timestamp(),
+                exp=(datetime.utcnow() + timedelta(days=1)).timestamp(),
+                iss="accounts.google.com",
+            )
+        except ValidationError:
+            assert True
+        else:
+            assert False
+
+    def test_name(self):
+        serializer = GoogleIdInfo(
+            aud=GOOGLE_CLIENT_ID,
+            iat=datetime.utcnow().timestamp(),
+            exp=(datetime.utcnow() + timedelta(days=1)).timestamp(),
+            sub="1",
+            iss="accounts.google.com",
+            name="user",
+        )
+        assert isinstance(serializer, GoogleIdInfo)
+        assert serializer.username != "user"
+
+    def test_iss(self):
+        try:
+            GoogleIdInfo(
+                aud=GOOGLE_CLIENT_ID,
+                iat=datetime.utcnow().timestamp(),
+                exp=(datetime.utcnow() + timedelta(days=1)).timestamp(),
+                iss="google.com",
+                name="user",
+            )
+        except ValidationError:
+            assert True
+        else:
+            assert False
 
 
 class TestGOCUser:
@@ -240,6 +308,65 @@ class TestGUserFR:
             assert False
 
 
-# TODO: @devalv TokenInfo.save hash for refresh token
+async def test_login(api_client):
 
-# TODO: @devalv text cases for Serializer
+    resp = await api_client.get(
+        f"{API_URL_PREFIX}/login", query_string={"state": "qwe"}, allow_redirects=False
+    )
+
+    assert resp.status_code == status.HTTP_307_TEMPORARY_REDIRECT
+
+
+async def test_logout(api_client, single_admin_auth_headers):
+    resp = await api_client.get(
+        f"{API_URL_PREFIX}/logout", headers=single_admin_auth_headers
+    )
+    assert resp.status_code == status.HTTP_204_NO_CONTENT
+
+
+async def test_logout_2(api_client):
+    resp = await api_client.get(f"{API_URL_PREFIX}/logout")
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+class TestUserInfo:
+    """Authenticated user attributes tests."""
+
+    API_URL = f"{API_URL_PREFIX}/user/info"
+
+    async def test_granted_info(
+        self, api_client, single_admin, single_admin_auth_headers
+    ):
+        resp = await api_client.get(self.API_URL, headers=single_admin_auth_headers)
+        assert resp.status_code == status.HTTP_200_OK
+        assert "data" in resp.json()
+        response_data = resp.json()["data"]
+        assert "attributes" in response_data
+        response_attributes = response_data["attributes"]
+        for key in response_attributes:
+            if key == "created":
+                continue
+            assert hasattr(single_admin, key)
+            assert response_attributes[key] == getattr(single_admin, key)
+
+    async def test_permitted_info(self, api_client):
+        resp = await api_client.get(self.API_URL)
+        assert resp.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+async def test_refresh_access_token(api_client, single_admin_refresh_token):
+    resp = await api_client.post(
+        f"{API_URL_PREFIX}/refresh_access_token",
+        query_string={"token": single_admin_refresh_token},
+    )
+    assert resp.status_code == status.HTTP_200_OK
+    resp_data = resp.json()
+    assert "access_token" in resp_data
+    assert "refresh_token" in resp_data
+
+
+async def test_refresh_access_token_with_bad_token(api_client):
+    resp = await api_client.post(
+        f"{API_URL_PREFIX}/refresh_access_token", query_string={"token": "qwe"}
+    )
+    assert resp.status_code == status.HTTP_401_UNAUTHORIZED

@@ -15,7 +15,8 @@ from core.config import (
     GOOGLE_SCOPES,
     SWAP_TOKEN_ENDPOINT,
 )
-from core.schemas import GoogleIdInfo, Token, UserDBModel
+from core.database import UserGinoModel
+from core.schemas import GoogleIdInfo, Token, UserDBDataModel
 from core.services.security import (
     get_current_user,
     get_or_create_user,
@@ -59,7 +60,7 @@ async def swap_token(code: str = Form(...)):  # noqa: B008
 @security_router.post("/refresh_access_token", response_model=Token, tags=["security"])
 @version(1)
 async def refresh_access_token(
-    current_user: UserDBModel = Depends(get_user_for_refresh),  # noqa: B008
+    current_user: UserGinoModel = Depends(get_user_for_refresh),  # noqa: B008
 ):
     return await current_user.create_token()
 
@@ -80,13 +81,13 @@ async def login(state: str):
 
 @security_router.get("/logout", status_code=status.HTTP_204_NO_CONTENT, tags=["auth"])
 @version(1)
-async def logout(current_user: UserDBModel = Depends(get_current_user)):  # noqa: B008
+async def logout(current_user: UserGinoModel = Depends(get_current_user)):  # noqa: B008
     await current_user.delete_refresh_token()
 
 
-@security_router.get("/user/info", response_model=UserDBModel)
+@security_router.get("/user/info", response_model=UserDBDataModel)
 @version(1)
 async def user_info(
-    current_user: UserDBModel = Depends(get_current_user),  # noqa: B008
+    current_user: UserGinoModel = Depends(get_current_user),  # noqa: B008
 ):
     return current_user
