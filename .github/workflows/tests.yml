@@ -14,11 +14,10 @@ jobs:
     env:
       DB_HOST: localhost
       DB_PORT: 5430
-      DB_USER: test_us1er
+      DB_USER: test_user
       DB_PASSWORD: test_pass
       DB_DATABASE: test_db
       PYTHONPATH: /opt/yawm/app
-      PLATFORM: GITHUB
       API_HOST: 0.0.0.0
       API_PORT: 8000
       API_DOMAIN: localhost
