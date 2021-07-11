@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 
 from jose import jwt
+from passlib.context import CryptContext
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
@@ -19,6 +20,8 @@ from core.config import (
 from core.utils import CREDENTIALS_EX, JsonApiGinoModel
 
 from .. import db
+
+ref_token_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class User(db.Model, JsonApiGinoModel):
@@ -64,9 +67,7 @@ class User(db.Model, JsonApiGinoModel):
             "username": self.username,
         }
         token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
-        async with db.transaction():
-            await TokenInfo.delete.where(TokenInfo.user_id == self.id).gino.status()
-            await TokenInfo.create(user_id=self.id, refresh_token=token)
+        await TokenInfo.add_token(user_id=self.id, refresh_token=token)
         return token
 
     async def delete_refresh_token(self):
@@ -91,7 +92,7 @@ class User(db.Model, JsonApiGinoModel):
     async def token_is_valid(self, token: str) -> bool:
         """Checking that the token matches the issued one."""
         token_info = await self.token_info()
-        return token_info and token_info.refresh_token == token
+        return token_info and token_info.verify_token(token)
 
     @classmethod
     async def insert_or_update_by_ext_id(
@@ -138,3 +139,21 @@ class TokenInfo(db.Model):
     created = db.Column(
         db.DateTime(timezone=True), server_default=func.now(), nullable=False
     )
+
+    @staticmethod
+    def get_refresh_token_hash(token: str):
+        """Hash plain token str."""
+        return ref_token_context.hash(token)
+
+    @classmethod
+    async def add_token(cls, user_id: UUID, refresh_token: str):
+        """Add new refresh_token for a user."""
+        async with db.transaction():
+            await cls.delete.where(cls.user_id == user_id).gino.status()
+            await cls.create(
+                user_id=user_id, refresh_token=cls.get_refresh_token_hash(refresh_token)
+            )
+
+    def verify_token(self, refresh_token: str):
+        """Verify plain token text and stored hashed value."""
+        return ref_token_context.verify(refresh_token, self.refresh_token)
