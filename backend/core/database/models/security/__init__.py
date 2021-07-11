@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Project database security models."""
 
-from .auth import User
+from .auth import TokenInfo, User
 
-__all__ = ["User"]
+__all__ = ["User", "TokenInfo"]
