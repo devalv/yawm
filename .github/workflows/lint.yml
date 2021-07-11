@@ -5,8 +5,8 @@ name: Linter and smoke tests
 on:
   pull_request:
     branches: [ main ]
-#  push:
-#    branches: [ '**' ]
+  push:
+    branches: [ '**' ]
 
 jobs:
   linters:

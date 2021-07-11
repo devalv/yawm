@@ -137,7 +137,7 @@ async def single_admin_auth_headers(single_admin_access_token):
 
 
 @pytest.mark.skipif(
-    os.environ.get("PLATFORM", "GITHUB") == "GITHUB", reason="Only for a local docker."
+    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
 class TestGoogleIdInfoPydantic:
     """Pydantic model tests."""
@@ -196,7 +196,7 @@ class TestGoogleIdInfoPydantic:
 
 
 @pytest.mark.skipif(
-    os.environ.get("PLATFORM", "GITHUB") == "GITHUB", reason="Only for a local docker."
+    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
 class TestGOCUser:
     """Get or create (GOC) user tests."""
@@ -231,7 +231,7 @@ class TestGOCUser:
 
 
 @pytest.mark.skipif(
-    os.environ.get("PLATFORM", "GITHUB") == "GITHUB", reason="Only for a local docker."
+    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
 class TestGCUser:
     """Get current (GC) user tests."""
@@ -268,7 +268,7 @@ class TestGCUser:
 
 
 @pytest.mark.skipif(
-    os.environ.get("PLATFORM", "GITHUB") == "GITHUB", reason="Only for a local docker."
+    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
 class TestGUserFR:
     """Get user (GU) for refresh tests."""
@@ -319,7 +319,7 @@ class TestGUserFR:
 
 
 @pytest.mark.skipif(
-    os.environ.get("PLATFORM", "GITHUB") == "GITHUB", reason="Only for a local docker."
+    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
 async def test_login(api_client):
 
@@ -331,7 +331,7 @@ async def test_login(api_client):
 
 
 @pytest.mark.skipif(
-    os.environ.get("PLATFORM", "GITHUB") == "GITHUB", reason="Only for a local docker."
+    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
 async def test_logout(api_client, single_admin_auth_headers):
     resp = await api_client.get(
@@ -341,7 +341,7 @@ async def test_logout(api_client, single_admin_auth_headers):
 
 
 @pytest.mark.skipif(
-    os.environ.get("PLATFORM", "GITHUB") == "GITHUB", reason="Only for a local docker."
+    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
 async def test_logout_2(api_client):
     resp = await api_client.get(f"{API_URL_PREFIX}/logout")
@@ -349,7 +349,7 @@ async def test_logout_2(api_client):
 
 
 @pytest.mark.skipif(
-    os.environ.get("PLATFORM", "GITHUB") == "GITHUB", reason="Only for a local docker."
+    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
 class TestUserInfo:
     """Authenticated user attributes tests."""
@@ -391,7 +391,7 @@ async def test_refresh_access_token(api_client, single_admin_refresh_token):
 
 
 @pytest.mark.skipif(
-    os.environ.get("PLATFORM", "GITHUB") == "GITHUB", reason="Only for a local docker."
+    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
 async def test_refresh_access_token_with_bad_token(api_client):
     resp = await api_client.post(
