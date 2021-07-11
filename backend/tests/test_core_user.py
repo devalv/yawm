@@ -180,7 +180,7 @@ class TestUserPydantic:
 
 
 @pytest.mark.skipif(
-    os.environ.get("PLATFORM", "GITHUB") == "GITHUB", reason="Only for a local docker."
+    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
 class TestUserToken:
     """User token tests."""
