@@ -116,6 +116,7 @@ class TestUserPydantic:
         assert serializer.data.type == single_admin.type
         assert serializer.data.attributes.ext_id == single_admin.ext_id
         assert serializer.data.attributes.disabled == single_admin.disabled
+        assert serializer.disabled == single_admin.disabled
         assert serializer.data.attributes.superuser == single_admin.superuser
         assert serializer.data.attributes.created == single_admin.created
         assert serializer.data.attributes.username == single_admin.username
