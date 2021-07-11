@@ -19,6 +19,10 @@ jobs:
       DB_DATABASE: test_db
       PYTHONPATH: /opt/yawm/app
       GITHUB: True
+      API_HOST: 0.0.0.0
+      API_PORT: 8000
+      API_DOMAIN: localhost
+      API_PROTOCOL: http
     steps:
       - uses: actions/checkout@v2
       - name: Build the docker-compose stack
