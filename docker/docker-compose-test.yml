@@ -32,6 +32,8 @@ services:
       - API_PROTOCOL=${API_PROTOCOL}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - OAUTHLIB_INSECURE_TRANSPORT=1
+      - GOOGLE_CLIENT_SECRETS_JSON=${GOOGLE_CLIENT_SECRETS_JSON}
+      - GOOGLE_USERINFO_SCOPE=${GOOGLE_USERINFO_SCOPE}
     working_dir: /opt/yawm/app
     command: sh -c "sleep 3 && pipenv install --dev && pipenv run python -m pytest"
     depends_on:

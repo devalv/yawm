@@ -173,5 +173,5 @@ async def get_product_name(url: str, chunk_size: int = 100) -> str:
                     chunk_iter=response_iter, chunk_size=chunk_size
                 )
                 return await page_parser.get_value()
-    except httpx.RequestError:
+    except httpx.RequestError:  # pragma: no cover
         return
