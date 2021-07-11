@@ -9,6 +9,12 @@ CREDENTIALS_EX = HTTPException(
     headers={"WWW-Authenticate": "Bearer"},
 )
 
+INACTIVE_EX = HTTPException(
+    status_code=status.HTTP_403_FORBIDDEN,
+    detail="Inactive user",
+    headers={"WWW-Authenticate": "Bearer"},
+)
+
 
 OAUTH2_EX = HTTPException(
     status_code=status.HTTP_400_BAD_REQUEST,

@@ -6,7 +6,7 @@ from datetime import datetime
 import pytest
 from asyncpg.pgproto.pgproto import UUID as UUID_PG
 
-from core.database import UserGinoModel
+from core.database import TokenInfoGinoModel, UserGinoModel
 from core.schemas import (
     UserDataCreateModel,
     UserDataUpdateModel,
@@ -177,3 +177,48 @@ class TestUserPydantic:
         await single_admin.update(**serializer.data.validated_attributes).apply()
         assert single_admin.disabled is False
         assert single_admin.superuser is False
+
+
+class TestUserToken:
+    """User token tests."""
+
+    async def test_create_access_token(self, api_client, single_admin):
+        access_token = single_admin.create_access_token()
+        assert isinstance(access_token, str)
+
+    async def test_create_refresh_token(self, api_client, single_admin):
+        refresh_token = await single_admin.create_refresh_token()
+        assert isinstance(refresh_token, str)
+
+    async def test_delete_refresh_token(self, api_client, single_admin):
+        await single_admin.create_token()
+        token_obj = await TokenInfoGinoModel.get(single_admin.id)
+        assert token_obj
+        await single_admin.delete_refresh_token()
+        token_obj = await TokenInfoGinoModel.get(single_admin.id)
+        assert not token_obj
+
+    async def test_create_token(self, api_client, single_admin):
+        token = await single_admin.create_token()
+        assert isinstance(token, dict)
+
+    async def test_token_info(self, api_client, single_admin):
+        await single_admin.create_token()
+        token_info = await single_admin.token_info()
+        assert isinstance(token_info, TokenInfoGinoModel)
+
+    async def test_token_is_valid(self, api_client, single_admin):
+        token_is_valid = await single_admin.token_is_valid("bad")
+        assert not token_is_valid
+
+    async def test_update_by_ext_id(self, api_client, single_admin):
+        updated_user = await single_admin.insert_or_update_by_ext_id(
+            sub="1", username="updated"
+        )
+        assert single_admin.username != updated_user.username
+
+    async def test_create_by_ext_id(self, api_client):
+        created_user = await UserGinoModel.insert_or_update_by_ext_id(
+            sub="1", username="new-user"
+        )
+        assert isinstance(created_user, UserGinoModel)

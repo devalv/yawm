@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """Authentication system."""
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.security.oauth2 import OAuth2AuthorizationCodeBearer
 from jose import JWTError
 
 from core.config import LOGIN_ENDPOINT, SWAP_TOKEN_ENDPOINT
 from core.database import UserGinoModel
 from core.schemas import AccessToken, GoogleIdInfo, RefreshToken
-from core.utils import CREDENTIALS_EX
+from core.utils import CREDENTIALS_EX, INACTIVE_EX
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
     authorizationUrl=LOGIN_ENDPOINT, tokenUrl=SWAP_TOKEN_ENDPOINT
@@ -41,9 +41,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):  # noqa: B008
         token_info = AccessToken.decode_and_create(token=token)
         user = await UserGinoModel.get(token_info.id)
         if user is None or user.disabled:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
-            )
+            raise INACTIVE_EX
     except (JWTError, ValueError):
         raise CREDENTIALS_EX
     return user
@@ -54,9 +52,7 @@ async def get_user_for_refresh(token: str):
         token_info = RefreshToken.decode_and_create(token=token)
         user = await UserGinoModel.get(token_info.id)
         if user is None or user.disabled:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
-            )
+            raise INACTIVE_EX
         token_valid = await user.token_is_valid(token)
         if not token_valid:
             raise CREDENTIALS_EX
