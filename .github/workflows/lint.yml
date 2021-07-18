@@ -31,21 +31,3 @@ jobs:
           git commit -am "fixup: Format Python code with Black"
           git push
       - uses: pre-commit/action@v2.0.0
-  smoke-test:
-    needs: linters
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-            python-version: '3.9'
-      - name: Test with pytest
-        run: |
-          cd backend
-          pip install --upgrade pip
-          python -m pip install pipenv
-          pipenv install --deploy --system --dev
-          python -m pytest -vm "smoke"
-        env:
-          PYTHONPATH: /opt/yawm/app

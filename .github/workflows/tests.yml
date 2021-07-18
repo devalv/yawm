@@ -5,6 +5,8 @@ name: Tests and codecov.
 on:
   pull_request:
     branches: [ main ]
+  push:
+    branches: [ '**' ]
 
 jobs:
   tests:
