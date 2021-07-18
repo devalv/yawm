@@ -25,7 +25,7 @@ wishlist_product_router = APIRouter(redirect_slashes=True, tags=["wishlist-produ
 )
 @version(1)
 async def list_wishlist_products(
-    wishlist: WishlistGinoModel = Depends(get_wishlist)  # noqa: B008
+    wishlist: WishlistGinoModel = Depends(get_wishlist),  # noqa: B008
 ):
     """API for getting all related products."""
     return await paginate(wishlist.products)
