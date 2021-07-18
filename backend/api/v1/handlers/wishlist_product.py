@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 """Wishlist rest-api handlers."""
 
-from fastapi import APIRouter, Response, status
+from fastapi import APIRouter, Depends, Response, status
 from fastapi_pagination.ext.gino import paginate
 from fastapi_versioning import version
 from pydantic import UUID4
 
-from core.database.models.wishlist import Wishlist, WishlistProducts
+from core.database import WishlistGinoModel
+from core.database.models.wishlist import WishlistProducts
 from core.schemas import (
     WishlistProductsDataCreateModel,
     WishlistProductsDataModel,
     WishlistProductsDataUpdateModel,
     WishlistProductsModel,
 )
+from core.services.security import get_user_wishlist, get_wishlist
 from core.utils import JsonApiPage
 
 wishlist_product_router = APIRouter(redirect_slashes=True, tags=["wishlist-products"])
@@ -22,9 +24,10 @@ wishlist_product_router = APIRouter(redirect_slashes=True, tags=["wishlist-produ
     "/wishlist/{id}/products", response_model=JsonApiPage[WishlistProductsModel]
 )
 @version(1)
-async def list_wishlist_products(id: UUID4):  # noqa: A002
+async def list_wishlist_products(
+    wishlist: WishlistGinoModel = Depends(get_wishlist)  # noqa: B008
+):
     """API for getting all related products."""
-    wishlist = await Wishlist.get_or_404(id)
     return await paginate(wishlist.products)
 
 
@@ -33,10 +36,10 @@ async def list_wishlist_products(id: UUID4):  # noqa: A002
 )
 @version(1)
 async def create_wishlist_product(
-    id: UUID4, product: WishlistProductsDataCreateModel  # noqa: A002
+    product: WishlistProductsDataCreateModel,
+    wishlist: WishlistGinoModel = Depends(get_user_wishlist),  # noqa: B008
 ):
     """API for adding existing product to a existing wishlist."""
-    wishlist = await Wishlist.get_or_404(id)
     return await wishlist.add_product(**product.data.validated_attributes)
 
 
@@ -45,10 +48,11 @@ async def create_wishlist_product(
 )
 @version(1)
 async def update_wishlist_product(
-    id: UUID4, pw_id: UUID4, pwm: WishlistProductsDataUpdateModel  # noqa: A002
+    pw_id: UUID4,
+    pwm: WishlistProductsDataUpdateModel,
+    wishlist: WishlistGinoModel = Depends(get_user_wishlist),  # noqa: B008
 ):
     """API for updating product associated to a wishlist."""
-    await Wishlist.get_or_404(id)
     wishlist_product = await WishlistProducts.get_or_404(pw_id)
     await wishlist_product.update(**pwm.data.non_null_attributes).apply()
     return wishlist_product
@@ -60,8 +64,9 @@ async def update_wishlist_product(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 @version(1)
-async def delete_wishlist_product(id: UUID4, pw_id: UUID4):  # noqa: A002
+async def delete_wishlist_product(
+    pw_id: UUID4, wishlist: WishlistGinoModel = Depends(get_user_wishlist)  # noqa: B008
+):
     """API for removing product from wishlist."""
-    await Wishlist.get_or_404(id)
     wishlist_product = await WishlistProducts.get_or_404(pw_id)
     await wishlist_product.delete()
