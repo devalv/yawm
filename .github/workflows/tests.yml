@@ -15,14 +15,14 @@ jobs:
       PYTHONPATH: /opt/yawm/app
       PLATFORM: GITHUB
       API_PORT: 8000
-      API_DOMAIN: ${{ secrets.API_DOMAIN }}
-      API_HOST: ${{ secrets.API_HOST }}
-      API_PROTOCOL: ${{ secrets.API_PROTOCOL }}
-      DB_DATABASE: ${{ secrets.DB_DATABASE }}
-      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: 5431
+      DB_DATABASE: dev_db
+      DB_HOST: localhost
+      DB_USER: dev_user
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DB_PORT: ${{ secrets.DB_PORT }}
-      DB_USER: ${{ secrets.DB_USER }}
+      API_HOST: 0.0.0.0
+      API_DOMAIN: ${{ secrets.API_DOMAIN }}
+      API_PROTOCOL: ${{ secrets.API_PROTOCOL }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
