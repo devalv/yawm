@@ -37,16 +37,11 @@ async def user_extra_ser_mock(user_admin_mock):
     return {"data": {"attributes": user_admin_mock}}
 
 
-@pytest.fixture
-async def single_admin(user_admin_mock):
-    return await UserGinoModel.create(**user_admin_mock)
-
-
 class TestUserDB:
     """User db-table tests."""
 
     @pytest.mark.api_base
-    async def test_user_default_create(self, api_client, user_mock):
+    async def test_user_default_create(self, backend_app, user_mock):
         user_obj = await UserGinoModel.create(**user_mock)
         assert user_obj.ext_id == user_mock["ext_id"]
         assert user_obj.disabled == user_mock["disabled"]
@@ -60,7 +55,7 @@ class TestUserDB:
         await user_obj.delete()
 
     @pytest.mark.api_base
-    async def test_user_shortened_create(self, api_client, user_shortened_mock):
+    async def test_user_shortened_create(self, backend_app, user_shortened_mock):
         user_obj = await UserGinoModel.create(**user_shortened_mock)
         assert user_obj.ext_id == user_shortened_mock["ext_id"]
         assert user_obj.disabled is False
@@ -74,7 +69,7 @@ class TestUserDB:
         await user_obj.delete()
 
     @pytest.mark.api_base
-    async def test_user_extra_create(self, api_client, user_admin_mock):
+    async def test_user_extra_create(self, backend_app, user_admin_mock):
         user_obj = await UserGinoModel.create(**user_admin_mock)
         assert user_obj.ext_id == user_admin_mock["ext_id"]
         assert user_obj.disabled == user_admin_mock["disabled"]
@@ -88,7 +83,7 @@ class TestUserDB:
         await user_obj.delete()
 
     @pytest.mark.api_base
-    async def test_user_get(self, api_client, single_admin):
+    async def test_user_get(self, backend_app, single_admin):
         assert isinstance(single_admin.data["id"], UUID_PG)
         assert single_admin.data["id"] == single_admin.id
         assert single_admin.data["type"] == "user"
@@ -108,7 +103,7 @@ class TestUserPydantic:
     """User pydantic serializer tests."""
 
     @pytest.mark.api_base
-    async def test_user_serializer_get(self, api_client, single_admin):
+    async def test_user_serializer_get(self, backend_app, single_admin):
         serializer = UserDBDataModel.from_orm(single_admin)
         assert isinstance(serializer, UserDBDataModel)
         assert isinstance(serializer.data, UserDBModel)
@@ -126,7 +121,7 @@ class TestUserPydantic:
 
     @pytest.mark.api_base
     async def test_user_serializer_short_create(
-        self, api_client, user_shortened_ser_mock
+        self, backend_app, user_shortened_ser_mock
     ):
         serializer = UserDataCreateModel.parse_obj(user_shortened_ser_mock)
         assert isinstance(serializer, UserDataCreateModel)
@@ -152,7 +147,7 @@ class TestUserPydantic:
         await db_obj.delete()
 
     @pytest.mark.api_base
-    async def test_user_serializer_extra_create(self, api_client, user_extra_ser_mock):
+    async def test_user_serializer_extra_create(self, backend_app, user_extra_ser_mock):
         serializer = UserDataCreateModel.parse_obj(user_extra_ser_mock)
         assert isinstance(serializer, UserDataCreateModel)
         db_obj = await UserGinoModel.create(**serializer.data.validated_attributes)
@@ -169,7 +164,7 @@ class TestUserPydantic:
 
     @pytest.mark.api_base
     async def test_user_serializer_update(
-        self, api_client, single_admin, user_shortened_ser_mock
+        self, backend_app, single_admin, user_shortened_ser_mock
     ):
         serializer = UserDataUpdateModel.parse_obj(user_shortened_ser_mock)
         assert isinstance(serializer, UserDataUpdateModel)
@@ -185,15 +180,15 @@ class TestUserPydantic:
 class TestUserToken:
     """User token tests."""
 
-    async def test_create_access_token(self, api_client, single_admin):
+    async def test_create_access_token(self, backend_app, single_admin):
         access_token = single_admin.create_access_token()
         assert isinstance(access_token, str)
 
-    async def test_create_refresh_token(self, api_client, single_admin):
+    async def test_create_refresh_token(self, backend_app, single_admin):
         refresh_token = await single_admin.create_refresh_token()
         assert isinstance(refresh_token, str)
 
-    async def test_delete_refresh_token(self, api_client, single_admin):
+    async def test_delete_refresh_token(self, backend_app, single_admin):
         await single_admin.create_token()
         token_obj = await TokenInfoGinoModel.get(single_admin.id)
         assert token_obj
@@ -201,26 +196,26 @@ class TestUserToken:
         token_obj = await TokenInfoGinoModel.get(single_admin.id)
         assert not token_obj
 
-    async def test_create_token(self, api_client, single_admin):
+    async def test_create_token(self, backend_app, single_admin):
         token = await single_admin.create_token()
         assert isinstance(token, dict)
 
-    async def test_token_info(self, api_client, single_admin):
+    async def test_token_info(self, backend_app, single_admin):
         await single_admin.create_token()
         token_info = await single_admin.token_info()
         assert isinstance(token_info, TokenInfoGinoModel)
 
-    async def test_token_is_valid(self, api_client, single_admin):
+    async def test_token_is_valid(self, backend_app, single_admin):
         token_is_valid = await single_admin.token_is_valid("bad")
         assert not token_is_valid
 
-    async def test_update_by_ext_id(self, api_client, single_admin):
+    async def test_update_by_ext_id(self, backend_app, single_admin):
         updated_user = await single_admin.insert_or_update_by_ext_id(
             sub="1", username="updated"
         )
         assert single_admin.username != updated_user.username
 
-    async def test_create_by_ext_id(self, api_client):
+    async def test_create_by_ext_id(self, backend_app):
         created_user = await UserGinoModel.insert_or_update_by_ext_id(
             sub="1", username="new-user"
         )

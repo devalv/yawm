@@ -58,6 +58,17 @@ async def update_wishlist_product(
     return wishlist_product
 
 
+@wishlist_product_router.put(
+    "/wishlist/{id}/products/{pw_id}/reserve", response_model=WishlistProductsDataModel
+)
+@version(1)
+async def reserve_wishlist_product(pw_id: UUID4, pwm: WishlistProductsDataUpdateModel):
+    """API for updating product associated to a wishlist."""
+    wishlist_product = await WishlistProducts.get_or_404(pw_id)
+    await wishlist_product.update(**pwm.data.non_null_attributes).apply()
+    return wishlist_product
+
+
 @wishlist_product_router.delete(
     "/wishlist/{id}/products/{pw_id}",
     response_class=Response,
