@@ -18,13 +18,13 @@ jobs:
       DB_DATABASE: dev_db
       DB_HOST: localhost
       DB_USER: dev_user
-      DB_PASSWORD: ${{ Docker-tests.DB_PASSWORD }}
+      DB_PASSWORD: ${{ DB_PASSWORD }}
       API_PORT: 8000
       API_HOST: 0.0.0.0
-      API_DOMAIN: ${{ Docker-tests.API_DOMAIN }}
-      API_PROTOCOL: ${{ Docker-tests.API_PROTOCOL }}
-      SECRET_KEY: ${{ Docker-tests.SECRET_KEY }}
-      CODECOV_TOKEN: ${{ Docker-tests.CODECOV_TOKEN }}
+      API_DOMAIN: ${{ API_DOMAIN }}
+      API_PROTOCOL: ${{ API_PROTOCOL }}
+      SECRET_KEY: ${{ SECRET_KEY }}
+      CODECOV_TOKEN: ${{ CODECOV_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - name: Build the docker-compose stack
