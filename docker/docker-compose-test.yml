@@ -35,6 +35,7 @@ services:
       - GOOGLE_USERINFO_SCOPE=${GOOGLE_USERINFO_SCOPE}
       - PLATFORM=${PLATFORM}
       - OAUTHLIB_INSECURE_TRANSPORT=1
+      - SECRET_KEY=${SECRET_KEY}
     working_dir: /opt/yawm/app
     command: sh -c "sleep 3 && pipenv install --dev && pipenv run python -m pytest"
     depends_on:
