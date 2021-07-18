@@ -18,11 +18,11 @@ jobs:
       DB_DATABASE: dev_db
       DB_HOST: localhost
       DB_USER: dev_user
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_PASSWORD: dev_pass
       API_PORT: 8000
       API_HOST: 0.0.0.0
-      API_DOMAIN: ${{ secrets.API_DOMAIN }}
-      API_PROTOCOL: ${{ secrets.API_PROTOCOL }}
+      API_DOMAIN: localhost
+      API_PROTOCOL: http
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
