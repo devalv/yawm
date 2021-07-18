@@ -3,9 +3,12 @@
 [report]
 include =
     api/*
+    core/*
 
 omit =
     tests/*
+    core/database/migrations/__init__.py
+    core/database/migrations/env.py
 
 exclude_lines =
     # Have to re-enable the standard pragma

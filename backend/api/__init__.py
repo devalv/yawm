@@ -1,31 +1,64 @@
 # -*- coding: utf-8 -*-
+"""Project API by versions."""
 
-"""Yet another wishlist maker.
-
-for additional info see README.md
-"""
-__version__ = "0.0.1"
-__author__ = "Aleksei Deviatkin <yawm@devyatkin.dev>"
 
 from fastapi import FastAPI
+from fastapi_pagination import add_pagination
+from fastapi_versioning import VersionedFastAPI
 
-from .handlers import wishlist_router
-from .models import db
+from core.config import SWAP_TOKEN_ENDPOINT
+from core.database.models import db
+
+from .v1 import (  # noqa: I201
+    product_router,
+    security_router,
+    utils_router,
+    wishlist_product_router,
+    wishlist_router,
+)
 
 
-def get_app():
+def get_app() -> FastAPI:
     """Just simple application initialization."""
-    application = FastAPI(title="Yet another wishlist maker", version="0.0.1")
-    db.init_app(application)
-    return application
+    return FastAPI(
+        title="Yet another wishlist maker",
+        version="0.2.0",
+        swagger_ui_oauth2_redirect_url=SWAP_TOKEN_ENDPOINT,
+        swagger_ui_init_oauth={
+            "clientId": "please keep this value",
+            "clientSecret": "please keep this value",
+            "appName": "Yet another wishlist maker",
+        },
+    )
 
 
-def configure(application: FastAPI):
+def configure_routes(application: FastAPI):
     """Configure application."""
     application.include_router(wishlist_router)
+    application.include_router(product_router)
+    application.include_router(wishlist_product_router)
+    application.include_router(utils_router)
+    application.include_router(security_router)
+    add_pagination(application)
+
+
+def get_versioned_app(application: FastAPI) -> VersionedFastAPI:
+    return VersionedFastAPI(
+        application,
+        version_format="{major}",
+        prefix_format="/api/v{major}",
+        swagger_ui_oauth2_redirect_url=SWAP_TOKEN_ENDPOINT,
+    )
+
+
+def configure_db(application: FastAPI):
+    db.init_app(application)
 
 
 app = get_app()
-configure(application=app)
+configure_routes(application=app)
+app = get_versioned_app(application=app)
+configure_db(app)
 
-__all__ = ["app", "__version__", "__author__", "db"]
+
+__all__ = ["app", "db"]
