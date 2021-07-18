@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 """Project extra utils."""
 
-from .exceptions import CREDENTIALS_EX, INACTIVE_EX, NOT_IMPLEMENTED_EX, OAUTH2_EX
+from .exceptions import (
+    CREDENTIALS_EX,
+    INACTIVE_EX,
+    NOT_AN_OWNER,
+    NOT_IMPLEMENTED_EX,
+    OAUTH2_EX,
+)
 from .fastapi_pagination import JsonApiPage
 from .gino_models import JsonApiGinoModel
 from .pydantic_models import (
@@ -26,4 +32,5 @@ __all__ = [
     "INACTIVE_EX",
     "OAUTH2_EX",
     "NOT_IMPLEMENTED_EX",
+    "NOT_AN_OWNER",
 ]

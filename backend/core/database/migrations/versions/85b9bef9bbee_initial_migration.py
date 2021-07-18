@@ -20,14 +20,6 @@ depends_on = None
 def upgrade():
     """Apply changes on database."""
     op.create_table(
-        "product",
-        sa.Column("id", postgresql.UUID(), nullable=False),
-        sa.Column("name", sa.Unicode(length=255), nullable=False),
-        sa.Column("url", sa.Unicode(length=8000), nullable=False),
-        sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("url"),
-    )
-    op.create_table(
         "user",
         sa.Column("id", postgresql.UUID(), nullable=False),
         sa.Column("ext_id", sa.Unicode(length=255), nullable=False),
@@ -48,10 +40,22 @@ def upgrade():
     )
     op.create_index(op.f("ix_user_username"), "user", ["username"], unique=False)
     op.create_table(
+        "product",
+        sa.Column("id", postgresql.UUID(), nullable=False),
+        sa.Column("name", sa.Unicode(length=255), nullable=False),
+        sa.Column("url", sa.Unicode(length=8000), nullable=False),
+        sa.Column("user_id", postgresql.UUID(), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("url"),
+        sa.ForeignKeyConstraint(["user_id"], ["user.id"], ondelete="CASCADE"),
+    )
+    op.create_table(
         "wishlist",
         sa.Column("id", postgresql.UUID(), nullable=False),
         sa.Column("name", sa.Unicode(length=255), nullable=False),
         sa.PrimaryKeyConstraint("id"),
+        sa.Column("user_id", postgresql.UUID(), nullable=False),
+        sa.ForeignKeyConstraint(["user_id"], ["user.id"], ondelete="CASCADE"),
     )
     op.create_table(
         "token_info",
@@ -92,5 +96,5 @@ def downgrade():
     op.drop_table("token_info")
     op.drop_table("wishlist")
     op.drop_index(op.f("ix_user_username"), table_name="user")
-    op.drop_table("user")
     op.drop_table("product")
+    op.drop_table("user")

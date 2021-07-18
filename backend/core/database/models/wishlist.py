@@ -8,6 +8,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from starlette import status
 from starlette.exceptions import HTTPException
 
+from core.database.models.security import User
 from core.utils import JsonApiGinoModel
 
 from . import db
@@ -21,6 +22,9 @@ class Product(db.Model, JsonApiGinoModel):
     id = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A002, A003, VNE003
     name = db.Column(db.Unicode(length=255), nullable=False)
     url = db.Column(db.Unicode(length=8000), nullable=False, unique=True)
+    user_id = db.Column(
+        UUID(), db.ForeignKey(User.id, ondelete="CASCADE"), nullable=False
+    )
 
 
 class Wishlist(db.Model, JsonApiGinoModel):
@@ -30,6 +34,9 @@ class Wishlist(db.Model, JsonApiGinoModel):
 
     id = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A002, A003, VNE003
     name = db.Column(db.Unicode(length=255), nullable=False)
+    user_id = db.Column(
+        UUID(), db.ForeignKey(User.id, ondelete="CASCADE"), nullable=False
+    )
 
     @property
     def products(self):
