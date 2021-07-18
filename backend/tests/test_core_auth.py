@@ -31,21 +31,6 @@ API_URL_PREFIX = "/api/v1"
 
 
 @pytest.fixture
-async def single_admin(api_client, user_admin_mock):
-    return await UserGinoModel.create(**user_admin_mock)
-
-
-@pytest.fixture
-async def single_user(api_client, user_mock):
-    return await UserGinoModel.create(**user_mock)
-
-
-@pytest.fixture
-async def single_disabled_user(api_client, disabled_user_mock):
-    return await UserGinoModel.create(**disabled_user_mock)
-
-
-@pytest.fixture
 async def google_id_info():
     token_info = dict()
     token_info["aud"] = GOOGLE_CLIENT_ID
@@ -68,11 +53,6 @@ async def existing_user_id_info(google_id_info, single_admin):
 async def existing_deactivated_user_id_info(google_id_info, single_disabled_user):
     google_id_info.sub = single_disabled_user.ext_id
     return google_id_info
-
-
-@pytest.fixture
-async def single_admin_token(single_admin) -> dict:
-    return await single_admin.create_token()
 
 
 @pytest.fixture
@@ -108,11 +88,6 @@ async def no_refresh_token(single_admin):
 
 
 @pytest.fixture
-async def single_admin_access_token(single_admin_token) -> str:
-    return single_admin_token["access_token"]
-
-
-@pytest.fixture
 async def single_admin_refresh_token(single_admin_token) -> str:
     return single_admin_token["refresh_token"]
 
@@ -129,11 +104,6 @@ async def single_disabled_refresh_token(
 ) -> str:
     await single_admin.update(disabled=True).apply()
     return single_admin_refresh_token
-
-
-@pytest.fixture
-async def single_admin_auth_headers(single_admin_access_token):
-    return {"Authorization": f"Bearer {single_admin_access_token}"}
 
 
 @pytest.mark.skipif(
@@ -202,7 +172,7 @@ class TestGOCUser:
     """Get or create (GOC) user tests."""
 
     async def test_get_or_create_user_deactivated_user(
-        self, api_client, single_disabled_user, existing_deactivated_user_id_info
+        self, backend_app, single_disabled_user, existing_deactivated_user_id_info
     ):
         try:
             await get_or_create_user(existing_deactivated_user_id_info)
@@ -212,14 +182,14 @@ class TestGOCUser:
             assert False
 
     async def test_get_or_create_user_update_user(
-        self, api_client, single_admin, existing_user_id_info
+        self, backend_app, single_admin, existing_user_id_info
     ):
         user_object = await get_or_create_user(existing_user_id_info)
         assert user_object.ext_id == existing_user_id_info.sub
         assert user_object.given_name == existing_user_id_info.given_name
         assert user_object.family_name == existing_user_id_info.family_name
 
-    async def test_get_or_create_user_create_user(self, api_client, google_id_info):
+    async def test_get_or_create_user_create_user(self, backend_app, google_id_info):
         user_obj = await UserGinoModel.query.where(
             UserGinoModel.ext_id == google_id_info.sub
         ).gino.first()
@@ -236,12 +206,14 @@ class TestGOCUser:
 class TestGCUser:
     """Get current (GC) user tests."""
 
-    async def test_get_current_active_user(self, api_client, single_admin_access_token):
+    async def test_get_current_active_user(
+        self, backend_app, single_admin_access_token
+    ):
         user_object = await get_current_user(single_admin_access_token)
         assert isinstance(user_object, UserGinoModel)
 
     async def test_get_current_disabled_user(
-        self, api_client, single_disabled_admin_token
+        self, backend_app, single_disabled_admin_token
     ):
         try:
             await get_current_user(single_disabled_admin_token)
@@ -250,7 +222,7 @@ class TestGCUser:
         else:
             assert False
 
-    async def test_get_current_user_bad_token(self, api_client, bad_access_token):
+    async def test_get_current_user_bad_token(self, backend_app, bad_access_token):
         try:
             await get_current_user(bad_access_token)
         except HTTPException as ex:
@@ -258,7 +230,7 @@ class TestGCUser:
         else:
             assert False
 
-    async def test_get_current_user_no_token(self, api_client):
+    async def test_get_current_user_no_token(self, backend_app):
         try:
             await get_current_user("")
         except HTTPException as ex:
@@ -274,13 +246,13 @@ class TestGUserFR:
     """Get user (GU) for refresh tests."""
 
     async def test_get_active_user_for_refresh(
-        self, api_client, single_admin_refresh_token
+        self, backend_app, single_admin_refresh_token
     ):
         user_object = await get_user_for_refresh(single_admin_refresh_token)
         assert isinstance(user_object, UserGinoModel)
 
     async def test_get_disabled_user_for_refresh(
-        self, api_client, single_disabled_refresh_token
+        self, backend_app, single_disabled_refresh_token
     ):
         try:
             await get_user_for_refresh(single_disabled_refresh_token)
@@ -290,7 +262,7 @@ class TestGUserFR:
             assert False
 
     async def test_get_current_user_for_refresh_bad_token(
-        self, api_client, bad_access_token
+        self, backend_app, bad_access_token
     ):
         try:
             await get_user_for_refresh(bad_access_token)
@@ -300,7 +272,7 @@ class TestGUserFR:
             assert False
 
     async def test_get_current_user_for_refresh_unknown_token(
-        self, api_client, single_admin_refresh_token, no_refresh_token
+        self, backend_app, single_admin_refresh_token, no_refresh_token
     ):
         try:
             await get_user_for_refresh(single_admin_refresh_token)
@@ -309,7 +281,7 @@ class TestGUserFR:
         else:
             assert False
 
-    async def test_get_current_user_for_refresh_no_token(self, api_client):
+    async def test_get_current_user_for_refresh_no_token(self, backend_app):
         try:
             await get_user_for_refresh("")
         except HTTPException as ex:
@@ -321,9 +293,9 @@ class TestGUserFR:
 @pytest.mark.skipif(
     os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
-async def test_login(api_client):
+async def test_login(backend_app):
 
-    resp = await api_client.get(
+    resp = await backend_app.get(
         f"{API_URL_PREFIX}/login", query_string={"state": "qwe"}, allow_redirects=False
     )
 
@@ -333,8 +305,8 @@ async def test_login(api_client):
 @pytest.mark.skipif(
     os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
-async def test_logout(api_client, single_admin_auth_headers):
-    resp = await api_client.get(
+async def test_logout(backend_app, single_admin_auth_headers):
+    resp = await backend_app.get(
         f"{API_URL_PREFIX}/logout", headers=single_admin_auth_headers
     )
     assert resp.status_code == status.HTTP_204_NO_CONTENT
@@ -343,8 +315,8 @@ async def test_logout(api_client, single_admin_auth_headers):
 @pytest.mark.skipif(
     os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
-async def test_logout_2(api_client):
-    resp = await api_client.get(f"{API_URL_PREFIX}/logout")
+async def test_logout_2(backend_app):
+    resp = await backend_app.get(f"{API_URL_PREFIX}/logout")
     assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
@@ -357,9 +329,9 @@ class TestUserInfo:
     API_URL = f"{API_URL_PREFIX}/user/info"
 
     async def test_granted_info(
-        self, api_client, single_admin, single_admin_auth_headers
+        self, backend_app, single_admin, single_admin_auth_headers
     ):
-        resp = await api_client.get(self.API_URL, headers=single_admin_auth_headers)
+        resp = await backend_app.get(self.API_URL, headers=single_admin_auth_headers)
         assert resp.status_code == status.HTTP_200_OK
         assert "data" in resp.json()
         response_data = resp.json()["data"]
@@ -371,16 +343,16 @@ class TestUserInfo:
             assert hasattr(single_admin, key)
             assert response_attributes[key] == getattr(single_admin, key)
 
-    async def test_permitted_info(self, api_client):
-        resp = await api_client.get(self.API_URL)
+    async def test_permitted_info(self, backend_app):
+        resp = await backend_app.get(self.API_URL)
         assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 @pytest.mark.skipif(
     os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
-async def test_refresh_access_token(api_client, single_admin_refresh_token):
-    resp = await api_client.post(
+async def test_refresh_access_token(backend_app, single_admin_refresh_token):
+    resp = await backend_app.post(
         f"{API_URL_PREFIX}/refresh_access_token",
         query_string={"token": single_admin_refresh_token},
     )
@@ -393,8 +365,8 @@ async def test_refresh_access_token(api_client, single_admin_refresh_token):
 @pytest.mark.skipif(
     os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
-async def test_refresh_access_token_with_bad_token(api_client):
-    resp = await api_client.post(
+async def test_refresh_access_token_with_bad_token(backend_app):
+    resp = await backend_app.post(
         f"{API_URL_PREFIX}/refresh_access_token", query_string={"token": "qwe"}
     )
     assert resp.status_code == status.HTTP_401_UNAUTHORIZED

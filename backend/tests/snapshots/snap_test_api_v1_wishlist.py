@@ -11,6 +11,11 @@ snapshots["TestEmptyWishlist.test_empty_wishlist_full_update 1"] = {
     "type": "wishlist",
 }
 
+snapshots["TestEmptyWishlist.test_empty_wishlist_full_update_admin 1"] = {
+    "attributes": {"name": "test-updated"},
+    "type": "wishlist",
+}
+
 snapshots["TestEmptyWishlist.test_empty_wishlist_read 1"] = {
     "attributes": {"name": "test"},
     "type": "wishlist",
@@ -46,6 +51,13 @@ snapshots["TestProduct.test_product_full_update 1"] = {
     }
 }
 
+snapshots["TestProduct.test_product_full_update_admin 1"] = {
+    "data": {
+        "attributes": {"name": "test-updated", "url": "https://ya.ru"},
+        "type": "product",
+    }
+}
+
 snapshots["TestProduct.test_product_paginator_limit 1"] = {
     "data": [
         {
@@ -69,9 +81,6 @@ snapshots["TestProduct.test_product_paginator_limit 1"] = {
             "type": "product",
         },
     ],
-    "page": 1,
-    "size": 5,
-    "total": 9,
     "links": {
         "first": "/api/v1/product?size=5&page=1",
         "last": "/api/v1/product?size=5&page=2",
@@ -79,9 +88,22 @@ snapshots["TestProduct.test_product_paginator_limit 1"] = {
         "prev": None,
         "self": "/api/v1/product?size=5",
     },
+    "page": 1,
+    "size": 5,
+    "total": 9,
 }
 
 snapshots["TestProduct.test_product_partial_update 1"] = {
+    "data": {
+        "attributes": {
+            "name": "partial-updated-name",
+            "url": "https://devyatkin.dev/1",
+        },
+        "type": "product",
+    }
+}
+
+snapshots["TestProduct.test_product_partial_update_admin 1"] = {
     "data": {
         "attributes": {
             "name": "partial-updated-name",
@@ -137,9 +159,6 @@ snapshots["TestProduct.test_products 1"] = {
             "type": "product",
         },
     ],
-    "page": 1,
-    "size": 50,
-    "total": 9,
     "links": {
         "first": "/api/v1/product?page=1",
         "last": "/api/v1/product?page=1",
@@ -147,6 +166,9 @@ snapshots["TestProduct.test_products 1"] = {
         "prev": None,
         "self": "/api/v1/product",
     },
+    "page": 1,
+    "size": 50,
+    "total": 9,
 }
 
 snapshots["TestProductPaginator.test_default_paginator 1"] = {

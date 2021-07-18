@@ -43,8 +43,10 @@ def h11_before_h1_response() -> bytes:
 
 
 @pytest.fixture
-async def products_1():
-    return await ProductGinoModel.create(name="test", url="https://devyatkin.dev/1")
+async def products_1(single_admin):
+    return await ProductGinoModel.create(
+        user_id=single_admin.id, name="test", url="https://devyatkin.dev/1"
+    )
 
 
 class TestPageParser:
@@ -111,39 +113,58 @@ class TestApi:
 
     API_URL = f"{API_URL_PREFIX}/extract-product-title"
 
-    async def test_bad_input(self, snapshot, api_client):
-        resp = await api_client.post(
-            f"{self.API_URL}", json={"data": {"attributes": {"url": "bad-url"}}}
+    async def test_unauthenticated_input(self, snapshot, backend_app):
+        resp = await backend_app.post(
+            f"{self.API_URL}",
+            json={"data": {"attributes": {"url": "https://css_h1.io"}}},
+        )
+        assert resp.status_code == 401
+
+    async def test_bad_input(self, snapshot, backend_app, single_admin_auth_headers):
+        resp = await backend_app.post(
+            f"{self.API_URL}",
+            json={"data": {"attributes": {"url": "bad-url"}}},
+            headers=single_admin_auth_headers,
         )
         assert resp.status_code == 422
         snapshot.assert_match(resp.json())
 
-    async def test_good_input(self, httpx_mock, snapshot, api_client, css_response):
+    async def test_good_input(
+        self, httpx_mock, snapshot, backend_app, css_response, single_admin_auth_headers
+    ):
         test_url = "https://css_h1.io"
         httpx_mock.add_response(data=css_response, url=test_url)
 
-        response = await api_client.post(
-            f"{self.API_URL}", json={"data": {"attributes": {"url": test_url}}}
+        response = await backend_app.post(
+            f"{self.API_URL}",
+            json={"data": {"attributes": {"url": test_url}}},
+            headers=single_admin_auth_headers,
         )
         assert response.status_code == 200
         snapshot.assert_match(response.json())
 
-    async def test_bad_url(self, httpx_mock, snapshot, api_client):
+    async def test_bad_url(
+        self, httpx_mock, snapshot, backend_app, single_admin_auth_headers
+    ):
         test_url = "https://bad.io"
         httpx_mock.add_response(status_code=500)
 
-        response = await api_client.post(
-            f"{self.API_URL}", json={"data": {"attributes": {"url": test_url}}}
+        response = await backend_app.post(
+            f"{self.API_URL}",
+            json={"data": {"attributes": {"url": test_url}}},
+            headers=single_admin_auth_headers,
         )
         assert response.status_code == 200
         snapshot.assert_match(response.json())
 
     async def test_existing_product(
-        self, snapshot, api_client, products_1, css_response
+        self, snapshot, backend_app, products_1, css_response, single_admin_auth_headers
     ):
         test_url = products_1.url
-        response = await api_client.post(
-            f"{self.API_URL}", json={"data": {"attributes": {"url": test_url}}}
+        response = await backend_app.post(
+            f"{self.API_URL}",
+            json={"data": {"attributes": {"url": test_url}}},
+            headers=single_admin_auth_headers,
         )
         assert response.status_code == 200
         snapshot.assert_match(response.json())
