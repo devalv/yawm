@@ -14,17 +14,17 @@ jobs:
     env:
       PYTHONPATH: /opt/yawm/app
       PLATFORM: GITHUB
-      API_PORT: 8000
       DB_PORT: 5431
       DB_DATABASE: dev_db
       DB_HOST: localhost
       DB_USER: dev_user
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_PASSWORD: ${{ Docker-tests.DB_PASSWORD }}
+      API_PORT: 8000
       API_HOST: 0.0.0.0
-      API_DOMAIN: ${{ secrets.API_DOMAIN }}
-      API_PROTOCOL: ${{ secrets.API_PROTOCOL }}
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      API_DOMAIN: ${{ Docker-tests.API_DOMAIN }}
+      API_PROTOCOL: ${{ Docker-tests.API_PROTOCOL }}
+      SECRET_KEY: ${{ Docker-tests.SECRET_KEY }}
+      CODECOV_TOKEN: ${{ Docker-tests.CODECOV_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - name: Build the docker-compose stack
