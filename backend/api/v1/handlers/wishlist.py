@@ -28,7 +28,7 @@ async def list_wishlist():
 @wishlist_router.get("/wishlist/{id}", response_model=WishlistDataModel)
 @version(1)
 async def get_wishlist(
-    wishlist: WishlistGinoModel = Depends(get_wishlist)  # noqa: B008
+    wishlist: WishlistGinoModel = Depends(get_wishlist),  # noqa: B008
 ):
     """API for getting a wishlist."""
     return wishlist
@@ -62,7 +62,7 @@ async def update_wishlist(
 )
 @version(1)
 async def delete_wishlist(
-    wishlist: WishlistGinoModel = Depends(get_user_wishlist)  # noqa: B008
+    wishlist: WishlistGinoModel = Depends(get_user_wishlist),  # noqa: B008
 ):
     """API for deleting a wishlist."""
     await wishlist.delete()

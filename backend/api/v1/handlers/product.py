@@ -60,7 +60,7 @@ async def update_product(
 )
 @version(1)
 async def delete_product(
-    product: ProductGinoModel = Depends(get_user_product)  # noqa: B008
+    product: ProductGinoModel = Depends(get_user_product),  # noqa: B008
 ):
     """API for deleting a product."""
     await product.delete()
