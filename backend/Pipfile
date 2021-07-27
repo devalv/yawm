@@ -38,6 +38,7 @@ snapshottest = "*"
 pytest-dotenv = "*"
 pretty_errors = "==1.*"
 pytest-httpx = "*"
+mypy = "*"
 
 [requires]
 python_version = "3.9"
