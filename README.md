@@ -52,6 +52,9 @@ Project tests
 #### api
 Project API by versions (v1, v2 and etc.).
 
-
 ### docker
 Docker-images and docker-compose configuration files.
+
+#### ya-cloud registry
+docker build . -t cr.yandex/{$REGISTRY_ID}/yawm:backend
+docker push cr.yandex/{$REGISTRY_ID}/yawm:backend

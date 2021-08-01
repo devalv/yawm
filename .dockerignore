@@ -1,0 +1,8 @@
+venv/
+static/
+.circleci/
+__pycache__/
+*cache*/
+db.sqlite
+.coverage
+coverage.xml
