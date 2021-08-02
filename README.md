@@ -50,6 +50,9 @@ Project tests
 #### api
 Project API by versions (v1, v2 and etc.).
 
-
 ### docker
 Docker-images and docker-compose configuration files.
+
+#### ya-cloud registry
+docker build . -f backend/docker/python/Dockerfile -t devalv/yawm:backend
+docker push devalv/yawm:backend

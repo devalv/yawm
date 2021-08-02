@@ -16,12 +16,12 @@ services:
   app:
     container_name: yawm-backend-api
     build:
-      context: ..
-      dockerfile: ./docker/python/Dockerfile
+      context: .
+      dockerfile: ./backend/docker/python/Dockerfile
     ports:
       - ${API_PORT}:${API_PORT}
     volumes:
-      - ../backend/:/opt/yawm/app/
+      - ./backend/:/opt/yawm/app/
     environment:
       - PYTHONPATH=/opt/yawm/app
       - DB_HOST=db
@@ -40,6 +40,6 @@ services:
       - GOOGLE_USERINFO_SCOPE=${GOOGLE_USERINFO_SCOPE}
       - OAUTHLIB_INSECURE_TRANSPORT=1
     working_dir: /opt/yawm/app
-    command: sh -c "sleep 3 && pipenv run alembic upgrade head && pipenv run python main.py"
+    command: sh -c "pipenv install && sleep 3 && pipenv run alembic upgrade head && pipenv run python main.py"
     depends_on:
       - db
