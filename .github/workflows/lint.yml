@@ -1,6 +1,6 @@
 # Linting: run black, flake8 and small auto fixers.
 
-name: Linter and smoke tests
+name: Linters
 
 on:
   pull_request:

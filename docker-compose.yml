@@ -39,6 +39,6 @@ services:
       - GOOGLE_USERINFO_SCOPE=${GOOGLE_USERINFO_SCOPE}
       - OAUTHLIB_INSECURE_TRANSPORT=1
     working_dir: /opt/yawm/app
-    command: sh -c "pipenv install && sleep 3 && pipenv run alembic upgrade head && pipenv run python -m main"
+    command: sh -c "pipenv install && sleep 3 && pipenv run alembic upgrade head && pipenv run python main.py"
     depends_on:
       - db

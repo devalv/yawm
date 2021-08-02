@@ -4,9 +4,8 @@
 import pytest
 from async_asgi_testclient import TestClient
 
+from api import app
 from core.database import UserGinoModel
-
-from ..api import app
 
 
 @pytest.fixture
