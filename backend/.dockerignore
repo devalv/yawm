@@ -1,0 +1,8 @@
+venv/
+static/
+.circleci/
+docker/
+*cache*/
+db.sqlite
+.coverage
+coverage.xml
