@@ -8,6 +8,6 @@ RUN set -ex \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt/yawm/app
-ADD ./ ./
+ADD ./backend/ ./
 RUN pip install pipenv
 RUN pipenv install

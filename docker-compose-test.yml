@@ -16,6 +16,7 @@ services:
   app-tests:
     container_name: yawm-tests-backend-api
     build:
+      context: .
       dockerfile: ./backend/docker/python/Dockerfile
     volumes:
       - ./backend/:/opt/yawm/app/
