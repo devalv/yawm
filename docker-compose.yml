@@ -43,3 +43,19 @@ services:
     command: sh -c "pipenv install && sleep 3 && pipenv run alembic upgrade head && pipenv run python main.py"
     depends_on:
       - db
+
+  frontend-app:
+    container_name: yawm-frontend
+    image: node:lts-alpine
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend/:/opt/yawm/frontend
+    environment:
+      - API_URL=${API_URL}
+      - NODE_PATH=${NODE_PATH}
+    working_dir: /opt/yawm/frontend
+#    command: sh -c "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start"
+    command: sh -c "npm start"
+    depends_on:
+      - app
