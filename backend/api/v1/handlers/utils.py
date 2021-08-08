@@ -2,7 +2,6 @@
 """Utils rest-api handlers."""
 
 from fastapi import APIRouter, Depends
-from fastapi_versioning import version
 
 from core.database import ProductGinoModel, UserGinoModel
 from core.schemas import ExtractUrlDataInModel, ExtractUrlModelDataOutModel
@@ -13,7 +12,6 @@ utils_router = APIRouter(redirect_slashes=True, tags=["utils"])
 
 
 @utils_router.post("/extract-product-title", response_model=ExtractUrlModelDataOutModel)
-@version(1)
 async def extract_name_by_url(
     product_url: ExtractUrlDataInModel,
     current_user: UserGinoModel = Depends(get_current_user),  # noqa: B008

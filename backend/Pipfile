@@ -18,7 +18,6 @@ httpx = "*"
 google-auth = "*"
 google-auth-oauthlib = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
-fastapi-versioning = "*"
 uvloop = "*"
 pydantic = {extras = ["email"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}

@@ -48,8 +48,8 @@ GOOGLE_CLIENT_SECRETS_JSON = config("GOOGLE_CLIENT_SECRETS_JSON", default=None)
 GOOGLE_USERINFO_SCOPE = config("GOOGLE_USERINFO_SCOPE", default=None)
 GOOGLE_SCOPES = [GOOGLE_USERINFO_SCOPE]
 # security
-LOGIN_ENDPOINT = "/api/v1/login"
-SWAP_TOKEN_ENDPOINT = "/api/v1/swap_token"
+LOGIN_ENDPOINT = "/v1/login"
+SWAP_TOKEN_ENDPOINT = "/v1/swap_token"
 SECRET_KEY = config("SECRET_KEY", default=None)
 ALGORITHM = config("ALGORITHM", default="HS256")
 ACCESS_TOKEN_EXPIRE_MIN = config("ACCESS_TOKEN_EXPIRE_MIN", default=30)

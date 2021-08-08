@@ -46,7 +46,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):  # noqa: B008
 
     Example:
         @auth_router.get(f"{SUCCESS_ROUTE}", response_model=UserDBModel)
-        @version(1)
         async def read_users_me(  # noqa: D103
             current_user: UserDBModel = Depends(get_current_user),  # noqa: B008
         ):

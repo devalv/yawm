@@ -3,24 +3,22 @@
 
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
-from fastapi_versioning import VersionedFastAPI
 
 from core.config import SWAP_TOKEN_ENDPOINT
 from core.database.models import db
 
-from .v1 import (  # noqa: I201
-    product_router,
-    security_router,
-    utils_router,
-    wishlist_product_router,
-    wishlist_router,
-)
+from .v1 import product_router as product_router_v1  # noqa: I201
+from .v1 import security_router as security_router_v1
+from .v1 import utils_router as utils_router_v1
+from .v1 import wishlist_product_router as wishlist_product_router_v1
+from .v1 import wishlist_router as wishlist_router_v1
 
 
 def get_app() -> FastAPI:
     """Just simple application initialization."""
-    return FastAPI(
+    no_version_app = FastAPI(
         title="Yet another wishlist maker",
         version="0.2.0",
         swagger_ui_oauth2_redirect_url=SWAP_TOKEN_ENDPOINT,
@@ -30,25 +28,24 @@ def get_app() -> FastAPI:
             "appName": "Yet another wishlist maker",
         },
     )
+    no_version_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:3000"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    return no_version_app
 
 
 def configure_routes(application: FastAPI):
     """Configure application."""
-    application.include_router(wishlist_router)
-    application.include_router(product_router)
-    application.include_router(wishlist_product_router)
-    application.include_router(utils_router)
-    application.include_router(security_router)
+    application.include_router(wishlist_router_v1, prefix="/v1")
+    application.include_router(product_router_v1, prefix="/v1")
+    application.include_router(wishlist_product_router_v1, prefix="/v1")
+    application.include_router(utils_router_v1, prefix="/v1")
+    application.include_router(security_router_v1, prefix="/v1")
     add_pagination(application)
-
-
-def get_versioned_app(application: FastAPI) -> VersionedFastAPI:
-    return VersionedFastAPI(
-        application,
-        version_format="{major}",
-        prefix_format="/api/v{major}",
-        swagger_ui_oauth2_redirect_url=SWAP_TOKEN_ENDPOINT,
-    )
 
 
 def configure_db(application: FastAPI):
@@ -57,7 +54,6 @@ def configure_db(application: FastAPI):
 
 app = get_app()
 configure_routes(application=app)
-app = get_versioned_app(application=app)
 configure_db(app)
 
 

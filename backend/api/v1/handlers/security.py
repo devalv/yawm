@@ -3,7 +3,6 @@
 
 from fastapi import APIRouter, Depends, Form, status
 from fastapi.responses import RedirectResponse
-from fastapi_versioning import version
 from google.auth.transport import requests
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow as GFlow
@@ -28,7 +27,6 @@ security_router = APIRouter(redirect_slashes=True, tags=["security"])
 
 
 @security_router.post("/swap_token", response_model=Token, tags=["security"])
-@version(1)
 async def swap_token(code: str = Form(...)):  # pragma: no cover  # noqa: B008
     """Check Google Auth code and create access token."""
     # Get authentication code
@@ -58,7 +56,6 @@ async def swap_token(code: str = Form(...)):  # pragma: no cover  # noqa: B008
 
 
 @security_router.post("/refresh_access_token", response_model=Token, tags=["security"])
-@version(1)
 async def refresh_access_token(
     current_user: UserGinoModel = Depends(get_user_for_refresh),  # noqa: B008
 ):
@@ -66,7 +63,6 @@ async def refresh_access_token(
 
 
 @security_router.get("/login", tags=["auth"])
-@version(1)
 async def login(state: str):
     flow = GFlow.from_client_secrets_file(
         GOOGLE_CLIENT_SECRETS_JSON, scopes=GOOGLE_SCOPES
@@ -80,13 +76,11 @@ async def login(state: str):
 
 
 @security_router.get("/logout", status_code=status.HTTP_204_NO_CONTENT, tags=["auth"])
-@version(1)
 async def logout(current_user: UserGinoModel = Depends(get_current_user)):  # noqa: B008
     await current_user.delete_refresh_token()
 
 
 @security_router.get("/user/info", response_model=UserDBDataModel)
-@version(1)
 async def user_info(
     current_user: UserGinoModel = Depends(get_current_user),  # noqa: B008
 ):
