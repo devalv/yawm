@@ -5,8 +5,7 @@ from fastapi import APIRouter, Depends, Response, status
 from fastapi_pagination.ext.gino import paginate
 from pydantic import UUID4
 
-from core.database import WishlistGinoModel
-from core.database.models.wishlist import WishlistProducts
+from core.database import WishlistGinoModel, WishlistProductsGinoModel
 from core.schemas import (
     WishlistProductsDataCreateModel,
     WishlistProductsDataModel,
@@ -49,7 +48,7 @@ async def update_wishlist_product(
     wishlist: WishlistGinoModel = Depends(get_user_wishlist),  # noqa: B008
 ):
     """API for updating product associated to a wishlist."""
-    wishlist_product = await WishlistProducts.get_or_404(pw_id)
+    wishlist_product = await WishlistProductsGinoModel.get_or_404(pw_id)
     await wishlist_product.update(**pwm.data.non_null_attributes).apply()
     return wishlist_product
 
@@ -59,7 +58,7 @@ async def update_wishlist_product(
 )
 async def reserve_wishlist_product(pw_id: UUID4, pwm: WishlistProductsDataUpdateModel):
     """API for updating product associated to a wishlist."""
-    wishlist_product = await WishlistProducts.get_or_404(pw_id)
+    wishlist_product = await WishlistProductsGinoModel.get_or_404(pw_id)
     await wishlist_product.update(**pwm.data.non_null_attributes).apply()
     return wishlist_product
 
@@ -73,5 +72,5 @@ async def delete_wishlist_product(
     pw_id: UUID4, wishlist: WishlistGinoModel = Depends(get_user_wishlist)  # noqa: B008
 ):
     """API for removing product from wishlist."""
-    wishlist_product = await WishlistProducts.get_or_404(pw_id)
+    wishlist_product = await WishlistProductsGinoModel.get_or_404(pw_id)
     await wishlist_product.delete()
