@@ -136,3 +136,6 @@ dmypy.json
 
 # Google secrets
 oauth2.json
+
+# Macosx files
+.DS_Store/
