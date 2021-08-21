@@ -4,7 +4,7 @@
 The main idea is to have a standard format for model interfaces.
 """
 
-from abc import abstractmethod
+from datetime import datetime
 
 from pydantic import UUID4, BaseModel
 
@@ -12,16 +12,15 @@ from pydantic import UUID4, BaseModel
 class JsonApiAttributesBaseModel(BaseModel):
     """Abstract attributes pydantic model."""
 
-    @abstractmethod
-    def __init__(self):
-        """Main model should be redefined."""
+    created_at: datetime
+    updated_at: datetime = None
 
 
 class JsonApiCreateBaseModel(BaseModel):
     """Pydantic BaseModel extra utilities."""
 
     type: str  # noqa: A002, A003, VNE003
-    attributes: JsonApiAttributesBaseModel
+    attributes: dict
 
     @property
     def validated_attributes(self):

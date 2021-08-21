@@ -70,8 +70,9 @@ class BaseUserDB(BaseModel):
     ext_id: str
     disabled: bool
     superuser: bool
-    created: datetime
+    created_at: datetime
     username: str
+    updated_at: Optional[datetime]
     given_name: Optional[str]
     family_name: Optional[str]
     full_name: Optional[str]

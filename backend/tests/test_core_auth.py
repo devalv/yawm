@@ -338,7 +338,7 @@ class TestUserInfo:
         assert "attributes" in response_data
         response_attributes = response_data["attributes"]
         for key in response_attributes:
-            if key == "created":
+            if key in {"created_at", "updated_at"}:
                 continue
             assert hasattr(single_admin, key)
             assert response_attributes[key] == getattr(single_admin, key)

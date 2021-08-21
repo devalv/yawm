@@ -11,6 +11,7 @@ from .exceptions import (
 from .fastapi_pagination import JsonApiPage
 from .gino_models import JsonApiGinoModel
 from .pydantic_models import (
+    JsonApiAttributesBaseModel,
     JsonApiCreateBaseModel,
     JsonApiDataCreateBaseModel,
     JsonApiDataDBModel,
@@ -28,6 +29,7 @@ __all__ = [
     "JsonApiDataDBModel",
     "JsonApiCreateBaseModel",
     "JsonApiUpdateBaseModel",
+    "JsonApiAttributesBaseModel",
     "CREDENTIALS_EX",
     "INACTIVE_EX",
     "OAUTH2_EX",

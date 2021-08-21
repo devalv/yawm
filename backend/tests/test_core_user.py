@@ -50,7 +50,9 @@ class TestUserDB:
         assert user_obj.given_name == user_mock["given_name"]
         assert user_obj.full_name == user_mock["full_name"]
         assert user_obj.family_name == user_mock["family_name"]
-        assert isinstance(user_obj.created, datetime)
+        assert isinstance(user_obj.created_at, datetime)
+        if user_obj.updated_at is not None:
+            assert isinstance(user_obj.updated_at, datetime)
         assert isinstance(user_obj.id, UUID_PG)
         await user_obj.delete()
 
@@ -64,7 +66,9 @@ class TestUserDB:
         assert user_obj.given_name is None
         assert user_obj.full_name is None
         assert user_obj.family_name is None
-        assert isinstance(user_obj.created, datetime)
+        assert isinstance(user_obj.created_at, datetime)
+        if user_obj.updated_at is not None:
+            assert isinstance(user_obj.updated_at, datetime)
         assert isinstance(user_obj.id, UUID_PG)
         await user_obj.delete()
 
@@ -78,7 +82,8 @@ class TestUserDB:
         assert user_obj.given_name == user_admin_mock["given_name"]
         assert user_obj.full_name == user_admin_mock["full_name"]
         assert user_obj.family_name == user_admin_mock["family_name"]
-        assert isinstance(user_obj.created, datetime)
+        assert isinstance(user_obj.created_at, datetime)
+        assert isinstance(user_obj.created_at, datetime)
         assert isinstance(user_obj.id, UUID_PG)
         await user_obj.delete()
 
@@ -88,8 +93,11 @@ class TestUserDB:
         assert single_admin.data["id"] == single_admin.id
         assert single_admin.data["type"] == "user"
         attributes = single_admin.data["attributes"]
-        assert isinstance(attributes["created"], datetime)
-        assert attributes["created"] == single_admin.created
+        assert isinstance(attributes["created_at"], datetime)
+        if attributes["updated_at"] is not None:
+            assert isinstance(attributes["updated_at"], datetime)
+        assert attributes["created_at"] == single_admin.created_at
+        assert attributes["updated_at"] == single_admin.updated_at
         assert attributes["ext_id"] == single_admin.ext_id
         assert attributes["family_name"] == single_admin.family_name
         assert attributes["full_name"] == single_admin.full_name
@@ -113,7 +121,8 @@ class TestUserPydantic:
         assert serializer.data.attributes.disabled == single_admin.disabled
         assert serializer.disabled == single_admin.disabled
         assert serializer.data.attributes.superuser == single_admin.superuser
-        assert serializer.data.attributes.created == single_admin.created
+        assert serializer.data.attributes.created_at == single_admin.created_at
+        assert serializer.data.attributes.updated_at == single_admin.updated_at
         assert serializer.data.attributes.username == single_admin.username
         assert serializer.data.attributes.given_name == single_admin.given_name
         assert serializer.data.attributes.family_name == single_admin.family_name
@@ -142,7 +151,9 @@ class TestUserPydantic:
         assert db_obj.given_name is None
         assert db_obj.full_name is None
         assert db_obj.family_name is None
-        assert isinstance(db_obj.created, datetime)
+        assert isinstance(db_obj.created_at, datetime)
+        if db_obj.updated_at is not None:
+            assert isinstance(db_obj.updated_at, datetime)
         assert isinstance(db_obj.id, UUID_PG)
         await db_obj.delete()
 
@@ -158,7 +169,9 @@ class TestUserPydantic:
         assert db_obj.given_name == serializer.data.attributes.given_name
         assert db_obj.full_name == serializer.data.attributes.full_name
         assert db_obj.family_name == serializer.data.attributes.family_name
-        assert isinstance(db_obj.created, datetime)
+        assert isinstance(db_obj.created_at, datetime)
+        if db_obj.updated_at is not None:
+            assert isinstance(db_obj.updated_at, datetime)
         assert isinstance(db_obj.id, UUID_PG)
         await db_obj.delete()
 

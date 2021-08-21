@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from uuid import uuid4
 
 from jose import jwt
 from passlib.context import CryptContext
@@ -19,23 +18,19 @@ from core.config import (
 )
 from core.utils import CREDENTIALS_EX, JsonApiGinoModel
 
-from .. import db
+from .. import AbstractUpdateDateModel, db
 
 ref_token_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-class User(db.Model, JsonApiGinoModel):
+class User(AbstractUpdateDateModel, JsonApiGinoModel):
     """Yep, this is a User table."""
 
     __tablename__ = "user"
 
-    id = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A002, A003, VNE003
     ext_id = db.Column(db.Unicode(length=255), nullable=False, unique=True)
     disabled = db.Column(db.Boolean(), nullable=False, default=False)
     superuser = db.Column(db.Boolean(), nullable=False, default=False)
-    created = db.Column(
-        db.DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
     username = db.Column(db.Unicode(length=255), nullable=False, index=True)
     given_name = db.Column(db.Unicode(length=255), nullable=True)
     family_name = db.Column(db.Unicode(length=255), nullable=True)
@@ -136,7 +131,7 @@ class TokenInfo(db.Model):
         UUID(), db.ForeignKey(User.id, ondelete="CASCADE"), primary_key=True
     )
     refresh_token = db.Column(db.Unicode(), nullable=False, index=True)
-    created = db.Column(
+    created_at = db.Column(
         db.DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 

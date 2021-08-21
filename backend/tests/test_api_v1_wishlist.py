@@ -130,7 +130,11 @@ class TestProduct:
         resp_data = resp_json_data["data"]
         assert "id" in resp_data
         assert "type" in resp_data
+        assert "created_at" in resp_data["attributes"]
+        assert "updated_at" in resp_data["attributes"]
         resp_data.pop("id", None)
+        resp_data["attributes"].pop("created_at", None)
+        resp_data["attributes"].pop("updated_at", None)
         snapshot.assert_match(resp_json_data)
 
     @pytest.mark.api_base
@@ -146,6 +150,11 @@ class TestProduct:
             assert "id" in resp_product
             assert "type" in resp_product
             resp_product.pop("id", None)
+            assert "created_at" in resp_product["attributes"]
+            assert "updated_at" in resp_product["attributes"]
+            resp_product["attributes"].pop("created_at", None)
+            resp_product["attributes"].pop("updated_at", None)
+
         snapshot.assert_match(resp_data)
 
     @pytest.mark.api_base
@@ -157,6 +166,10 @@ class TestProduct:
         assert "id" in resp_data
         assert "type" in resp_data
         resp_data.pop("id", None)
+        assert "created_at" in resp_data["attributes"]
+        assert "updated_at" in resp_data["attributes"]
+        resp_data["attributes"].pop("created_at", None)
+        resp_data["attributes"].pop("updated_at", None)
         snapshot.assert_match(resp_json_data)
 
     @pytest.mark.api_base
@@ -239,6 +252,10 @@ class TestProduct:
         assert "id" in resp_data
         assert "type" in resp_data
         resp_data.pop("id", None)
+        assert "created_at" in resp_data["attributes"]
+        assert "updated_at" in resp_data["attributes"]
+        resp_data["attributes"].pop("created_at", None)
+        resp_data["attributes"].pop("updated_at", None)
         snapshot.assert_match(resp_json_data)
 
     @pytest.mark.api_base
@@ -258,6 +275,10 @@ class TestProduct:
         assert "id" in resp_data
         assert "type" in resp_data
         resp_data.pop("id", None)
+        assert "created_at" in resp_data["attributes"]
+        assert "updated_at" in resp_data["attributes"]
+        resp_data["attributes"].pop("created_at", None)
+        resp_data["attributes"].pop("updated_at", None)
         snapshot.assert_match(resp_json_data)
 
     async def test_product_partial_update_no_auth(
@@ -293,6 +314,10 @@ class TestProduct:
         assert "id" in resp_data
         assert "type" in resp_data
         resp_data.pop("id", None)
+        assert "created_at" in resp_data["attributes"]
+        assert "updated_at" in resp_data["attributes"]
+        resp_data["attributes"].pop("created_at", None)
+        resp_data["attributes"].pop("updated_at", None)
         snapshot.assert_match(resp_json_data)
 
     async def test_product_partial_update(
@@ -309,6 +334,10 @@ class TestProduct:
         assert "id" in resp_data
         assert "type" in resp_data
         resp_data.pop("id", None)
+        assert "created_at" in resp_data["attributes"]
+        assert "updated_at" in resp_data["attributes"]
+        resp_data["attributes"].pop("created_at", None)
+        resp_data["attributes"].pop("updated_at", None)
         snapshot.assert_match(resp_json_data)
 
     @pytest.mark.api_base
@@ -325,6 +354,10 @@ class TestProduct:
             assert "id" in resp_product
             assert "type" in resp_product
             resp_product.pop("id", None)
+            assert "created_at" in resp_product["attributes"]
+            assert "updated_at" in resp_product["attributes"]
+            resp_product["attributes"].pop("created_at", None)
+            resp_product["attributes"].pop("updated_at", None)
         snapshot.assert_match(resp_json_data)
 
 
@@ -355,6 +388,10 @@ class TestEmptyWishlist:
         assert "id" in resp_data
         assert "type" in resp_data
         resp_data.pop("id", None)
+        assert "created_at" in resp_data["attributes"]
+        assert "updated_at" in resp_data["attributes"]
+        resp_data["attributes"].pop("created_at", None)
+        resp_data["attributes"].pop("updated_at", None)
         snapshot.assert_match(resp_json_data)
 
     @pytest.mark.api_base
@@ -411,6 +448,10 @@ class TestEmptyWishlist:
             assert "id" in resp_product
             assert "type" in resp_product
             resp_product.pop("id", None)
+            assert "created_at" in resp_product["attributes"]
+            assert "updated_at" in resp_product["attributes"]
+            resp_product["attributes"].pop("created_at", None)
+            resp_product["attributes"].pop("updated_at", None)
         snapshot.assert_match(items)
 
     @pytest.mark.api_base
@@ -434,6 +475,10 @@ class TestEmptyWishlist:
             assert "id" in resp_product
             assert "type" in resp_product
             resp_product.pop("id", None)
+            assert "created_at" in resp_product["attributes"]
+            assert "updated_at" in resp_product["attributes"]
+            resp_product["attributes"].pop("created_at", None)
+            resp_product["attributes"].pop("updated_at", None)
         snapshot.assert_match(items)
 
     @pytest.mark.api_base
@@ -445,6 +490,10 @@ class TestEmptyWishlist:
         assert "id" in resp_data
         assert "type" in resp_data
         resp_data.pop("id", None)
+        assert "created_at" in resp_data["attributes"]
+        assert "updated_at" in resp_data["attributes"]
+        resp_data["attributes"].pop("created_at", None)
+        resp_data["attributes"].pop("updated_at", None)
         snapshot.assert_match(resp_data)
 
     @pytest.mark.api_base
@@ -462,6 +511,10 @@ class TestEmptyWishlist:
         assert "id" in resp_data
         assert "type" in resp_data
         resp_data.pop("id", None)
+        assert "created_at" in resp_data["attributes"]
+        assert "updated_at" in resp_data["attributes"]
+        resp_data["attributes"].pop("created_at", None)
+        resp_data["attributes"].pop("updated_at", None)
         snapshot.assert_match(resp_data)
 
     @pytest.mark.api_base
@@ -496,6 +549,10 @@ class TestEmptyWishlist:
         assert "id" in resp_data
         assert "type" in resp_data
         resp_data.pop("id", None)
+        assert "created_at" in resp_data["attributes"]
+        assert "updated_at" in resp_data["attributes"]
+        resp_data["attributes"].pop("created_at", None)
+        resp_data["attributes"].pop("updated_at", None)
         snapshot.assert_match(resp_data)
 
 
@@ -1356,6 +1413,11 @@ class TestProductPaginator(PaginatorValidator):
         response = await backend_app.get(api_url)
         assert response.status_code == 200
         response_json_data = response.json()
+        for row in response_json_data["data"]:
+            assert "created_at" in row["attributes"]
+            assert "updated_at" in row["attributes"]
+            row["attributes"].pop("created_at", None)
+            row["attributes"].pop("updated_at", None)
         self.validate_response(response_json_data)
         # check pagination links
         self.validate_links(
@@ -1371,11 +1433,15 @@ class TestProductPaginator(PaginatorValidator):
     @pytest.mark.api_full
     async def test_next_page_paginator(self, snapshot, backend_app, products_149):
         api_url = f"{API_URL_PREFIX}/product"
-
         # open next paginator page
         response = await backend_app.get(api_url, query_string=dict(page=2))
         assert response.status_code == 200
         response_json_data = response.json()
+        for row in response_json_data["data"]:
+            assert "created_at" in row["attributes"]
+            assert "updated_at" in row["attributes"]
+            row["attributes"].pop("created_at", None)
+            row["attributes"].pop("updated_at", None)
         self.validate_response(response_json_data)
         # check pagination links
         self.validate_links(
@@ -1391,11 +1457,15 @@ class TestProductPaginator(PaginatorValidator):
     @pytest.mark.api_full
     async def test_first_page_paginator(self, snapshot, backend_app, products_149):
         api_url = f"{API_URL_PREFIX}/product"
-
         # open first paginator page
         response = await backend_app.get(api_url, query_string=dict(page=1))
         assert response.status_code == 200
         response_json_data = response.json()
+        for row in response_json_data["data"]:
+            assert "created_at" in row["attributes"]
+            assert "updated_at" in row["attributes"]
+            row["attributes"].pop("created_at", None)
+            row["attributes"].pop("updated_at", None)
         self.validate_response(response_json_data)
         # check pagination links
         self.validate_links(
@@ -1411,11 +1481,15 @@ class TestProductPaginator(PaginatorValidator):
     @pytest.mark.api_full
     async def test_last_page_paginator(self, snapshot, backend_app, products_149):
         api_url = f"{API_URL_PREFIX}/product"
-
         # open last paginator page
         response = await backend_app.get(api_url, query_string=dict(page=3))
         assert response.status_code == 200
         response_json_data = response.json()
+        for row in response_json_data["data"]:
+            assert "created_at" in row["attributes"]
+            assert "updated_at" in row["attributes"]
+            row["attributes"].pop("created_at", None)
+            row["attributes"].pop("updated_at", None)
         self.validate_response(response_json_data)
         # check pagination links
         self.validate_links(
@@ -1431,12 +1505,15 @@ class TestProductPaginator(PaginatorValidator):
     @pytest.mark.api_full
     async def test_reduced_qs_paginator(self, snapshot, backend_app, products_149):
         api_url = f"{API_URL_PREFIX}/product"
-
         # reduce QS size
         response = await backend_app.get(api_url, query_string=dict(size=10))
-
         assert response.status_code == 200
         response_json_data = response.json()
+        for row in response_json_data["data"]:
+            assert "created_at" in row["attributes"]
+            assert "updated_at" in row["attributes"]
+            row["attributes"].pop("created_at", None)
+            row["attributes"].pop("updated_at", None)
         self.validate_response(response_json_data)
         # check pagination links
         self.validate_links(
@@ -1455,12 +1532,15 @@ class TestProductPaginator(PaginatorValidator):
         self, snapshot, backend_app, products_149
     ):
         api_url = f"{API_URL_PREFIX}/product"
-
         # open last page with reduced QS size
         response = await backend_app.get(api_url, query_string=dict(page=15, size=10))
-
         assert response.status_code == 200
         response_json_data = response.json()
+        for row in response_json_data["data"]:
+            assert "created_at" in row["attributes"]
+            assert "updated_at" in row["attributes"]
+            row["attributes"].pop("created_at", None)
+            row["attributes"].pop("updated_at", None)
         self.validate_response(response_json_data)
         # check pagination links
         self.validate_links(
@@ -1485,6 +1565,11 @@ class TestProductPaginator(PaginatorValidator):
 
         assert response.status_code == 200
         response_json_data = response.json()
+        for row in response_json_data["data"]:
+            assert "created_at" in row["attributes"]
+            assert "updated_at" in row["attributes"]
+            row["attributes"].pop("created_at", None)
+            row["attributes"].pop("updated_at", None)
         self.validate_response(response_json_data)
         # check pagination links
         self.validate_links(
@@ -1518,6 +1603,12 @@ class TestWishlistPaginator(PaginatorValidator):
         response = await backend_app.get(api_url)
         assert response.status_code == 200
         response_json_data = response.json()
+        for row in response_json_data["data"]:
+            assert "created_at" in row["attributes"]
+            assert "updated_at" in row["attributes"]
+            row["attributes"].pop("created_at", None)
+            row["attributes"].pop("updated_at", None)
+
         self.validate_response(response_json_data)
         # check pagination links
         self.validate_links(
@@ -1540,6 +1631,11 @@ class TestWishlistPaginator(PaginatorValidator):
         response = await backend_app.get(api_url, query_string=dict(page=2))
         assert response.status_code == 200
         response_json_data = response.json()
+        for row in response_json_data["data"]:
+            assert "created_at" in row["attributes"]
+            assert "updated_at" in row["attributes"]
+            row["attributes"].pop("created_at", None)
+            row["attributes"].pop("updated_at", None)
         self.validate_response(response_json_data)
         # check pagination links
         self.validate_links(
@@ -1562,6 +1658,11 @@ class TestWishlistPaginator(PaginatorValidator):
         response = await backend_app.get(api_url, query_string=dict(page=1))
         assert response.status_code == 200
         response_json_data = response.json()
+        for row in response_json_data["data"]:
+            assert "created_at" in row["attributes"]
+            assert "updated_at" in row["attributes"]
+            row["attributes"].pop("created_at", None)
+            row["attributes"].pop("updated_at", None)
         self.validate_response(response_json_data)
         # check pagination links
         self.validate_links(
@@ -1584,6 +1685,11 @@ class TestWishlistPaginator(PaginatorValidator):
         response = await backend_app.get(api_url, query_string=dict(page=3))
         assert response.status_code == 200
         response_json_data = response.json()
+        for row in response_json_data["data"]:
+            assert "created_at" in row["attributes"]
+            assert "updated_at" in row["attributes"]
+            row["attributes"].pop("created_at", None)
+            row["attributes"].pop("updated_at", None)
         self.validate_response(response_json_data)
         # check pagination links
         self.validate_links(
@@ -1607,6 +1713,11 @@ class TestWishlistPaginator(PaginatorValidator):
 
         assert response.status_code == 200
         response_json_data = response.json()
+        for row in response_json_data["data"]:
+            assert "created_at" in row["attributes"]
+            assert "updated_at" in row["attributes"]
+            row["attributes"].pop("created_at", None)
+            row["attributes"].pop("updated_at", None)
         self.validate_response(response_json_data)
         # check pagination links
         self.validate_links(
@@ -1631,6 +1742,11 @@ class TestWishlistPaginator(PaginatorValidator):
 
         assert response.status_code == 200
         response_json_data = response.json()
+        for row in response_json_data["data"]:
+            assert "created_at" in row["attributes"]
+            assert "updated_at" in row["attributes"]
+            row["attributes"].pop("created_at", None)
+            row["attributes"].pop("updated_at", None)
         self.validate_response(response_json_data)
         # check pagination links
         self.validate_links(

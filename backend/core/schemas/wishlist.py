@@ -4,6 +4,7 @@
 from pydantic import BaseModel
 
 from core.utils import (
+    JsonApiAttributesBaseModel,
     JsonApiCreateBaseModel,
     JsonApiDataCreateBaseModel,
     JsonApiDataDBModel,
@@ -19,6 +20,10 @@ class WishlistAttributesModel(BaseModel):
     name: str
 
 
+class WishlistViewAttributesModel(WishlistAttributesModel, JsonApiAttributesBaseModel):
+    pass
+
+
 class WishlistUpdateAttributesModel(BaseModel):
     """Wishlist update attributes serializer."""
 
@@ -28,7 +33,7 @@ class WishlistUpdateAttributesModel(BaseModel):
 class WishlistModel(JsonApiDBModel):
     """Wishlist serializer."""
 
-    attributes: WishlistAttributesModel
+    attributes: WishlistViewAttributesModel
 
 
 class WishlistDataModel(JsonApiDataDBModel):

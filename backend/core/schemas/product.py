@@ -6,6 +6,7 @@ from typing import Optional
 from pydantic import BaseModel, HttpUrl
 
 from core.utils import (
+    JsonApiAttributesBaseModel,
     JsonApiCreateBaseModel,
     JsonApiDataCreateBaseModel,
     JsonApiDataDBModel,
@@ -22,18 +23,21 @@ class ProductAttributesModel(BaseModel):
     url: HttpUrl
 
 
+class ProductViewAttributesModel(ProductAttributesModel, JsonApiAttributesBaseModel):
+    pass
+
+
 class ProductUpdateAttributesModel(BaseModel):
     """Product update attributes serializer."""
 
     name: Optional[str]
     url: Optional[HttpUrl]
-    name2: Optional[str]
 
 
 class ProductModel(JsonApiDBModel):
     """Product serializer."""
 
-    attributes: ProductAttributesModel
+    attributes: ProductViewAttributesModel
 
 
 class ProductDataModel(JsonApiDataDBModel):

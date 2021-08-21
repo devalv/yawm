@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """ORM Models for Wishlist entities."""
 
-from uuid import uuid4
-
 from asyncpg.exceptions import ForeignKeyViolationError
 from sqlalchemy.dialects.postgresql import UUID
 from starlette import status
@@ -11,15 +9,14 @@ from starlette.exceptions import HTTPException
 from core.database.models.security import User
 from core.utils import JsonApiGinoModel
 
-from . import db
+from . import AbstractUpdateDateModel, db
 
 
-class Product(db.Model, JsonApiGinoModel):
+class Product(AbstractUpdateDateModel, JsonApiGinoModel):
     """Yep, this is a Product with link to online store."""
 
     __tablename__ = "product"
 
-    id = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A002, A003, VNE003
     name = db.Column(db.Unicode(length=255), nullable=False)
     url = db.Column(db.Unicode(length=8000), nullable=False, unique=True)
     user_id = db.Column(
@@ -27,12 +24,11 @@ class Product(db.Model, JsonApiGinoModel):
     )
 
 
-class Wishlist(db.Model, JsonApiGinoModel):
+class Wishlist(AbstractUpdateDateModel, JsonApiGinoModel):
     """Wishlist is a user-bound list of Product(s)."""
 
     __tablename__ = "wishlist"
 
-    id = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A002, A003, VNE003
     name = db.Column(db.Unicode(length=255), nullable=False)
     user_id = db.Column(
         UUID(), db.ForeignKey(User.id, ondelete="CASCADE"), nullable=False
@@ -57,7 +53,7 @@ class Wishlist(db.Model, JsonApiGinoModel):
         return rv
 
 
-class WishlistProducts(db.Model, JsonApiGinoModel):
+class WishlistProducts(AbstractUpdateDateModel, JsonApiGinoModel):
     """Product related to Wishlist connection.
 
     The absence of unique together indices (product_id, wishlist_id) has been
@@ -67,7 +63,6 @@ class WishlistProducts(db.Model, JsonApiGinoModel):
 
     __tablename__ = "wishlist_products"
 
-    id = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A002, A003, VNE003
     wishlist_id = db.Column(
         UUID(), db.ForeignKey(Wishlist.id, ondelete="CASCADE"), nullable=False
     )
