@@ -1,55 +1,37 @@
 # -*- coding: utf-8 -*-
 """Pydantic models."""
 
-from .product import (
-    ProductDataCreateModel,
-    ProductDataModel,
-    ProductDataUpdateModel,
-    ProductModel,
-)
+from .product import ProductCreateModel, ProductUpdateModel, ProductViewModel
 from .security import (
     AccessToken,
     GoogleIdInfo,
     RefreshToken,
     Token,
-    UserDataCreateModel,
-    UserDataUpdateModel,
-    UserDBDataModel,
-    UserDBModel,
+    UserCreateModel,
+    UserViewModel,
 )
-from .utils import ExtractUrlDataInModel, ExtractUrlModelDataOutModel
-from .wishlist import (
-    WishlistDataCreateModel,
-    WishlistDataModel,
-    WishlistDataUpdateModel,
-    WishlistModel,
-)
+from .utils import ExtractUrlInModel, ExtractUrlOutModel
+from .wishlist import WishlistCreateModel, WishlistUpdateModel, WishlistViewModel
 from .wishlist_products import (
-    WishlistProductsDataCreateModel,
-    WishlistProductsDataModel,
-    WishlistProductsDataUpdateModel,
-    WishlistProductsModel,
+    WishlistProductsCreateModel,
+    WishlistProductsUpdateModel,
+    WishlistProductsViewModel,
 )
 
 __all__ = [
-    "ProductModel",
-    "ProductDataCreateModel",
-    "ProductDataUpdateModel",
-    "ProductDataModel",
-    "WishlistModel",
-    "WishlistDataModel",
-    "WishlistDataCreateModel",
-    "WishlistDataUpdateModel",
-    "WishlistProductsModel",
-    "WishlistProductsDataModel",
-    "WishlistProductsDataCreateModel",
-    "WishlistProductsDataUpdateModel",
-    "ExtractUrlModelDataOutModel",
-    "ExtractUrlDataInModel",
-    "UserDBModel",
-    "UserDBDataModel",
-    "UserDataCreateModel",
-    "UserDataUpdateModel",
+    "ProductCreateModel",
+    "ProductViewModel",
+    "ProductUpdateModel",
+    "WishlistViewModel",
+    "WishlistCreateModel",
+    "WishlistUpdateModel",
+    "WishlistProductsViewModel",
+    "WishlistProductsCreateModel",
+    "WishlistProductsUpdateModel",
+    "ExtractUrlInModel",
+    "ExtractUrlOutModel",
+    "UserViewModel",
+    "UserCreateModel",
     "Token",
     "AccessToken",
     "RefreshToken",

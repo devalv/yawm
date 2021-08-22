@@ -7,12 +7,11 @@ from starlette import status
 from starlette.exceptions import HTTPException
 
 from core.database.models.security import User
-from core.utils import JsonApiGinoModel
 
 from . import AbstractUpdateDateModel, db
 
 
-class Product(AbstractUpdateDateModel, JsonApiGinoModel):
+class Product(AbstractUpdateDateModel):
     """Yep, this is a Product with link to online store."""
 
     __tablename__ = "product"
@@ -24,7 +23,7 @@ class Product(AbstractUpdateDateModel, JsonApiGinoModel):
     )
 
 
-class Wishlist(AbstractUpdateDateModel, JsonApiGinoModel):
+class Wishlist(AbstractUpdateDateModel):
     """Wishlist is a user-bound list of Product(s)."""
 
     __tablename__ = "wishlist"
@@ -33,6 +32,13 @@ class Wishlist(AbstractUpdateDateModel, JsonApiGinoModel):
     user_id = db.Column(
         UUID(), db.ForeignKey(User.id, ondelete="CASCADE"), nullable=False
     )
+
+    @classmethod
+    def paginator_list(cls):
+        # TODO: @devalv ref
+        q = db.select([cls, User.username]).select_from(cls.join(User))  # noqa: VNE001
+        loaded = q.gino.load((cls, User))
+        return loaded.query
 
     @property
     def products(self):
@@ -53,7 +59,7 @@ class Wishlist(AbstractUpdateDateModel, JsonApiGinoModel):
         return rv
 
 
-class WishlistProducts(AbstractUpdateDateModel, JsonApiGinoModel):
+class WishlistProducts(AbstractUpdateDateModel):
     """Product related to Wishlist connection.
 
     The absence of unique together indices (product_id, wishlist_id) has been

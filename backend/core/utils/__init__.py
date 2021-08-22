@@ -8,28 +8,11 @@ from .exceptions import (
     NOT_IMPLEMENTED_EX,
     OAUTH2_EX,
 )
-from .fastapi_pagination import JsonApiPage
-from .gino_models import JsonApiGinoModel
-from .pydantic_models import (
-    JsonApiAttributesBaseModel,
-    JsonApiCreateBaseModel,
-    JsonApiDataCreateBaseModel,
-    JsonApiDataDBModel,
-    JsonApiDataUpdateBaseModel,
-    JsonApiDBModel,
-    JsonApiUpdateBaseModel,
-)
+from .pydantic_models import BaseUpdateModel, BaseViewModel
 
 __all__ = [
-    "JsonApiPage",
-    "JsonApiGinoModel",
-    "JsonApiDBModel",
-    "JsonApiDataCreateBaseModel",
-    "JsonApiDataUpdateBaseModel",
-    "JsonApiDataDBModel",
-    "JsonApiCreateBaseModel",
-    "JsonApiUpdateBaseModel",
-    "JsonApiAttributesBaseModel",
+    "BaseViewModel",
+    "BaseUpdateModel",
     "CREDENTIALS_EX",
     "INACTIVE_EX",
     "OAUTH2_EX",

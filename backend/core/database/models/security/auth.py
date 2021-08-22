@@ -16,14 +16,14 @@ from core.config import (
     REFRESH_TOKEN_EXPIRE_DAYS,
     SECRET_KEY,
 )
-from core.utils import CREDENTIALS_EX, JsonApiGinoModel
+from core.utils import CREDENTIALS_EX
 
 from .. import AbstractUpdateDateModel, db
 
 ref_token_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-class User(AbstractUpdateDateModel, JsonApiGinoModel):
+class User(AbstractUpdateDateModel):
     """Yep, this is a User table."""
 
     __tablename__ = "user"

@@ -333,15 +333,14 @@ class TestUserInfo:
     ):
         resp = await backend_app.get(self.API_URL, headers=single_admin_auth_headers)
         assert resp.status_code == status.HTTP_200_OK
-        assert "data" in resp.json()
-        response_data = resp.json()["data"]
-        assert "attributes" in response_data
-        response_attributes = response_data["attributes"]
-        for key in response_attributes:
+        for key in resp.json():
             if key in {"created_at", "updated_at"}:
                 continue
             assert hasattr(single_admin, key)
-            assert response_attributes[key] == getattr(single_admin, key)
+            value = getattr(single_admin, key)
+            if key == "id":
+                value = str(value)
+            assert resp.json()[key] == value
 
     async def test_permitted_info(self, backend_app):
         resp = await backend_app.get(self.API_URL)

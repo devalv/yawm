@@ -3,66 +3,29 @@
 
 from pydantic import BaseModel
 
-from core.utils import (
-    JsonApiAttributesBaseModel,
-    JsonApiCreateBaseModel,
-    JsonApiDataCreateBaseModel,
-    JsonApiDataDBModel,
-    JsonApiDataUpdateBaseModel,
-    JsonApiDBModel,
-    JsonApiUpdateBaseModel,
-)
+from core.utils import BaseUpdateModel, BaseViewModel
 
 
-class WishlistAttributesModel(BaseModel):
-    """Wishlist attributes serializer."""
-
+class WishlistCreateModel(BaseModel):
     name: str
 
 
-class WishlistViewAttributesModel(WishlistAttributesModel, JsonApiAttributesBaseModel):
+class WishlistViewModel(WishlistCreateModel, BaseViewModel):
+    class Config:
+        orm_mode = True
+
+
+class WishlistUpdateModel(WishlistCreateModel, BaseUpdateModel):
     pass
 
 
-class WishlistUpdateAttributesModel(BaseModel):
-    """Wishlist update attributes serializer."""
+# class YobaModel(BaseModel):
+#     TODO: @devalv ref
+# id: UUID4
+# name: str
+# updated_at: Optional[datetime]
+# created_at: datetime
+# username: str
 
-    name: str
-
-
-class WishlistModel(JsonApiDBModel):
-    """Wishlist serializer."""
-
-    attributes: WishlistViewAttributesModel
-
-
-class WishlistDataModel(JsonApiDataDBModel):
-    """Wishlist data model."""
-
-    data: WishlistModel
-
-
-class WishlistCreateModel(JsonApiCreateBaseModel):
-    """Wishlist creation serializer."""
-
-    type: str = "wishlist"  # noqa: A003, VNE003
-    attributes: WishlistAttributesModel
-
-
-class WishlistDataCreateModel(JsonApiDataCreateBaseModel):
-    """Wishlist data creation serializer."""
-
-    data: WishlistCreateModel
-
-
-class WishlistUpdateModel(JsonApiUpdateBaseModel):
-    """Wishlist update serializer."""
-
-    type: str = "wishlist"  # noqa: A003, VNE003
-    attributes: WishlistUpdateAttributesModel
-
-
-class WishlistDataUpdateModel(JsonApiDataUpdateBaseModel):
-    """Wishlist data update serializer."""
-
-    data: WishlistUpdateModel
+# class Config:  # noqa: D106
+#     orm_mode = True

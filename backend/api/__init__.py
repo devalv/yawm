@@ -9,7 +9,7 @@ from fastapi_pagination import add_pagination
 from core.config import SWAP_TOKEN_ENDPOINT
 from core.database.models import db
 
-from .v1 import product_router as product_router_v1  # noqa: I201
+from .v1 import product_router as product_router_v1
 from .v1 import security_router as security_router_v1
 from .v1 import utils_router as utils_router_v1
 from .v1 import wishlist_product_router as wishlist_product_router_v1
@@ -38,7 +38,7 @@ def get_app() -> FastAPI:
     return no_version_app
 
 
-def configure_routes(application: FastAPI):
+def configure_routes_v1(application: FastAPI):
     """Configure application."""
     application.include_router(wishlist_router_v1, prefix="/v1")
     application.include_router(product_router_v1, prefix="/v1")
@@ -53,7 +53,7 @@ def configure_db(application: FastAPI):
 
 
 app = get_app()
-configure_routes(application=app)
+configure_routes_v1(application=app)
 configure_db(app)
 
 

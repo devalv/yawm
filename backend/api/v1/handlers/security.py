@@ -15,7 +15,7 @@ from core.config import (
     SWAP_TOKEN_ENDPOINT,
 )
 from core.database import UserGinoModel
-from core.schemas import GoogleIdInfo, Token, UserDBDataModel
+from core.schemas import GoogleIdInfo, Token, UserViewModel
 from core.services.security import (
     get_current_user,
     get_or_create_user,
@@ -42,7 +42,7 @@ async def swap_token(code: str = Form(...)):  # pragma: no cover  # noqa: B008
         credentials = flow.credentials
     # token validation
     try:
-        # TODO: @devalv 0.3 change requests.Request() to httpx.Request or local validation
+        # TODO: @devalv change requests.Request() to httpx.Request or local validation
         id_info = id_token.verify_oauth2_token(
             credentials.id_token, requests.Request(), credentials.client_id
         )
@@ -80,7 +80,7 @@ async def logout(current_user: UserGinoModel = Depends(get_current_user)):  # no
     await current_user.delete_refresh_token()
 
 
-@security_router.get("/user/info", response_model=UserDBDataModel)
+@security_router.get("/user/info", response_model=UserViewModel)
 async def user_info(
     current_user: UserGinoModel = Depends(get_current_user),  # noqa: B008
 ):
