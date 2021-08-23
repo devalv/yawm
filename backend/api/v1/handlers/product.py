@@ -15,7 +15,7 @@ product_router = APIRouter(redirect_slashes=True, tags=["product"])
 @product_router.get("/product", response_model=Page[ProductViewModel])
 async def list_products():
     """API for listing all the products."""
-    return await paginate(ProductGinoModel.query)
+    return await paginate(ProductGinoModel.paginator_query())
 
 
 @product_router.get("/product/{id}", response_model=ProductViewModel)

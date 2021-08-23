@@ -63,12 +63,16 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):  # noqa: B008
 
 async def get_wishlist(id: UUID4):  # noqa: A002
     """Return WishlistGinoModel instance."""
-    return await WishlistGinoModel.get_or_404(id)
+    # TODO: ref view_query
+    wishlist = await WishlistGinoModel.get_or_404(id)
+    return await wishlist.view_query(wishlist.id)
 
 
 async def get_product(id: UUID4):  # noqa: A002
     """Return ProductGinoModel instance."""
-    return await ProductGinoModel.get_or_404(id)
+    # TODO: ref view_query
+    product = await ProductGinoModel.get_or_404(id)
+    return await product.view_query(product.id)
 
 
 async def get_user_wishlist(

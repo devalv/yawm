@@ -7,19 +7,15 @@ from fastapi_pagination.links import Page
 
 from core.database import UserGinoModel, WishlistGinoModel
 from core.schemas import WishlistCreateModel, WishlistUpdateModel, WishlistViewModel
-
-# from core.schemas.wishlist import YobaModel  # noqa: E800
 from core.services.security import get_current_user, get_user_wishlist, get_wishlist
 
 wishlist_router = APIRouter(redirect_slashes=True, tags=["wishlist"])
 
 
 @wishlist_router.get("/wishlist", response_model=Page[WishlistViewModel])
-# @wishlist_router.get("/wishlist", response_model=JsonApiPage[WishlistModel])
 async def list_wishlist():
     """API for listing all the wishlists."""
-    return await paginate(WishlistGinoModel.query)
-    # return await paginate(WishlistGinoModel.paginator_list())
+    return await paginate(WishlistGinoModel.paginator_query())
 
 
 @wishlist_router.get("/wishlist/{id}", response_model=WishlistViewModel)

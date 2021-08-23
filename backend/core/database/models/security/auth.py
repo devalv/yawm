@@ -18,12 +18,12 @@ from core.config import (
 )
 from core.utils import CREDENTIALS_EX
 
-from .. import AbstractUpdateDateModel, db
+from .. import BaseUpdateDateModel, db
 
 ref_token_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-class User(AbstractUpdateDateModel):
+class User(BaseUpdateDateModel):
     """Yep, this is a User table."""
 
     __tablename__ = "user"

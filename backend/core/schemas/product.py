@@ -13,6 +13,8 @@ class ProductCreateModel(BaseModel):
 
 
 class ProductViewModel(ProductCreateModel, BaseViewModel):
+    username: str
+
     class Config:
         orm_mode = True
 
