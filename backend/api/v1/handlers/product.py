@@ -30,7 +30,10 @@ async def create_product(
     current_user: UserGinoModel = Depends(get_current_user),  # noqa: B008
 ):
     """API for creating a new product."""
-    return await ProductGinoModel.create(user_id=current_user.id, **product.dict())
+    product_obj = await ProductGinoModel.create(
+        user_id=current_user.id, **product.dict()
+    )
+    return await ProductGinoModel.view_query(product_obj.id)
 
 
 @product_router.put("/product/{id}", response_model=ProductViewModel)
@@ -40,7 +43,7 @@ async def update_product(
 ):
     """API for updating a product."""
     await product.update(**product_updates.non_null_dict).apply()
-    return product
+    return await ProductGinoModel.view_query(product.id)
 
 
 @product_router.delete(

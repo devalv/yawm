@@ -17,7 +17,7 @@ services:
     container_name: yawm-tests-backend-api
     build:
       context: .
-      dockerfile: ./backend/docker/python/Dockerfile
+      dockerfile: ./backend/docker/tests-python/Dockerfile
     volumes:
       - ./backend/:/opt/yawm/app/
     environment:
@@ -37,6 +37,6 @@ services:
       - OAUTHLIB_INSECURE_TRANSPORT=1
       - SECRET_KEY=${SECRET_KEY}
     working_dir: /opt/yawm/app
-    command: sh -c "sleep 3 && pipenv install --dev && pipenv run python -m pytest"
+    command: sh -c "sleep 3 && pipenv run python -m pytest"
     depends_on:
       - db-tests

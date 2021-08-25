@@ -18,10 +18,7 @@ class BaseEntityModel(BaseUpdateDateModel):
     user_id = db.Column(
         UUID(), db.ForeignKey(User.id, ondelete="CASCADE"), nullable=False
     )
-
-    def __init__(self, **values):
-        super().__init__(**values)
-        self._user = None
+    _user = None
 
     @property
     def user(self):

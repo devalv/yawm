@@ -32,7 +32,10 @@ async def create_wishlist(
     current_user: UserGinoModel = Depends(get_current_user),  # noqa: B008
 ):
     """API for creating a new wishlist."""
-    return await WishlistGinoModel.create(user_id=current_user.id, **wishlist.dict())
+    wishlist_obj = await WishlistGinoModel.create(
+        user_id=current_user.id, **wishlist.dict()
+    )
+    return await WishlistGinoModel.view_query(wishlist_obj.id)
 
 
 @wishlist_router.put("/wishlist/{id}", response_model=WishlistViewModel)
@@ -42,7 +45,7 @@ async def update_wishlist(
 ):
     """API for updating a wishlist."""
     await wishlist.update(**wishlist_updates.non_null_dict).apply()
-    return wishlist
+    return await WishlistGinoModel.view_query(wishlist.id)
 
 
 @wishlist_router.delete(
