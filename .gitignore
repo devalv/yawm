@@ -138,4 +138,4 @@ dmypy.json
 oauth2.json
 
 # Macosx files
-.DS_Store/
+.DS_Store
