@@ -3,7 +3,7 @@
 [![codecov](https://codecov.io/gh/devalv/yawm/branch/main/graph/badge.svg)](https://codecov.io/gh/devalv/yawm)
 
 # yawm
-For additional instructions please see
+For any additional instructions please see
 [Wiki](https://github.com/devalv/yawm/wiki)
 
 ## Project directory structure
