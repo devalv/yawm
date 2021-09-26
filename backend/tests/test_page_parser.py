@@ -20,13 +20,13 @@ def no_css_response() -> bytes:
 
 @pytest.fixture
 def css_response() -> bytes:
-    minified_html = '<!DOCTYPE html><html lang="en"><head> <meta charset="UTF-8"> <title>Title</title></head><body><h1 class="b3a8">adidas Gazelle</h1></body></html>'  # noqa: E501
+    minified_html = b'<!DOCTYPE html><html lang="en"><head> <meta charset="UTF-8"> <title>Title</title></head><body><h1 class="b3a8">adidas Gazelle</h1></body></html>'  # noqa: E501
     return minified_html
 
 
 @pytest.fixture
 def no_h1_response() -> bytes:
-    minified_html = '<!DOCTYPE html><html lang="en"><head> <meta charset="UTF-8"> <title>Title</title></head><body><h2 class="b3a8">bad</h2></body></html>'  # noqa: E501
+    minified_html = b'<!DOCTYPE html><html lang="en"><head> <meta charset="UTF-8"> <title>Title</title></head><body><h2 class="b3a8">bad</h2></body></html>'  # noqa: E501
     return minified_html
 
 
