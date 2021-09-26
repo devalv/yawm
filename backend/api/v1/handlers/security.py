@@ -77,7 +77,7 @@ async def login(state: str):
 
 @security_router.get("/logout", status_code=status.HTTP_204_NO_CONTENT, tags=["auth"])
 async def logout(
-    current_user: UserGinoModel = Depends(get_current_user_gino_obj)  # noqa: B008
+    current_user: UserGinoModel = Depends(get_current_user_gino_obj),  # noqa: B008
 ):
     await current_user.delete_refresh_token()
 
