@@ -12,7 +12,7 @@ from core.schemas import (
     WishlistProductsUpdateModel,
     WishlistProductsViewModel,
 )
-from core.services.security import get_user_wishlist, get_wishlist
+from core.services.security import get_user_wishlist_gino_obj, get_wishlist_gino_obj
 
 wishlist_product_router = APIRouter(redirect_slashes=True, tags=["wishlist-products"])
 
@@ -21,7 +21,7 @@ wishlist_product_router = APIRouter(redirect_slashes=True, tags=["wishlist-produ
     "/wishlist/{id}/products", response_model=Page[WishlistProductsViewModel]
 )
 async def list_wishlist_products(
-    wishlist: WishlistGinoModel = Depends(get_wishlist),  # noqa: B008
+    wishlist: WishlistGinoModel = Depends(get_wishlist_gino_obj),  # noqa: B008
 ):
     """API for getting all related products."""
     return await paginate(wishlist.products)
@@ -32,7 +32,7 @@ async def list_wishlist_products(
 )
 async def create_wishlist_product(
     product: WishlistProductsCreateModel,
-    wishlist: WishlistGinoModel = Depends(get_user_wishlist),  # noqa: B008
+    wishlist: WishlistGinoModel = Depends(get_user_wishlist_gino_obj),  # noqa: B008
 ):
     """API for adding existing product to a existing wishlist."""
     return await wishlist.add_product(**product.dict())
@@ -44,7 +44,7 @@ async def create_wishlist_product(
 async def update_wishlist_product(
     pw_id: UUID4,
     pwm: WishlistProductsUpdateModel,
-    wishlist: WishlistGinoModel = Depends(get_user_wishlist),  # noqa: B008
+    wishlist: WishlistGinoModel = Depends(get_user_wishlist_gino_obj),  # noqa: B008
 ):
     """API for updating product associated to a wishlist."""
     wishlist_product = await WishlistProductsGinoModel.get_or_404(pw_id)
@@ -68,7 +68,8 @@ async def reserve_wishlist_product(pw_id: UUID4, pwm: WishlistProductsUpdateMode
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_wishlist_product(
-    pw_id: UUID4, wishlist: WishlistGinoModel = Depends(get_user_wishlist)  # noqa: B008
+    pw_id: UUID4,
+    wishlist: WishlistGinoModel = Depends(get_user_wishlist_gino_obj),  # noqa: B008
 ):
     """API for removing product from wishlist."""
     wishlist_product = await WishlistProductsGinoModel.get_or_404(pw_id)

@@ -28,7 +28,7 @@ class WishlistProductsViewModel(WishlistProductsCreateModel, BaseViewModel):
         orm_mode = True
 
 
-class WishlistProductsUpdateModel(WishlistProductsCreateModel, BaseUpdateModel):
+class WishlistProductsUpdateModel(BaseUpdateModel):
     """Wishlist products update attributes serializer."""
 
     product_id: Optional[UUID4]

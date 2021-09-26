@@ -39,23 +39,26 @@ services:
       - GOOGLE_CLIENT_SECRETS_JSON=${GOOGLE_CLIENT_SECRETS_JSON}
       - GOOGLE_USERINFO_SCOPE=${GOOGLE_USERINFO_SCOPE}
       - OAUTHLIB_INSECURE_TRANSPORT=1
+      - OAUTHLIB_RELAX_TOKEN_SCOPE=1
     working_dir: /opt/yawm/app
     command: sh -c "pipenv install && sleep 3 && pipenv run alembic upgrade head && pipenv run python main.py"
     depends_on:
       - db
 
-  frontend-app:
-    container_name: yawm-frontend
-    image: node:lts-alpine
-    ports:
-      - 3000:3000
-    volumes:
-      - ./frontend/:/opt/yawm/frontend
-    environment:
-      - API_URL=${API_URL}
-      - NODE_PATH=${NODE_PATH}
-    working_dir: /opt/yawm/frontend
-#    command: sh -c "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start"
-    command: sh -c "npm start"
-    depends_on:
-      - app
+  # frontend-app:
+  #   container_name: yawm-frontend
+  #   image: node:lts-alpine
+  #   ports:
+  #     - 3000:3000
+  #   volumes:
+  #     - ./frontend/:/opt/yawm/frontend
+  #   environment:
+  #     - API_PROTOCOL=http
+  #     - API_HOST=localhost
+  #     - API_PORT=8000
+  #     - NODE_PATH=./src
+  #   working_dir: /opt/yawm/frontend
+  # #    command: sh -c "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start"
+  #   command: sh -c "npm start"
+  #   depends_on:
+  #     - app

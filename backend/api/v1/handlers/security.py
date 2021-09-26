@@ -17,9 +17,9 @@ from core.config import (
 from core.database import UserGinoModel
 from core.schemas import GoogleIdInfo, Token, UserViewModel
 from core.services.security import (
-    get_current_user,
-    get_or_create_user,
-    get_user_for_refresh,
+    get_current_user_gino_obj,
+    get_or_create_user_gino_obj,
+    get_user_for_refresh_gino_obj,
 )
 from core.utils import CREDENTIALS_EX, OAUTH2_EX
 
@@ -50,14 +50,14 @@ async def swap_token(code: str = Form(...)):  # pragma: no cover  # noqa: B008
     except ValueError:
         raise CREDENTIALS_EX
     # get user object
-    authenticated_user = await get_or_create_user(id_info)
+    authenticated_user = await get_or_create_user_gino_obj(id_info)
     # generate system token for a user
     return await authenticated_user.create_token()
 
 
 @security_router.post("/refresh_access_token", response_model=Token, tags=["security"])
 async def refresh_access_token(
-    current_user: UserGinoModel = Depends(get_user_for_refresh),  # noqa: B008
+    current_user: UserGinoModel = Depends(get_user_for_refresh_gino_obj),  # noqa: B008
 ):
     return await current_user.create_token()
 
@@ -76,12 +76,14 @@ async def login(state: str):
 
 
 @security_router.get("/logout", status_code=status.HTTP_204_NO_CONTENT, tags=["auth"])
-async def logout(current_user: UserGinoModel = Depends(get_current_user)):  # noqa: B008
+async def logout(
+    current_user: UserGinoModel = Depends(get_current_user_gino_obj)  # noqa: B008
+):
     await current_user.delete_refresh_token()
 
 
 @security_router.get("/user/info", response_model=UserViewModel)
 async def user_info(
-    current_user: UserGinoModel = Depends(get_current_user),  # noqa: B008
+    current_user: UserGinoModel = Depends(get_current_user_gino_obj),  # noqa: B008
 ):
     return current_user

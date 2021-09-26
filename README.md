@@ -11,7 +11,7 @@ For any additional instructions please see
 
 ### backend
 
-```
+```bash
 ├── core
 │   ├── database
 │   │   ├── models
@@ -69,4 +69,10 @@ Docker-images and docker-compose configuration files.
 docker login
 docker build . -f backend/docker/python/Dockerfile -t devalv/yawm:backend
 docker push devalv/yawm:backend
+```
+
+#### mypy
+
+```bash
+mypy --config-file=tox.ini core api
 ```

@@ -3,6 +3,7 @@
 
 from uuid import uuid4
 
+from gino.declarative import Model as DeclarativeModel
 from gino_starlette import Gino
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
@@ -20,8 +21,10 @@ db = Gino(
     retry_interval=config.DB_RETRY_INTERVAL,
 )
 
+BaseGinoModel: DeclarativeModel = db.Model
 
-class BaseIdModel(db.Model):
+
+class BaseIdModel(BaseGinoModel):
     """Base model reference with id as PK."""
 
     id = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A002, A003, VNE003

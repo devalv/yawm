@@ -87,7 +87,7 @@ class User(BaseUpdateDateModel):
     async def token_is_valid(self, token: str) -> bool:
         """Checking that the token matches the issued one."""
         token_info = await self.token_info()
-        return token_info and token_info.verify_token(token)
+        return bool(token_info and token_info.verify_token(token))
 
     @classmethod
     async def insert_or_update_by_ext_id(
@@ -101,7 +101,7 @@ class User(BaseUpdateDateModel):
     ) -> User:
         """Create new record or update existing."""
 
-        user_obj = await cls.query.where(cls.ext_id == sub).gino.first()
+        user_obj: User = await cls.query.where(cls.ext_id == sub).gino.first()
         if user_obj and user_obj.active:
             await user_obj.update(
                 username=username,

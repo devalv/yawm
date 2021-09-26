@@ -7,7 +7,11 @@ from fastapi_pagination.links import Page
 
 from core.database import UserGinoModel, WishlistGinoModel
 from core.schemas import WishlistCreateModel, WishlistUpdateModel, WishlistViewModel
-from core.services.security import get_current_user, get_user_wishlist, get_wishlist
+from core.services.security import (
+    get_current_user_gino_obj,
+    get_user_wishlist_gino_obj,
+    get_wishlist_gino_obj,
+)
 
 wishlist_router = APIRouter(redirect_slashes=True, tags=["wishlist"])
 
@@ -20,7 +24,7 @@ async def list_wishlist():
 
 @wishlist_router.get("/wishlist/{id}", response_model=WishlistViewModel)
 async def get_wishlist(
-    wishlist: WishlistGinoModel = Depends(get_wishlist),  # noqa: B008
+    wishlist: WishlistGinoModel = Depends(get_wishlist_gino_obj),  # noqa: B008
 ):
     """API for getting a wishlist."""
     return wishlist
@@ -29,7 +33,7 @@ async def get_wishlist(
 @wishlist_router.post("/wishlist", response_model=WishlistViewModel)
 async def create_wishlist(
     wishlist: WishlistCreateModel,
-    current_user: UserGinoModel = Depends(get_current_user),  # noqa: B008
+    current_user: UserGinoModel = Depends(get_current_user_gino_obj),  # noqa: B008
 ):
     """API for creating a new wishlist."""
     wishlist_obj = await WishlistGinoModel.create(
@@ -41,7 +45,7 @@ async def create_wishlist(
 @wishlist_router.put("/wishlist/{id}", response_model=WishlistViewModel)
 async def update_wishlist(
     wishlist_updates: WishlistUpdateModel,
-    wishlist: WishlistGinoModel = Depends(get_user_wishlist),  # noqa: B008
+    wishlist: WishlistGinoModel = Depends(get_user_wishlist_gino_obj),  # noqa: B008
 ):
     """API for updating a wishlist."""
     await wishlist.update(**wishlist_updates.non_null_dict).apply()
@@ -52,7 +56,7 @@ async def update_wishlist(
     "/wishlist/{id}", response_class=Response, status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_wishlist(
-    wishlist: WishlistGinoModel = Depends(get_user_wishlist),  # noqa: B008
+    wishlist: WishlistGinoModel = Depends(get_user_wishlist_gino_obj),  # noqa: B008
 ):
     """API for deleting a wishlist."""
     await wishlist.delete()
