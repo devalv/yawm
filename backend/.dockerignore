@@ -1,8 +1,11 @@
-venv/
-static/
-.circleci/
-docker/
-*cache*/
+venv
+.vscode
+.idea
+.git
+static
+.circleci
+docker
+*cache*
 db.sqlite
 .coverage
 coverage.xml
