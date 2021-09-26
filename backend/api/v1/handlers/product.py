@@ -24,7 +24,7 @@ async def list_products():
 
 @product_router.get("/product/{id}", response_model=ProductViewModel)
 async def get_product(
-    product: ProductGinoModel = Depends(get_product_gino_obj)  # noqa: B008
+    product: ProductGinoModel = Depends(get_product_gino_obj),  # noqa: B008
 ):
     """API for getting a product."""
     return product
