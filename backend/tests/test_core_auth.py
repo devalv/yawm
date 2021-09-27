@@ -99,9 +99,7 @@ async def single_disabled_admin_token(single_admin_access_token, single_admin) -
 
 
 @pytest.fixture
-async def single_disabled_refresh_token(
-    single_admin_refresh_token, single_admin
-) -> str:
+async def single_disabled_refresh_token(single_admin_refresh_token, single_admin) -> str:
     await single_admin.update(disabled=True).apply()
     return single_admin_refresh_token
 
@@ -206,9 +204,7 @@ class TestGOCUser:
 class TestGCUser:
     """Get current (GC) user tests."""
 
-    async def test_get_current_active_user(
-        self, backend_app, single_admin_access_token
-    ):
+    async def test_get_current_active_user(self, backend_app, single_admin_access_token):
         user_object = await get_current_user_gino_obj(single_admin_access_token)
         assert isinstance(user_object, UserGinoModel)
 

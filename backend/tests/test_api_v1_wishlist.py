@@ -61,9 +61,7 @@ async def empty_wishlists_149(single_user):
 @pytest.fixture
 async def wishlist_products_1(ew_1, products_1):
     wishlist = await WishlistGinoModel.get(ew_1.id)
-    return await wishlist.add_product(
-        products_1.id, reserved=False, substitutable=False
-    )
+    return await wishlist.add_product(products_1.id, reserved=False, substitutable=False)
 
 
 @pytest.fixture
@@ -113,9 +111,7 @@ class TestProduct:
         assert resp.status_code == 401
 
     @pytest.mark.api_base
-    async def test_product_create(
-        self, snapshot, backend_app, single_user_auth_headers
-    ):
+    async def test_product_create(self, snapshot, backend_app, single_user_auth_headers):
         resp = await backend_app.post(
             self.API_URL,
             json={"name": "Product1", "url": "https://devyatkin.dev"},
@@ -349,9 +345,7 @@ class TestEmptyWishlist:
         assert resp.status_code == 401
 
     @pytest.mark.api_base
-    async def test_wishlist_create(
-        self, snapshot, backend_app, single_user_auth_headers
-    ):
+    async def test_wishlist_create(self, snapshot, backend_app, single_user_auth_headers):
         resp = await backend_app.post(
             self.API_URL, json={"name": "Wishlist1"}, headers=single_user_auth_headers
         )
@@ -920,9 +914,7 @@ class TestWishlist:
         )
         assert resp.status_code == 404
 
-    async def test_add_fake_product_wishlist_no_auth(
-        self, backend_app, ew_1, products_9
-    ):
+    async def test_add_fake_product_wishlist_no_auth(self, backend_app, ew_1, products_9):
         insert_data = {
             "data": {
                 "attributes": {
@@ -1023,9 +1015,7 @@ class TestWishlist:
         assert "updated_at" in resp_data
         assert resp_data["reserved"] is True
 
-    async def test_reserve_fake_wishlist_product(
-        self, backend_app, wishlist_products_1
-    ):
+    async def test_reserve_fake_wishlist_product(self, backend_app, wishlist_products_1):
         resp = await backend_app.put(
             f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.id}/products/{wishlist_products_1.id}",  # noqa: E501
             json={"reserved": True},
@@ -1543,9 +1533,7 @@ class TestWishlistPaginator(PaginatorValidator):
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
-    async def test_next_page_paginator(
-        self, snapshot, backend_app, empty_wishlists_149
-    ):
+    async def test_next_page_paginator(self, snapshot, backend_app, empty_wishlists_149):
         api_url = f"{API_URL_PREFIX}/wishlist"
 
         # open next paginator page
@@ -1565,9 +1553,7 @@ class TestWishlistPaginator(PaginatorValidator):
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
-    async def test_first_page_paginator(
-        self, snapshot, backend_app, empty_wishlists_149
-    ):
+    async def test_first_page_paginator(self, snapshot, backend_app, empty_wishlists_149):
         api_url = f"{API_URL_PREFIX}/wishlist"
 
         # open first paginator page
@@ -1587,9 +1573,7 @@ class TestWishlistPaginator(PaginatorValidator):
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
-    async def test_last_page_paginator(
-        self, snapshot, backend_app, empty_wishlists_149
-    ):
+    async def test_last_page_paginator(self, snapshot, backend_app, empty_wishlists_149):
         api_url = f"{API_URL_PREFIX}/wishlist"
 
         # open last paginator page
@@ -1609,9 +1593,7 @@ class TestWishlistPaginator(PaginatorValidator):
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
-    async def test_reduced_qs_paginator(
-        self, snapshot, backend_app, empty_wishlists_149
-    ):
+    async def test_reduced_qs_paginator(self, snapshot, backend_app, empty_wishlists_149):
         api_url = f"{API_URL_PREFIX}/wishlist"
 
         # reduce QS size

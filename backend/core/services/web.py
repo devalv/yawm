@@ -172,9 +172,7 @@ async def get_product_name(url: str, chunk_size: int = 100) -> Optional[str]:
         ) as client:
             async with client.stream("GET", url) as response:
                 response_iter = response.aiter_text
-                page_parser = PageParser(
-                    chunk_iter=response_iter, chunk_size=chunk_size
-                )
+                page_parser = PageParser(chunk_iter=response_iter, chunk_size=chunk_size)
                 return await page_parser.get_value()
     except httpx.RequestError:  # pragma: no cover
         return None

@@ -36,9 +36,7 @@ async def create_product(
     current_user: UserGinoModel = Depends(get_current_user_gino_obj),  # noqa: B008
 ):
     """API for creating a new product."""
-    product_obj = await ProductGinoModel.create(
-        user_id=current_user.id, **product.dict()
-    )
+    product_obj = await ProductGinoModel.create(user_id=current_user.id, **product.dict())
     return await ProductGinoModel.view_query(product_obj.id)
 
 

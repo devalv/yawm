@@ -97,7 +97,7 @@ class User(BaseUpdateDateModel):
         family_name: str = None,
         given_name: str = None,
         full_name: str = None,
-        **__
+        **__,
     ) -> User:
         """Create new record or update existing."""
 
