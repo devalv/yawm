@@ -48,9 +48,19 @@ GOOGLE_CLIENT_SECRETS_JSON = config("GOOGLE_CLIENT_SECRETS_JSON", default=None)
 GOOGLE_USERINFO_SCOPE = config("GOOGLE_USERINFO_SCOPE", default=None)
 GOOGLE_SCOPES = [GOOGLE_USERINFO_SCOPE]
 # security
-LOGIN_ENDPOINT = "/v1/login"
-SWAP_TOKEN_ENDPOINT = "/v1/swap_token"
+SWAG_LOGIN_ENDPOINT = "/v1/swag_login"
+SWAG_SWAP_TOKEN_ENDPOINT = "/v1/swag_swap_token"
+REACT_SWAP_TOKEN_ENDPOINT = "/v1/react_swap_token"
 SECRET_KEY = config("SECRET_KEY", default=None)
 ALGORITHM = config("ALGORITHM", default="HS256")
 ACCESS_TOKEN_EXPIRE_MIN = config("ACCESS_TOKEN_EXPIRE_MIN", default=30)
 REFRESH_TOKEN_EXPIRE_DAYS = config("REFRESH_TOKEN_EXPIRE_DAYS", default=7)
+# client application endpoints
+FRONTEND_DOMAIN = config("FRONTEND_DOMAIN", cast=str, default="localhost")
+FRONTEND_PORT = config("FRONTEND_PORT", cast=int, default=3000)
+FRONTEND_PROTOCOL = config("FRONTEND_PROTOCOL", cast=str, default="https")
+FRONTEND_URL = f"{FRONTEND_PROTOCOL}://{FRONTEND_DOMAIN}:{FRONTEND_PORT}"
+FRONTEND_AUTH_TOKEN_PARAM = config(
+    "FRONTEND_AUTH_TOKEN_PARAM", cast=str, default="authToken"
+)
+FRONTEND_AUTH_URL = f"{FRONTEND_URL}?{FRONTEND_AUTH_TOKEN_PARAM}"

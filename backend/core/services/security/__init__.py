@@ -9,6 +9,8 @@ from .auth import (
     get_user_product_gino_obj,
     get_user_wishlist_gino_obj,
     get_wishlist_gino_obj,
+    google_auth,
+    login,
 )
 
 __all__ = [
@@ -19,4 +21,6 @@ __all__ = [
     "get_user_product_gino_obj",
     "get_wishlist_gino_obj",
     "get_product_gino_obj",
+    "google_auth",
+    "login",
 ]

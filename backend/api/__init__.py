@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 
-from core.config import SWAP_TOKEN_ENDPOINT
+from core.config import SWAG_SWAP_TOKEN_ENDPOINT
 from core.database.models import db
 
 from .v1 import product_router as product_router_v1
@@ -21,7 +21,7 @@ def get_app() -> FastAPI:
     no_version_app = FastAPI(
         title="Yet another wishlist maker",
         version="0.3.0",
-        swagger_ui_oauth2_redirect_url=SWAP_TOKEN_ENDPOINT,
+        swagger_ui_oauth2_redirect_url=SWAG_SWAP_TOKEN_ENDPOINT,
         swagger_ui_init_oauth={
             "clientId": "please keep this value",
             "clientSecret": "please keep this value",

@@ -40,6 +40,7 @@ services:
       - GOOGLE_USERINFO_SCOPE=${GOOGLE_USERINFO_SCOPE}
       - OAUTHLIB_INSECURE_TRANSPORT=1
       - OAUTHLIB_RELAX_TOKEN_SCOPE=1
+      - FRONTEND_PROTOCOL=http
     working_dir: /opt/yawm/app
     command: sh -c "pipenv install && sleep 3 && pipenv run alembic upgrade head && pipenv run python main.py"
     depends_on:
