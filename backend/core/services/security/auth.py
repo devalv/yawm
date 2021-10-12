@@ -1,22 +1,71 @@
 # -*- coding: utf-8 -*-
 """Authentication system."""
+from typing import Any, Dict, Tuple
 
 from fastapi import Depends
 from fastapi.security.oauth2 import OAuth2AuthorizationCodeBearer
+from google.auth.transport import requests
+from google.oauth2 import id_token
+from google_auth_oauthlib.flow import Flow as GFlow
 from jose import JWTError
+from oauthlib.oauth2 import OAuth2Error
 from pydantic import UUID4
 
-from core.config import LOGIN_ENDPOINT, SWAP_TOKEN_ENDPOINT
+from core.config import (
+    GOOGLE_CLIENT_SECRETS_JSON,
+    GOOGLE_SCOPES,
+    SWAG_LOGIN_ENDPOINT,
+    SWAG_SWAP_TOKEN_ENDPOINT,
+)
 from core.database import ProductGinoModel, UserGinoModel, WishlistGinoModel
 from core.schemas import AccessToken, GoogleIdInfo, RefreshToken
-from core.utils import CREDENTIALS_EX, INACTIVE_EX, NOT_AN_OWNER
+from core.utils import CREDENTIALS_EX, INACTIVE_EX, NOT_AN_OWNER, OAUTH2_EX
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
-    authorizationUrl=LOGIN_ENDPOINT, tokenUrl=SWAP_TOKEN_ENDPOINT
+    authorizationUrl=SWAG_LOGIN_ENDPOINT, tokenUrl=SWAG_SWAP_TOKEN_ENDPOINT
 )
 
 
-async def get_or_create_user_gino_obj(id_info: GoogleIdInfo):
+async def google_auth(code: str, redirect_uri: str) -> Dict[str, Any]:
+    """Check Google Auth code and create access token."""
+    # Get authentication code
+    flow = GFlow.from_client_secrets_file(
+        GOOGLE_CLIENT_SECRETS_JSON, scopes=GOOGLE_SCOPES
+    )
+    flow.redirect_uri = redirect_uri
+    try:
+        flow.fetch_token(code=code)
+    except OAuth2Error:
+        raise OAUTH2_EX
+    else:
+        credentials = flow.credentials
+    # token validation
+    try:
+        # TODO: @devalv change requests.Request() to httpx.Request or local validation
+        id_info = id_token.verify_oauth2_token(
+            credentials.id_token, requests.Request(), credentials.client_id
+        )
+        id_info = GoogleIdInfo(**id_info)
+    except ValueError:
+        raise CREDENTIALS_EX
+    # get user object
+    authenticated_user = await get_or_create_user_gino_obj(id_info)
+    # generate system token for a user
+    return await authenticated_user.create_token()
+
+
+async def login(state: str, redirect_url: str) -> str:
+    flow = GFlow.from_client_secrets_file(
+        GOOGLE_CLIENT_SECRETS_JSON, scopes=GOOGLE_SCOPES
+    )
+    flow.redirect_uri = redirect_url
+    flow_info: Tuple[str, str] = flow.authorization_url(
+        access_type="offline", state=state, include_granted_scopes="true"
+    )
+    return flow_info[0]
+
+
+async def get_or_create_user_gino_obj(id_info: GoogleIdInfo) -> UserGinoModel:
     """Get/Update or Create new user."""
     return await UserGinoModel.insert_or_update_by_ext_id(
         sub=id_info.sub,

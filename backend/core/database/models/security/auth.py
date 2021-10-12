@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
+from typing import Any, Dict
 
 from jose import jwt
 from passlib.context import CryptContext
@@ -69,7 +70,7 @@ class User(BaseUpdateDateModel):
         """Delete for a user existing refresh token."""
         return await TokenInfo.delete.where(TokenInfo.user_id == self.id).gino.status()
 
-    async def create_token(self):
+    async def create_token(self) -> Dict[str, Any]:
         acc_token = self.create_access_token()
         ref_token = await self.create_refresh_token()
         return {
