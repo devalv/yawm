@@ -6,7 +6,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-fastapi = "==0.*"
+fastapi = "==0.68.*"
 uvicorn = "==0.*"
 ujson = "==4.*"
 gino-starlette = "==0.*"
@@ -21,6 +21,7 @@ python-jose = {extras = ["cryptography"], version = "*"}
 uvloop = "*"
 pydantic = {extras = ["email"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
+coolname = "==1.1.*"
 
 [dev-packages]
 coverage = "==5.*"
