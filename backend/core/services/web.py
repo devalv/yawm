@@ -66,6 +66,8 @@ class PageParser:
     @close_tag_ind.setter
     def close_tag_ind(self, chunk: str):
         """Find a tag position in a chunk and remember index."""
+        # TODO: @devalv remove setter
+        # TODO: @devalv ref - chunk may be int
         value_ind = -1
         # break if there is nothing to search
         if not chunk:
@@ -112,7 +114,7 @@ class PageParser:
             tag_has_no_value = self.close_tag_ind - value_ind < 2
             if tag_has_no_value:
                 value_ind = -1
-                self.close_tag_ind = -2
+                self.close_tag_ind = None  # type: ignore
             elif value_ind == -1:
                 value_ind = self.rfind_pattern_ind(
                     ">", self.__prev_chunk, self.chunk_size
@@ -139,9 +141,9 @@ class PageParser:
     async def get_value(self) -> Optional[str]:
         """Get html tag value from PageParser.chunk_iter."""
         async for chunk in self.chunk_iter(chunk_size=self.chunk_size):
-            if self.close_tag_ind == -1:
+            if self.close_tag_ind <= -1:
                 self.close_tag_ind = chunk
-            if self.close_tag_ind >= 0 and self.open_tag_ind == -1:
+            if self.close_tag_ind >= 0 and self.open_tag_ind <= -1:
                 self.open_tag_ind = chunk
             if self.both_ind_found:
                 # fmt: off
