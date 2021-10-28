@@ -85,13 +85,15 @@ class Wishlist(BaseEntityModel):
 
     @staticmethod
     async def create_product(user_id: UUID, product_url: HttpUrl) -> Product:
+        # All urls should be in a lower case
+        url = product_url.url.lower()
         # Search existing product
         existing_product: Product = await Product.query.where(
-            Product.url == product_url.url
+            Product.url == url
         ).gino.first()
         if existing_product:
             return existing_product
-        product_kwargs = {"url": product_url.url, "user_id": user_id}
+        product_kwargs = {"url": url, "user_id": user_id}
         # Get h1 from product page as product name
         product_name: Optional[str] = await get_product_name(product_url.url)
         if product_name:
