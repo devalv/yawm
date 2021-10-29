@@ -5,7 +5,7 @@ from api.v2.schemas import WishlistCreateV2Model, WishlistViewV2Model
 from fastapi import APIRouter, Depends
 
 from core.database import UserGinoModel, WishlistGinoModel
-from core.services.security import get_current_user_gino_obj
+from core.services.security import get_current_user_gino_obj, get_wishlist_gino_obj
 
 basename = "wishlists"
 wishlist_router = APIRouter(redirect_slashes=True, tags=[basename])
@@ -27,4 +27,14 @@ async def create_wishlist(
     wishlist_dict = wishlist_obj.to_dict()
     wishlist_dict["products"] = await wishlist_obj.get_products_v2()
 
+    return wishlist_dict
+
+
+@wishlist_router.get(f"/{basename}/" + "{id}", response_model=WishlistViewV2Model)
+async def get_wishlist(
+    wishlist: WishlistGinoModel = Depends(get_wishlist_gino_obj),  # noqa: B008
+):
+    """API for getting a wishlist."""
+    wishlist_dict = wishlist.to_dict()
+    wishlist_dict["products"] = await wishlist.get_products_v2()
     return wishlist_dict
