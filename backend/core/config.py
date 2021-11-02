@@ -53,8 +53,8 @@ SWAG_SWAP_TOKEN_ENDPOINT = "/v1/swag_swap_token"
 REACT_SWAP_TOKEN_ENDPOINT = "/v1/react_swap_token"
 SECRET_KEY = config("SECRET_KEY", default=None)
 ALGORITHM = config("ALGORITHM", default="HS256")
-ACCESS_TOKEN_EXPIRE_MIN = config("ACCESS_TOKEN_EXPIRE_MIN", default=30)
-REFRESH_TOKEN_EXPIRE_DAYS = config("REFRESH_TOKEN_EXPIRE_DAYS", default=7)
+ACCESS_TOKEN_EXPIRE_MIN = config("ACCESS_TOKEN_EXPIRE_MIN", cast=int, default=30)
+REFRESH_TOKEN_EXPIRE_DAYS = config("REFRESH_TOKEN_EXPIRE_DAYS", cast=int, default=7)
 # client application endpoints
 FRONTEND_DOMAIN = config("FRONTEND_DOMAIN", cast=str, default="localhost")
 FRONTEND_PORT = config("FRONTEND_PORT", cast=int, default=3000)
