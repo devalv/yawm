@@ -26,7 +26,7 @@ async def create_wishlist(
 
     wishlist_dict = wishlist_obj.to_dict()
     wishlist_dict["products"] = await wishlist_obj.get_products_v2()
-
+    wishlist_dict["username"] = current_user.username
     return wishlist_dict
 
 
