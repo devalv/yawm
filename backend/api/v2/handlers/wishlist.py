@@ -37,4 +37,5 @@ async def get_wishlist(
     """API for getting a wishlist."""
     wishlist_dict = wishlist.to_dict()
     wishlist_dict["products"] = await wishlist.get_products_v2()
+    wishlist_dict["username"] = wishlist.username
     return wishlist_dict

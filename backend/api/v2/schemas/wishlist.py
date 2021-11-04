@@ -3,7 +3,7 @@
 
 from typing import List
 
-from pydantic import BaseModel
+from pydantic import UUID4, BaseModel
 
 from core.utils import BaseViewModel
 
@@ -18,4 +18,6 @@ class WishlistViewV2Model(BaseViewModel):
     """Wishlist products attributes serializer."""
 
     name: str
+    username: str
+    user_id: UUID4
     products: List[ProductViewV2Model]
