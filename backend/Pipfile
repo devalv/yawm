@@ -39,6 +39,7 @@ pytest-dotenv = "*"
 pretty_errors = "==1.*"
 pytest-httpx = "*"
 mypy = "*"
+black = "*"
 
 [requires]
 python_version = "3.9"

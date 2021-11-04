@@ -190,3 +190,7 @@ class WishlistProducts(BaseUpdateDateModel):
     @property
     def url(self):
         return self._product.url
+
+    async def reserve(self):
+        """Mark product as `reserved`."""
+        return await self.update(reserved=True).apply()

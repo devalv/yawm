@@ -14,6 +14,7 @@ from .v1 import security_router as security_router_v1
 from .v1 import utils_router as utils_router_v1
 from .v1 import wishlist_product_router as wishlist_product_router_v1
 from .v1 import wishlist_router as wishlist_router_v1
+from .v2 import wishlist_products_router as wishlist_products_router_v2
 from .v2 import wishlist_router as wishlist_router_v2
 
 
@@ -52,6 +53,7 @@ def configure_routes_v1(application: FastAPI):
 def configure_routes_v2(application: FastAPI):
     """Configure application routes."""
     application.include_router(wishlist_router_v2, prefix="/v2")
+    application.include_router(wishlist_products_router_v2, prefix="/v2")
 
 
 def configure_db(application: FastAPI):
