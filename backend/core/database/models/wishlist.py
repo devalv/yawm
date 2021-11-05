@@ -187,6 +187,7 @@ class WishlistProducts(BaseUpdateDateModel):
     reserved = db.Column(db.Boolean(), nullable=False, default=False)
 
     _product = None
+    _wishlist = None
 
     @property
     def product(self):
@@ -195,6 +196,14 @@ class WishlistProducts(BaseUpdateDateModel):
     @product.setter
     def product(self, product):
         self._product = product
+
+    @property
+    def wishlist(self):
+        return self._wishlist
+
+    @wishlist.setter
+    def wishlist(self, wishlist):
+        self._wishlist = wishlist
 
     @property
     def name(self):

@@ -17,7 +17,12 @@ from core.config import (
     SWAG_LOGIN_ENDPOINT,
     SWAG_SWAP_TOKEN_ENDPOINT,
 )
-from core.database import ProductGinoModel, UserGinoModel, WishlistGinoModel
+from core.database import (
+    ProductGinoModel,
+    UserGinoModel,
+    WishlistGinoModel,
+    WishlistProductsGinoModel,
+)
 from core.schemas import AccessToken, GoogleIdInfo, RefreshToken
 from core.utils import CREDENTIALS_EX, INACTIVE_EX, NOT_AN_OWNER, OAUTH2_EX
 
@@ -90,7 +95,7 @@ async def get_user_for_refresh_gino_obj(token: str):
     return user
 
 
-async def get_current_user_gino_obj(token: str = Depends(oauth2_scheme)):  # noqa: B008
+async def get_current_user_gino_obj(token: str = Depends(oauth2_scheme)):
     """Validate token and get user db model instance."""
     try:
         token_info = AccessToken.decode_and_create(token=token)
@@ -102,14 +107,14 @@ async def get_current_user_gino_obj(token: str = Depends(oauth2_scheme)):  # noq
     return user
 
 
-async def get_wishlist_gino_obj(id: UUID4):  # noqa: A002
+async def get_wishlist_gino_obj(id: UUID4):
     """Return WishlistGinoModel instance."""
     # TODO: ref view_query
     wishlist = await WishlistGinoModel.get_or_404(id)
     return await wishlist.view_query(wishlist.id)
 
 
-async def get_product_gino_obj(id: UUID4):  # noqa: A002
+async def get_product_gino_obj(id: UUID4):
     """Return ProductGinoModel instance."""
     # TODO: ref view_query
     product = await ProductGinoModel.get_or_404(id)
@@ -117,8 +122,8 @@ async def get_product_gino_obj(id: UUID4):  # noqa: A002
 
 
 async def get_user_wishlist_gino_obj(
-    wishlist: WishlistGinoModel = Depends(get_wishlist_gino_obj),  # noqa: B008
-    current_user: UserGinoModel = Depends(get_current_user_gino_obj),  # noqa: B008
+    wishlist: WishlistGinoModel = Depends(get_wishlist_gino_obj),
+    current_user: UserGinoModel = Depends(get_current_user_gino_obj),
 ) -> WishlistGinoModel:
     """Return WishlistGinoModel if user has rights on it."""
     if current_user.superuser or wishlist.user_id == current_user.id:
@@ -127,10 +132,26 @@ async def get_user_wishlist_gino_obj(
 
 
 async def get_user_product_gino_obj(
-    product: ProductGinoModel = Depends(get_product_gino_obj),  # noqa: B008
-    current_user: UserGinoModel = Depends(get_current_user_gino_obj),  # noqa: B008
+    product: ProductGinoModel = Depends(get_product_gino_obj),
+    current_user: UserGinoModel = Depends(get_current_user_gino_obj),
 ) -> ProductGinoModel:
     """Return ProductGinoModel if user has rights on it."""
     if current_user.superuser or product.user_id == current_user.id:
         return product
+    raise NOT_AN_OWNER
+
+
+async def get_wishlist_product_gino_obj(id: UUID4):
+    """Return WishlistProductsGinoModel instance."""
+    return await WishlistProductsGinoModel.get_or_404(id)
+
+
+async def get_user_wishlist_product_gino_obj(
+    wishlist_product: WishlistProductsGinoModel = Depends(get_wishlist_product_gino_obj),
+    current_user: UserGinoModel = Depends(get_current_user_gino_obj),
+):
+    """Return WishlistProductsGinoModel if user has rights on it."""
+    wishlist = await WishlistGinoModel.get_or_404(wishlist_product.wishlist_id)
+    if current_user.superuser or wishlist.user_id == current_user.id:
+        return wishlist_product
     raise NOT_AN_OWNER

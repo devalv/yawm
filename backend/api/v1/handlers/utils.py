@@ -14,7 +14,7 @@ utils_router = APIRouter(redirect_slashes=True, tags=["utils"])
 @utils_router.post("/extract-product-title", response_model=ExtractUrlOutModel)
 async def extract_name_by_url(
     product_url: ExtractUrlInModel,
-    current_user: UserGinoModel = Depends(get_current_user_gino_obj),  # noqa: B008
+    current_user: UserGinoModel = Depends(get_current_user_gino_obj),
 ):
     """Extract product name by url."""
     product_with_url = await ProductGinoModel.query.where(

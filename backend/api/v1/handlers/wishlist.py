@@ -24,7 +24,7 @@ async def list_wishlist():
 
 @wishlist_router.get("/wishlist/{id}", response_model=WishlistViewModel)
 async def get_wishlist(
-    wishlist: WishlistGinoModel = Depends(get_wishlist_gino_obj),  # noqa: B008
+    wishlist: WishlistGinoModel = Depends(get_wishlist_gino_obj),
 ):
     """API for getting a wishlist."""
     return wishlist
@@ -33,7 +33,7 @@ async def get_wishlist(
 @wishlist_router.post("/wishlist", response_model=WishlistViewModel)
 async def create_wishlist(
     wishlist: WishlistCreateModel,
-    current_user: UserGinoModel = Depends(get_current_user_gino_obj),  # noqa: B008
+    current_user: UserGinoModel = Depends(get_current_user_gino_obj),
 ):
     """API for creating a new wishlist."""
     wishlist_obj = await WishlistGinoModel.create(
@@ -45,7 +45,7 @@ async def create_wishlist(
 @wishlist_router.put("/wishlist/{id}", response_model=WishlistViewModel)
 async def update_wishlist(
     wishlist_updates: WishlistUpdateModel,
-    wishlist: WishlistGinoModel = Depends(get_user_wishlist_gino_obj),  # noqa: B008
+    wishlist: WishlistGinoModel = Depends(get_user_wishlist_gino_obj),
 ):
     """API for updating a wishlist."""
     await wishlist.update(**wishlist_updates.non_null_dict).apply()
@@ -56,7 +56,7 @@ async def update_wishlist(
     "/wishlist/{id}", response_class=Response, status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_wishlist(
-    wishlist: WishlistGinoModel = Depends(get_user_wishlist_gino_obj),  # noqa: B008
+    wishlist: WishlistGinoModel = Depends(get_user_wishlist_gino_obj),
 ):
     """API for deleting a wishlist."""
     await wishlist.delete()

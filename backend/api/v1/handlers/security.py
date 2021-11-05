@@ -23,14 +23,14 @@ security_router = APIRouter(redirect_slashes=True, tags=["security"])
 
 
 @security_router.post("/swag_swap_token", response_model=Token, tags=["security"])
-async def swag_swap_token(code: str = Form(...)):  # pragma: no cover  # noqa: B008
+async def swag_swap_token(code: str = Form(...)):  # pragma: no cover
     """SwaggerUI swap-token page."""
     redirect_uri = f"{API_LOCATION}{SWAG_SWAP_TOKEN_ENDPOINT}"
     return await google_auth(code=code, redirect_uri=redirect_uri)
 
 
 @security_router.get("/react_swap_token", response_model=Token, tags=["security"])
-async def react_swap_token(code: str):  # pragma: no cover  # noqa: B008
+async def react_swap_token(code: str):  # pragma: no cover
     """React client-app swap-token page."""
     redirect_uri = f"{API_LOCATION}{REACT_SWAP_TOKEN_ENDPOINT}"
     token_info = await google_auth(code=code, redirect_uri=redirect_uri)
@@ -41,7 +41,7 @@ async def react_swap_token(code: str):  # pragma: no cover  # noqa: B008
 
 @security_router.post("/refresh_access_token", response_model=Token, tags=["security"])
 async def refresh_access_token(
-    current_user: UserGinoModel = Depends(get_user_for_refresh_gino_obj),  # noqa: B008
+    current_user: UserGinoModel = Depends(get_user_for_refresh_gino_obj),
 ):
     return await current_user.create_token()
 
@@ -64,7 +64,7 @@ async def swag_login(state: str):
 
 @security_router.get("/logout", tags=["auth"])
 async def logout(
-    current_user: UserGinoModel = Depends(get_current_user_gino_obj),  # noqa: B008
+    current_user: UserGinoModel = Depends(get_current_user_gino_obj),
 ):
     await current_user.delete_refresh_token()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -72,6 +72,6 @@ async def logout(
 
 @security_router.get("/user/info", response_model=UserViewModel)
 async def user_info(
-    current_user: UserGinoModel = Depends(get_current_user_gino_obj),  # noqa: B008
+    current_user: UserGinoModel = Depends(get_current_user_gino_obj),
 ):
     return current_user
