@@ -139,6 +139,19 @@ class Wishlist(BaseEntityModel):
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Product is not found")
         return rv
 
+    async def add_products_v2(self, user_id: UUID, product_urls: List[HttpUrl]):
+        """Add Products to a Wishlist."""
+        # Create new products
+        created_products = set()
+        for product_url in product_urls:
+            created_products.add(
+                await self.create_product(user_id=user_id, product_url=product_url)
+            )
+        # Include products to a wishlist
+        for product in created_products:
+            await self.add_product(product_id=product.id)
+        return self
+
     async def get_products_v2(self):
         # TODO: @devalv ref ASAP
         return (

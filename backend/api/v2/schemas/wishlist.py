@@ -10,7 +10,7 @@ from core.utils import BaseViewModel
 from .product import ProductCreateV2Model, ProductViewV2Model
 
 
-class WishlistCreateV2Model(BaseModel):
+class WishlistProductsV2Model(BaseModel):
     product_urls: List[ProductCreateV2Model]
 
 
