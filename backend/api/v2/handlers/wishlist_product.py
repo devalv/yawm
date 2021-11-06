@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Wishlist rest-api handlers."""
 
-from api.v2.schemas import WishlistProductV2Model
+from api.v2.schemas import WishlistProductUpdateV2Model, WishlistProductV2Model
 from fastapi import APIRouter, Depends, Response, status
 from pydantic import UUID4
 
@@ -36,3 +36,18 @@ async def delete_wishlist_product(
 ):
     """API for deleting product from wishlist."""
     await wishlist_product.delete()
+
+
+@wishlist_products_router.put(
+    f"/{basename}/" + "{id}",
+    response_model=WishlistProductV2Model,
+)
+async def update_wishlist_product(
+    wpm: WishlistProductUpdateV2Model,
+    wishlist_product: WishlistProductsGinoModel = Depends(
+        get_user_wishlist_product_gino_obj
+    ),
+):
+    """API for updating WishlistProduct attributes."""
+    await wishlist_product.update(**wpm.dict()).apply()
+    return wishlist_product
