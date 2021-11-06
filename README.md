@@ -1,8 +1,15 @@
-# yawm
+# Yet another wishlist maker - YAWM
 
+---
+
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://github.com/tiangolo/fastapi)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![codecov](https://codecov.io/gh/devalv/yawm/branch/main/graph/badge.svg)](https://codecov.io/gh/devalv/yawm)
+
+---
+
 
 For any additional instructions please see [Wiki](https://github.com/devalv/yawm/wiki).
 
@@ -11,11 +18,13 @@ For any additional instructions please see [Wiki](https://github.com/devalv/yawm
 ### backend
 
 ```bash
+├── docker
 ├── core
 │   ├── database
 │   │   ├── models
 │   │   └── migrations
 │   ├── schemas
+│   │   └── security
 │   ├── services
 │   ├── utils
 │   ├── .env
@@ -24,10 +33,14 @@ For any additional instructions please see [Wiki](https://github.com/devalv/yawm
 │   ├── snapshots
 │   └── conftest.py
 ├── api
-│   └── v1
-│       └── handlers
+│   ├── v1
+│   │   ├── handlers
+│   │   └── schemas
+│   └── v2
+│       ├── handlers
+│       └── schemas
 ├── main.py
-└── .coveragerc
+└── tox.ini
 ```
 
 #### root
@@ -35,10 +48,9 @@ For any additional instructions please see [Wiki](https://github.com/devalv/yawm
 Project outer-startup files, such as:
 
 * alembic configuration
-* pytest configuration
+* pytest, coverage, flake8, etc configurations (tox.ini)
 * uvicorn app file
 * project requirements lists
-* coverage configuration
 
 #### core
 
