@@ -70,7 +70,7 @@ class PageParser:
         # TODO: @devalv ref - chunk may be int
         value_ind = -1
         # break if there is nothing to search
-        if not chunk:
+        if not chunk:  # pragma: no cover
             self.__close_tag_ind = value_ind
             return None
         # try to find proper index
@@ -86,7 +86,7 @@ class PageParser:
                 break
             elif value_cant_be_found:
                 value_ind = -1
-            elif extra_search_needed:
+            elif extra_search_needed:  # pragma: no cover
                 # end of a tag must be in a previous chunk
                 value_ind = self.rfind_pattern_ind(extra_pattern, self.__prev_chunk)
                 if value_ind >= 0:
@@ -105,14 +105,14 @@ class PageParser:
         """Find a tag position in a chunk and remember index."""
         value_ind = -1
         # break if there is nothing to search
-        if not chunk:
+        if not chunk:  # pragma: no cover
             self.__close_tag_ind = value_ind
             return -2
         # try to find proper index
         if self.close_tag_ind >= 0 and value_ind == -1:
             value_ind = self.rfind_pattern_ind(">", chunk, self.close_tag_ind)
             tag_has_no_value = self.close_tag_ind - value_ind < 2
-            if tag_has_no_value:
+            if tag_has_no_value:  # pragma: no cover
                 value_ind = -1
                 self.close_tag_ind = None  # type: ignore
             elif value_ind == -1:

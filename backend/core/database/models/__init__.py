@@ -25,7 +25,7 @@ db = Gino(
 BaseGinoModel: DeclarativeModel = db.Model
 
 
-async def get_connection():
+async def get_connection():  # pragma: no cover
     try:
         conn = await db.acquire()
     except:  # noqa
@@ -35,14 +35,16 @@ async def get_connection():
         return True
 
 
-def is_database_online(db_status: bool = Depends(get_connection)) -> bool:
+def is_database_online(
+    db_status: bool = Depends(get_connection),
+) -> bool:  # pragma: no cover
     return db_status
 
 
 class BaseIdModel(BaseGinoModel):
     """Base model reference with id as PK."""
 
-    id = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A002, A003, VNE003
+    id = db.Column(UUID(), default=uuid4, primary_key=True)
 
 
 class BaseCreateDateModel(BaseIdModel):

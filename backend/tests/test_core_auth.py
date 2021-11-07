@@ -289,9 +289,21 @@ class TestGUserFR:
 @pytest.mark.skipif(
     os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
-async def test_login(backend_app):
+async def test_swag_login(backend_app):
     resp = await backend_app.get(
         f"{API_URL_PREFIX}/swag_login",
+        query_string={"state": "qwe"},
+        allow_redirects=False,
+    )
+    assert resp.status_code == status.HTTP_307_TEMPORARY_REDIRECT
+
+
+@pytest.mark.skipif(
+    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
+)
+async def test_react_login(backend_app):
+    resp = await backend_app.get(
+        f"{API_URL_PREFIX}/react_login",
         query_string={"state": "qwe"},
         allow_redirects=False,
     )

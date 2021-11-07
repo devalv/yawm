@@ -31,7 +31,7 @@ oauth2_scheme = OAuth2AuthorizationCodeBearer(
 )
 
 
-async def google_auth(code: str, redirect_uri: str) -> Dict[str, Any]:
+async def google_auth(code: str, redirect_uri: str) -> Dict[str, Any]:  # pragma: no cover
     """Check Google Auth code and create access token."""
     # Get authentication code
     flow = GFlow.from_client_secrets_file(

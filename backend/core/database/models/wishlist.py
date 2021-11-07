@@ -27,7 +27,7 @@ class BaseEntityModel(BaseUpdateDateModel):
     _user = None
 
     @property
-    def user(self):
+    def user(self):  # pragma: no cover
         return self._user
 
     @user.setter
@@ -97,7 +97,7 @@ class Wishlist(BaseEntityModel):
         # Get h1 from product page as product name
         product_name: Optional[str] = await get_product_name(product_url.url)
         if product_name:
-            product_kwargs["name"] = product_name
+            product_kwargs["name"] = product_name  # pragma: no cover
         else:
             product_kwargs["name"] = random_name()[0].capitalize()
         # Create new product
@@ -156,11 +156,13 @@ class Wishlist(BaseEntityModel):
         # TODO: @devalv ref ASAP
         return (
             await WishlistProducts.join(Product)
+            .join(Wishlist)
             .select()
             .where(WishlistProducts.wishlist_id == self.id)
             .gino.load(
                 WishlistProducts.distinct(WishlistProducts.id).load(
-                    product=Product.distinct(Product.id)
+                    product=Product.distinct(Product.id),
+                    wishlist=Wishlist.distinct(Wishlist.id),
                 )
             )
             .all()
@@ -190,7 +192,7 @@ class WishlistProducts(BaseUpdateDateModel):
     _wishlist = None
 
     @property
-    def product(self):
+    def product(self):  # pragma: no cover
         return self._product
 
     @product.setter
@@ -198,7 +200,7 @@ class WishlistProducts(BaseUpdateDateModel):
         self._product = product
 
     @property
-    def wishlist(self):
+    def wishlist(self):  # pragma: no cover
         return self._wishlist
 
     @wishlist.setter
