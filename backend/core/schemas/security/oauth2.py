@@ -12,7 +12,7 @@ from core.config import ALGORITHM, GOOGLE_CLIENT_ID, SECRET_KEY
 
 
 class RefreshToken(BaseModel):
-    id: UUID4  # noqa: A003, VNE003
+    id: UUID4
     username: str
     exp: Union[Type[float], datetime] = confloat(gt=datetime.utcnow().timestamp())
 

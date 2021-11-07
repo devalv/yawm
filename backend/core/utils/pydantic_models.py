@@ -13,7 +13,7 @@ from pydantic import UUID4, BaseModel
 class BaseViewModel(BaseModel):
     """Abstract pydantic view model."""
 
-    id: UUID4  # noqa: A002, A003, VNE003
+    id: UUID4
     created_at: datetime
     updated_at: Optional[datetime] = None
 

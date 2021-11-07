@@ -51,7 +51,7 @@ class BaseEntityModel(BaseUpdateDateModel):
         return q.query
 
     @classmethod
-    async def view_query(cls, id: uuid.UUID):  # noqa: A002
+    async def view_query(cls, id: uuid.UUID):
         # TODO: @devalv ref like get_or_404
         q = (  # noqa: VNE001
             cls.join(User)
