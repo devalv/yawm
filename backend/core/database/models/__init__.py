@@ -3,6 +3,7 @@
 
 from uuid import uuid4
 
+from fastapi import Depends
 from gino.declarative import Model as DeclarativeModel
 from gino_starlette import Gino
 from sqlalchemy.dialects.postgresql import UUID
@@ -22,6 +23,20 @@ db = Gino(
 )
 
 BaseGinoModel: DeclarativeModel = db.Model
+
+
+async def get_connection():
+    try:
+        conn = await db.acquire()
+    except:  # noqa
+        return False
+    else:
+        await conn.release()
+        return True
+
+
+def is_database_online(db_status: bool = Depends(get_connection)) -> bool:
+    return db_status
 
 
 class BaseIdModel(BaseGinoModel):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Project database configuration."""
 
-from .models import db
+from .models import db, is_database_online
 from .models.security import TokenInfo as TokenInfoGinoModel
 from .models.security import User as UserGinoModel
 from .models.wishlist import Product as ProductGinoModel
@@ -15,4 +15,5 @@ __all__ = [
     "UserGinoModel",
     "TokenInfoGinoModel",
     "db",
+    "is_database_online",
 ]

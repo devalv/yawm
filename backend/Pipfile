@@ -22,6 +22,7 @@ uvloop = "*"
 pydantic = {extras = ["email"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
 coolname = "==1.1.*"
+fastapi-health = "==0.4.0"
 
 [dev-packages]
 coverage = "==5.*"

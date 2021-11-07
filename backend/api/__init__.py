@@ -4,10 +4,12 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_health import health
 from fastapi_pagination import add_pagination
 
 from core.config import SWAG_SWAP_TOKEN_ENDPOINT
-from core.database.models import db
+from core.database import db
+from core.health import StatusModel, services_status
 
 from .v1 import product_router as product_router_v1
 from .v1 import security_router as security_router_v1
@@ -60,10 +62,17 @@ def configure_db(application: FastAPI):
     db.init_app(application)
 
 
+def configure_health_check(application: FastAPI):
+    application.add_api_route(
+        "/health", health([services_status]), tags=["service"], response_model=StatusModel
+    )
+
+
 app = get_app()
 configure_routes_v1(application=app)
 configure_routes_v2(application=app)
 configure_db(app)
+configure_health_check(app)
 
 
 __all__ = ["app", "db"]

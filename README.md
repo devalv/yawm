@@ -26,6 +26,7 @@ For any additional instructions please see [Wiki](https://github.com/devalv/yawm
 │   ├── schemas
 │   │   └── security
 │   ├── services
+│   ├── health
 │   ├── utils
 │   ├── .env
 │   └── config.py
@@ -61,6 +62,7 @@ Core project features such as:
 * services (business logic)
 * schemas (pydantic models)
 * utils (extra utils, such as fastapi-pagination custom Page)
+* health (health check endpoint)
 
 #### tests
 
