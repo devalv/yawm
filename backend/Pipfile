@@ -13,7 +13,7 @@ gino-starlette = "*"
 alembic = "==1.*"
 psycopg2-binary = "*"
 python-multipart = "*"
-fastapi-pagination = {extras = ["gino"], version = "*"}
+fastapi-pagination = {extras = ["gino"], version = "==0.9.1"}
 httpx = "*"
 google-auth = "*"
 google-auth-oauthlib = "*"

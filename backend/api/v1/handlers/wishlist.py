@@ -22,7 +22,7 @@ async def list_wishlist():
     return await paginate(WishlistGinoModel.paginator_query())
 
 
-@wishlist_router.get("/wishlist/{id}", response_model=WishlistViewModel)
+@wishlist_router.get("/wishlist/{id}", response_model=WishlistViewModel, deprecated=True)
 async def get_wishlist(
     wishlist: WishlistGinoModel = Depends(get_wishlist_gino_obj),
 ):
@@ -30,7 +30,7 @@ async def get_wishlist(
     return wishlist
 
 
-@wishlist_router.post("/wishlist", response_model=WishlistViewModel)
+@wishlist_router.post("/wishlist", response_model=WishlistViewModel, deprecated=True)
 async def create_wishlist(
     wishlist: WishlistCreateModel,
     current_user: UserGinoModel = Depends(get_current_user_gino_obj),

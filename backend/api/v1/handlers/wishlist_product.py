@@ -18,7 +18,9 @@ wishlist_product_router = APIRouter(redirect_slashes=True, tags=["wishlist-produ
 
 
 @wishlist_product_router.get(
-    "/wishlist/{id}/products", response_model=Page[WishlistProductsViewModel]
+    "/wishlist/{id}/products",
+    response_model=Page[WishlistProductsViewModel],
+    deprecated=True,
 )
 async def list_wishlist_products(
     wishlist: WishlistGinoModel = Depends(get_wishlist_gino_obj),
@@ -28,7 +30,7 @@ async def list_wishlist_products(
 
 
 @wishlist_product_router.post(
-    "/wishlist/{id}/products", response_model=WishlistProductsViewModel
+    "/wishlist/{id}/products", response_model=WishlistProductsViewModel, deprecated=True
 )
 async def create_wishlist_product(
     product: WishlistProductsCreateModel,
@@ -39,7 +41,9 @@ async def create_wishlist_product(
 
 
 @wishlist_product_router.put(
-    "/wishlist/{id}/products/{pw_id}", response_model=WishlistProductsViewModel
+    "/wishlist/{id}/products/{pw_id}",
+    response_model=WishlistProductsViewModel,
+    deprecated=True,
 )
 async def update_wishlist_product(
     pw_id: UUID4,
@@ -53,7 +57,9 @@ async def update_wishlist_product(
 
 
 @wishlist_product_router.put(
-    "/wishlist/{id}/products/{pw_id}/reserve", response_model=WishlistProductsViewModel
+    "/wishlist/{id}/products/{pw_id}/reserve",
+    response_model=WishlistProductsViewModel,
+    deprecated=True,
 )
 async def reserve_wishlist_product(pw_id: UUID4, pwm: WishlistProductsUpdateModel):
     """API for updating product associated to a wishlist."""
@@ -66,6 +72,7 @@ async def reserve_wishlist_product(pw_id: UUID4, pwm: WishlistProductsUpdateMode
     "/wishlist/{id}/products/{pw_id}",
     response_class=Response,
     status_code=status.HTTP_204_NO_CONTENT,
+    deprecated=True,
 )
 async def delete_wishlist_product(
     pw_id: UUID4,
