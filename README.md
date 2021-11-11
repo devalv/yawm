@@ -80,8 +80,9 @@ Docker-images and docker-compose configuration files.
 
 ```bash
 docker login
-docker build . -f backend/docker/python/Dockerfile -t devalv/yawm:backend
-docker push devalv/yawm:backend
+docker build . -f .backend/docker/python/Dockerfile -t devalv/yawm:backend-0.3.0
+docker run -it devalv/yawm:backend-0.3.0 sh
+docker push devalv/yawm:backend-0.3.0
 ```
 
 #### mypy
