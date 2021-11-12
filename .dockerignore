@@ -1,6 +1,6 @@
 # folders
-venv
-env
+*/venv
+*/env
 */.vscode
 */.idea
 */.git
@@ -9,6 +9,7 @@ env
 */*.mypy_cache
 */*.pytest_cache
 */*__pycache__
+*/node_modules
 
 # files
 */db.sqlite
