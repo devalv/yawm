@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_health import health
 from fastapi_pagination import add_pagination
 
-from core.config import SWAG_SWAP_TOKEN_ENDPOINT
+from core.config import ALLOW_ORIGINS, SWAG_SWAP_TOKEN_ENDPOINT
 from core.database import db
 from core.health import StatusModel, services_status
 
@@ -34,7 +34,7 @@ def get_app() -> FastAPI:
     )
     no_version_app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000"],
+        allow_origins=list(ALLOW_ORIGINS),
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

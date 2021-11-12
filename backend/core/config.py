@@ -3,7 +3,7 @@
 
 from sqlalchemy.engine.url import URL, make_url
 from starlette.config import Config
-from starlette.datastructures import Secret
+from starlette.datastructures import CommaSeparatedStrings, Secret
 
 config = Config(".env")
 # Gino
@@ -55,6 +55,7 @@ SECRET_KEY = config("SECRET_KEY", default=None)
 ALGORITHM = config("ALGORITHM", default="HS256")
 ACCESS_TOKEN_EXPIRE_MIN = config("ACCESS_TOKEN_EXPIRE_MIN", cast=int, default=30)
 REFRESH_TOKEN_EXPIRE_DAYS = config("REFRESH_TOKEN_EXPIRE_DAYS", cast=int, default=7)
+ALLOW_ORIGINS = config("ALLOW_ORIGINS", cast=CommaSeparatedStrings, default=[])
 # client application endpoints
 FRONTEND_DOMAIN = config("FRONTEND_DOMAIN", cast=str, default="localhost")
 FRONTEND_PORT = config("FRONTEND_PORT", cast=int, default=3000)
