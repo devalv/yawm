@@ -61,3 +61,4 @@ services:
       - REACT_APP_STATE=nonrandom-docker-local-state
     working_dir: /opt/yawm/frontend
     command: sh -c "npm start"
+    stdin_open: true
