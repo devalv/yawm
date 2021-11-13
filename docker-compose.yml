@@ -46,20 +46,18 @@ services:
     depends_on:
       - db
 
-  # frontend-app:
-  #   container_name: yawm-frontend
-  #   image: node:lts-alpine
-  #   ports:
-  #     - 3000:3000
-  #   volumes:
-  #     - ./frontend/:/opt/yawm/frontend
-  #   environment:
-  #     - API_PROTOCOL=http
-  #     - API_HOST=localhost
-  #     - API_PORT=8000
-  #     - NODE_PATH=./src
-  #   working_dir: /opt/yawm/frontend
-  # #    command: sh -c "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start"
-  #   command: sh -c "npm start"
-  #   depends_on:
-  #     - app
+  frontend-app:
+    image: devalv/yawm:frontend-0.1.0
+    container_name: yawm-frontend
+    ports:
+      - 3000:3000
+    depends_on:
+      - app, db
+    environment:
+      - REACT_APP_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - REACT_APP_API_URL=${API_PROTOCOL}://${API_HOST}:${API_PORT}/v1
+      - REACT_APP_API_V2_URL=${API_PROTOCOL}://${API_HOST}:${API_PORT}/v2
+      - REACT_APP_HEALTH_URL=${API_PROTOCOL}://${API_HOST}:${API_PORT}/health
+      - REACT_APP_STATE=nonrandom-docker-local-state
+    working_dir: /opt/yawm/frontend
+    command: sh -c "npm start"
