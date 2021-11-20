@@ -44,18 +44,18 @@ def get_app() -> FastAPI:
 
 def configure_routes_v1(application: FastAPI):
     """Configure application."""
-    application.include_router(wishlist_router_v1, prefix="/v1")
-    application.include_router(product_router_v1, prefix="/v1")
-    application.include_router(wishlist_product_router_v1, prefix="/v1")
-    application.include_router(utils_router_v1, prefix="/v1")
-    application.include_router(security_router_v1, prefix="/v1")
+    application.include_router(wishlist_router_v1, prefix="/api/v1")
+    application.include_router(product_router_v1, prefix="/api/v1")
+    application.include_router(wishlist_product_router_v1, prefix="/api/v1")
+    application.include_router(utils_router_v1, prefix="/api/v1")
+    application.include_router(security_router_v1, prefix="/api/v1")
     add_pagination(application)
 
 
 def configure_routes_v2(application: FastAPI):
     """Configure application routes."""
-    application.include_router(wishlist_router_v2, prefix="/v2")
-    application.include_router(wishlist_products_router_v2, prefix="/v2")
+    application.include_router(wishlist_router_v2, prefix="/api/v2")
+    application.include_router(wishlist_products_router_v2, prefix="/api/v2")
 
 
 def configure_db(application: FastAPI):
@@ -64,7 +64,10 @@ def configure_db(application: FastAPI):
 
 def configure_health_check(application: FastAPI):
     application.add_api_route(
-        "/health", health([services_status]), tags=["service"], response_model=StatusModel
+        "/api/health",
+        health([services_status]),
+        tags=["service"],
+        response_model=StatusModel,
     )
 
 

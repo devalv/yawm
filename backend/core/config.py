@@ -39,7 +39,9 @@ API_HOST = config("API_HOST", default="127.0.0.1")
 API_PORT = config("API_PORT", cast=int, default=8000)
 API_DOMAIN = config("API_DOMAIN", default="localhost")
 API_PROTOCOL = config("API_PROTOCOL", default="https")
-API_LOCATION = f"{API_PROTOCOL}://{API_DOMAIN}:{API_PORT}"
+API_LOCATION = config(
+    "API_LOCATION", cast=str, default=f"{API_PROTOCOL}://{API_DOMAIN}:{API_PORT}"
+)
 # crawler User-Agent
 CRAWLER_USER_AGENT = config("CRAWLER_USER_AGENT", default="yawm-api")
 # Google OAuth2 configuration
@@ -48,9 +50,15 @@ GOOGLE_CLIENT_SECRETS_JSON = config("GOOGLE_CLIENT_SECRETS_JSON", default=None)
 GOOGLE_USERINFO_SCOPE = config("GOOGLE_USERINFO_SCOPE", default=None)
 GOOGLE_SCOPES = [GOOGLE_USERINFO_SCOPE]
 # security
-SWAG_LOGIN_ENDPOINT = "/v1/swag_login"
-SWAG_SWAP_TOKEN_ENDPOINT = "/v1/swag_swap_token"
-REACT_SWAP_TOKEN_ENDPOINT = "/v1/react_swap_token"
+SWAG_LOGIN_ENDPOINT = config(
+    "SWAG_LOGIN_ENDPOINT", cast=str, default="/api/v1/swag_login"
+)
+SWAG_SWAP_TOKEN_ENDPOINT = config(
+    "SWAG_SWAP_TOKEN_ENDPOINT", cast=str, default="/api/v1/swag_swap_token"
+)
+REACT_SWAP_TOKEN_ENDPOINT = config(
+    "REACT_SWAP_TOKEN_ENDPOINT", cast=str, default="/api/v1/react_swap_token"
+)
 SECRET_KEY = config("SECRET_KEY", default=None)
 ALGORITHM = config("ALGORITHM", default="HS256")
 ACCESS_TOKEN_EXPIRE_MIN = config("ACCESS_TOKEN_EXPIRE_MIN", cast=int, default=30)

@@ -7,7 +7,7 @@ from core.database import ProductGinoModel, WishlistGinoModel
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.api_full]
 
-API_URL_PREFIX = "/v1"
+API_URL_PREFIX = "/api/v1"
 
 
 @pytest.fixture

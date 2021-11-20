@@ -9,7 +9,7 @@ from core.services import get_product_name
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.api_full]
 
-API_URL_PREFIX = "/v1"
+API_URL_PREFIX = "/api/v1"
 
 
 @pytest.fixture

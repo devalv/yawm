@@ -27,7 +27,7 @@ pytestmark = [
 ]
 
 
-API_URL_PREFIX = "/v1"
+API_URL_PREFIX = "/api/v1"
 
 
 @pytest.fixture
