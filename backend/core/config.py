@@ -35,10 +35,10 @@ DB_USE_CONNECTION_FOR_REQUEST = config(
 DB_RETRY_LIMIT = config("DB_RETRY_LIMIT", cast=int, default=1)
 DB_RETRY_INTERVAL = config("DB_RETRY_INTERVAL", cast=int, default=1)
 # uvicorn
-API_HOST = config("API_HOST", default="127.0.0.1")
+API_HOST = config("API_HOST", cast=str, default="127.0.0.1")
 API_PORT = config("API_PORT", cast=int, default=8000)
-API_DOMAIN = config("API_DOMAIN", default="localhost")
-API_PROTOCOL = config("API_PROTOCOL", default="https")
+API_DOMAIN = config("API_DOMAIN", cast=str, default="localhost")
+API_PROTOCOL = config("API_PROTOCOL", cast=str, default="https")
 API_LOCATION = config(
     "API_LOCATION", cast=str, default=f"{API_PROTOCOL}://{API_DOMAIN}:{API_PORT}"
 )

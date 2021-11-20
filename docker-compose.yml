@@ -29,11 +29,10 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_DATABASE=${DB_DATABASE}
-      - API_HOST=${API_HOST}
+      - API_HOST=0.0.0.0
       - API_PORT=${API_PORT}
       - API_PROTOCOL=${API_PROTOCOL}
       - API_DOMAIN=${API_DOMAIN}
-      - API_LOCATION=${API_LOCATION}
       - CRAWLER_USER_AGENT=${CRAWLER_USER_AGENT}
       - SECRET_KEY=${SECRET_KEY}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
@@ -45,6 +44,7 @@ services:
       - SWAG_LOGIN_ENDPOINT=${SWAG_LOGIN_ENDPOINT}
       - SWAG_SWAP_TOKEN_ENDPOINT=${SWAG_SWAP_TOKEN_ENDPOINT}
       - REACT_SWAP_TOKEN_ENDPOINT=${REACT_SWAP_TOKEN_ENDPOINT}
+      - ALLOW_ORIGINS=${ALLOW_ORIGINS}
     working_dir: /opt/yawm/app
     command: sh -c "pipenv install && sleep 3 && pipenv run alembic upgrade head && pipenv run python main.py"
     depends_on:
@@ -56,12 +56,13 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - app, db
+      - app
+      - db
     environment:
       - REACT_APP_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - REACT_APP_API_URL=${API_PROTOCOL}://${API_HOST}:${API_PORT}/v1
-      - REACT_APP_API_V2_URL=${API_PROTOCOL}://${API_HOST}:${API_PORT}/v2
-      - REACT_APP_HEALTH_URL=${API_PROTOCOL}://${API_HOST}:${API_PORT}/health
+      - REACT_APP_API_URL=${API_PROTOCOL}://${API_HOST}:${API_PORT}/api/v1
+      - REACT_APP_API_V2_URL=${API_PROTOCOL}://${API_HOST}:${API_PORT}/api/v2
+      - REACT_APP_HEALTH_URL=${API_PROTOCOL}://${API_HOST}:${API_PORT}/api/health
       - REACT_APP_STATE=nonrandom-docker-local-state
     working_dir: /opt/yawm/frontend
     command: sh -c "npm start"
