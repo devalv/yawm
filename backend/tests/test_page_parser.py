@@ -20,13 +20,13 @@ def no_css_response() -> bytes:
 
 @pytest.fixture
 def css_response() -> bytes:
-    minified_html = '<!DOCTYPE html><html lang="en"><head> <meta charset="UTF-8"> <title>Title</title></head><body><h1 class="b3a8">adidas Gazelle</h1></body></html>'  # noqa: E501
+    minified_html = b'<!DOCTYPE html><html lang="en"><head> <meta charset="UTF-8"> <title>Title</title></head><body><h1 class="b3a8">adidas Gazelle</h1></body></html>'  # noqa: E501
     return minified_html
 
 
 @pytest.fixture
 def no_h1_response() -> bytes:
-    minified_html = '<!DOCTYPE html><html lang="en"><head> <meta charset="UTF-8"> <title>Title</title></head><body><h2 class="b3a8">bad</h2></body></html>'  # noqa: E501
+    minified_html = b'<!DOCTYPE html><html lang="en"><head> <meta charset="UTF-8"> <title>Title</title></head><body><h2 class="b3a8">bad</h2></body></html>'  # noqa: E501
     return minified_html
 
 
@@ -115,15 +115,14 @@ class TestApi:
 
     async def test_unauthenticated_input(self, snapshot, backend_app):
         resp = await backend_app.post(
-            f"{self.API_URL}",
-            json={"data": {"attributes": {"url": "https://css_h1.io"}}},
+            f"{self.API_URL}", json={"url": "https://css_h1.io"}
         )
         assert resp.status_code == 401
 
     async def test_bad_input(self, snapshot, backend_app, single_admin_auth_headers):
         resp = await backend_app.post(
             f"{self.API_URL}",
-            json={"data": {"attributes": {"url": "bad-url"}}},
+            json={"url": "bad-url"},
             headers=single_admin_auth_headers,
         )
         assert resp.status_code == 422
@@ -136,9 +135,7 @@ class TestApi:
         httpx_mock.add_response(data=css_response, url=test_url)
 
         response = await backend_app.post(
-            f"{self.API_URL}",
-            json={"data": {"attributes": {"url": test_url}}},
-            headers=single_admin_auth_headers,
+            f"{self.API_URL}", json={"url": test_url}, headers=single_admin_auth_headers
         )
         assert response.status_code == 200
         snapshot.assert_match(response.json())
@@ -150,9 +147,7 @@ class TestApi:
         httpx_mock.add_response(status_code=500)
 
         response = await backend_app.post(
-            f"{self.API_URL}",
-            json={"data": {"attributes": {"url": test_url}}},
-            headers=single_admin_auth_headers,
+            f"{self.API_URL}", json={"url": test_url}, headers=single_admin_auth_headers
         )
         assert response.status_code == 200
         snapshot.assert_match(response.json())
@@ -162,9 +157,7 @@ class TestApi:
     ):
         test_url = products_1.url
         response = await backend_app.post(
-            f"{self.API_URL}",
-            json={"data": {"attributes": {"url": test_url}}},
-            headers=single_admin_auth_headers,
+            f"{self.API_URL}", json={"url": test_url}, headers=single_admin_auth_headers
         )
         assert response.status_code == 200
         snapshot.assert_match(response.json())

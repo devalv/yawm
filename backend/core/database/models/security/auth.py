@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from uuid import uuid4
+from typing import Any, Dict
 
 from jose import jwt
 from passlib.context import CryptContext
@@ -17,25 +17,21 @@ from core.config import (
     REFRESH_TOKEN_EXPIRE_DAYS,
     SECRET_KEY,
 )
-from core.utils import CREDENTIALS_EX, JsonApiGinoModel
+from core.utils import CREDENTIALS_EX
 
-from .. import db
+from .. import BaseUpdateDateModel, db
 
 ref_token_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-class User(db.Model, JsonApiGinoModel):
+class User(BaseUpdateDateModel):
     """Yep, this is a User table."""
 
     __tablename__ = "user"
 
-    id = db.Column(UUID(), default=uuid4, primary_key=True)  # noqa: A002, A003, VNE003
     ext_id = db.Column(db.Unicode(length=255), nullable=False, unique=True)
     disabled = db.Column(db.Boolean(), nullable=False, default=False)
     superuser = db.Column(db.Boolean(), nullable=False, default=False)
-    created = db.Column(
-        db.DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
     username = db.Column(db.Unicode(length=255), nullable=False, index=True)
     given_name = db.Column(db.Unicode(length=255), nullable=True)
     family_name = db.Column(db.Unicode(length=255), nullable=True)
@@ -74,7 +70,7 @@ class User(db.Model, JsonApiGinoModel):
         """Delete for a user existing refresh token."""
         return await TokenInfo.delete.where(TokenInfo.user_id == self.id).gino.status()
 
-    async def create_token(self):
+    async def create_token(self) -> Dict[str, Any]:
         acc_token = self.create_access_token()
         ref_token = await self.create_refresh_token()
         return {
@@ -92,7 +88,7 @@ class User(db.Model, JsonApiGinoModel):
     async def token_is_valid(self, token: str) -> bool:
         """Checking that the token matches the issued one."""
         token_info = await self.token_info()
-        return token_info and token_info.verify_token(token)
+        return bool(token_info and token_info.verify_token(token))
 
     @classmethod
     async def insert_or_update_by_ext_id(
@@ -102,11 +98,11 @@ class User(db.Model, JsonApiGinoModel):
         family_name: str = None,
         given_name: str = None,
         full_name: str = None,
-        **__
+        **__,
     ) -> User:
         """Create new record or update existing."""
 
-        user_obj = await cls.query.where(cls.ext_id == sub).gino.first()
+        user_obj: User = await cls.query.where(cls.ext_id == sub).gino.first()
         if user_obj and user_obj.active:
             await user_obj.update(
                 username=username,
@@ -136,7 +132,7 @@ class TokenInfo(db.Model):
         UUID(), db.ForeignKey(User.id, ondelete="CASCADE"), primary_key=True
     )
     refresh_token = db.Column(db.Unicode(), nullable=False, index=True)
-    created = db.Column(
+    created_at = db.Column(
         db.DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Project web utils."""
 
+from typing import Optional
+
 import httpx
 
 from core.config import CRAWLER_USER_AGENT
@@ -25,7 +27,7 @@ class PageParser:
 
     """
 
-    __H1_SEARCH_PATTERNS = {"</h1": None, "1>": "</h", "/h1": "<", "h1": "</"}
+    __H1_SEARCH_PATTERNS = {"</h1": "", "1>": "</h", "/h1": "<", "h1": "</"}
 
     def __init__(self, chunk_iter, chunk_size):
         """Please see help(PageParser) for more info."""
@@ -33,8 +35,8 @@ class PageParser:
         self.chunk_size = chunk_size
         self.__look_in_previous_chunk = False
         self.__prev_chunk = None
-        self.__open_tag_ind = -1
-        self.__close_tag_ind = -1
+        self.__open_tag_ind: int = -1
+        self.__close_tag_ind: int = -1
 
     @staticmethod
     def find_pattern_ind(value: str, chunk: str, start=0) -> int:
@@ -62,17 +64,19 @@ class PageParser:
         return self.__close_tag_ind
 
     @close_tag_ind.setter
-    def close_tag_ind(self, chunk: str) -> int:
+    def close_tag_ind(self, chunk: str):
         """Find a tag position in a chunk and remember index."""
+        # TODO: @devalv remove setter
+        # TODO: @devalv ref - chunk may be int
         value_ind = -1
         # break if there is nothing to search
-        if not chunk:
+        if not chunk:  # pragma: no cover
             self.__close_tag_ind = value_ind
-            return
+            return None
         # try to find proper index
         for pattern in self.__H1_SEARCH_PATTERNS:
             value_ind = self.find_pattern_ind(pattern, chunk)
-            extra_pattern = self.__H1_SEARCH_PATTERNS[pattern]
+            extra_pattern: str = self.__H1_SEARCH_PATTERNS[pattern]
             # logical conditions
             extra_search_needed = value_ind >= 0 and self.__prev_chunk and extra_pattern
             value_found = value_ind >= 0 and not extra_pattern
@@ -82,7 +86,7 @@ class PageParser:
                 break
             elif value_cant_be_found:
                 value_ind = -1
-            elif extra_search_needed:
+            elif extra_search_needed:  # pragma: no cover
                 # end of a tag must be in a previous chunk
                 value_ind = self.rfind_pattern_ind(extra_pattern, self.__prev_chunk)
                 if value_ind >= 0:
@@ -97,20 +101,20 @@ class PageParser:
         return self.__open_tag_ind
 
     @open_tag_ind.setter
-    def open_tag_ind(self, chunk: str) -> int:
+    def open_tag_ind(self, chunk: str):
         """Find a tag position in a chunk and remember index."""
         value_ind = -1
         # break if there is nothing to search
-        if not chunk:
+        if not chunk:  # pragma: no cover
             self.__close_tag_ind = value_ind
-            return
+            return -2
         # try to find proper index
         if self.close_tag_ind >= 0 and value_ind == -1:
             value_ind = self.rfind_pattern_ind(">", chunk, self.close_tag_ind)
             tag_has_no_value = self.close_tag_ind - value_ind < 2
-            if tag_has_no_value:
+            if tag_has_no_value:  # pragma: no cover
                 value_ind = -1
-                self.close_tag_ind = None
+                self.close_tag_ind = None  # type: ignore
             elif value_ind == -1:
                 value_ind = self.rfind_pattern_ind(
                     ">", self.__prev_chunk, self.chunk_size
@@ -134,12 +138,12 @@ class PageParser:
         """If both indexes found - you can get a value."""
         return self.open_tag_ind >= 0 and self.close_tag_ind >= 1
 
-    async def get_value(self) -> str:
+    async def get_value(self) -> Optional[str]:
         """Get html tag value from PageParser.chunk_iter."""
         async for chunk in self.chunk_iter(chunk_size=self.chunk_size):
-            if self.close_tag_ind == -1:
+            if self.close_tag_ind <= -1:
                 self.close_tag_ind = chunk
-            if self.close_tag_ind >= 0 and self.open_tag_ind == -1:
+            if self.close_tag_ind >= 0 and self.open_tag_ind <= -1:
                 self.open_tag_ind = chunk
             if self.both_ind_found:
                 # fmt: off
@@ -155,9 +159,10 @@ class PageParser:
                 return value
                 # fmt: on
             self.__prev_chunk = chunk
+        return None
 
 
-async def get_product_name(url: str, chunk_size: int = 100) -> str:
+async def get_product_name(url: str, chunk_size: int = 100) -> Optional[str]:
     """Extract product name from url.
 
     Note:
@@ -169,9 +174,7 @@ async def get_product_name(url: str, chunk_size: int = 100) -> str:
         ) as client:
             async with client.stream("GET", url) as response:
                 response_iter = response.aiter_text
-                page_parser = PageParser(
-                    chunk_iter=response_iter, chunk_size=chunk_size
-                )
+                page_parser = PageParser(chunk_iter=response_iter, chunk_size=chunk_size)
                 return await page_parser.get_value()
     except httpx.RequestError:  # pragma: no cover
-        return
+        return None
