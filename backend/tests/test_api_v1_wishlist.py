@@ -61,9 +61,7 @@ async def empty_wishlists_149(single_user):
 @pytest.fixture
 async def wishlist_products_1(ew_1, products_1):
     wishlist = await WishlistGinoModel.get(ew_1.id)
-    return await wishlist.add_product(
-        products_1.id, reserved=False, substitutable=False
-    )
+    return await wishlist.add_product(products_1.id, reserved=False, substitutable=False)
 
 
 @pytest.fixture
@@ -113,51 +111,50 @@ class TestProduct:
         assert resp.status_code == 401
 
     @pytest.mark.api_base
-    async def test_product_create(
-        self, snapshot, backend_app, single_user_auth_headers
-    ):
+    async def test_product_create(self, snapshot, backend_app, single_user_auth_headers):
         resp = await backend_app.post(
             self.API_URL,
-            json={
-                "data": {
-                    "attributes": {"name": "Product1", "url": "https://devyatkin.dev"}
-                }
-            },
+            json={"name": "Product1", "url": "https://devyatkin.dev"},
             headers=single_user_auth_headers,
         )
         assert resp.status_code == 200
-        resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp.json()
         assert "id" in resp_data
-        assert "type" in resp_data
+        assert "created_at" in resp_data
+        assert "updated_at" in resp_data
         resp_data.pop("id", None)
-        snapshot.assert_match(resp_json_data)
+        resp_data.pop("created_at", None)
+        resp_data.pop("updated_at", None)
+        snapshot.assert_match(resp_data)
 
     @pytest.mark.api_base
     async def test_products(self, snapshot, backend_app, products_9):
         resp = await backend_app.get(self.API_URL)
         assert resp.status_code == 200
         resp_data = resp.json()
-
         assert isinstance(resp_data, dict)
         # removing product id from items
-        resp_products = resp_data["data"]
-        for resp_product in resp_products:
+        for resp_product in resp_data["items"]:
             assert "id" in resp_product
-            assert "type" in resp_product
+            assert "created_at" in resp_product
+            assert "updated_at" in resp_product
             resp_product.pop("id", None)
+            resp_product.pop("created_at", None)
+            resp_product.pop("updated_at", None)
         snapshot.assert_match(resp_data)
 
     @pytest.mark.api_base
     async def test_product_read(self, snapshot, backend_app, products_1):
         resp = await backend_app.get(f"{self.API_URL}/{products_1.id}")
         assert resp.status_code == 200
-        resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp.json()
         assert "id" in resp_data
-        assert "type" in resp_data
+        assert "created_at" in resp_data
+        assert "updated_at" in resp_data
         resp_data.pop("id", None)
-        snapshot.assert_match(resp_json_data)
+        resp_data.pop("created_at", None)
+        resp_data.pop("updated_at", None)
+        snapshot.assert_match(resp_data)
 
     @pytest.mark.api_base
     async def test_product_delete_no_auth(self, backend_app, products_1):
@@ -228,18 +225,18 @@ class TestProduct:
     ):
         resp = await backend_app.put(
             f"{self.API_URL}/{products_1.id}",
-            json={
-                "data": {"attributes": {"name": "test-updated", "url": "https://ya.ru"}}
-            },
+            json={"name": "test-updated", "url": "https://ya.ru"},
             headers=single_admin_auth_headers,
         )
         assert resp.status_code == 200
-        resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp.json()
         assert "id" in resp_data
-        assert "type" in resp_data
+        assert "created_at" in resp_data
+        assert "updated_at" in resp_data
         resp_data.pop("id", None)
-        snapshot.assert_match(resp_json_data)
+        resp_data.pop("created_at", None)
+        resp_data.pop("updated_at", None)
+        snapshot.assert_match(resp_data)
 
     @pytest.mark.api_base
     async def test_product_full_update(
@@ -247,18 +244,18 @@ class TestProduct:
     ):
         resp = await backend_app.put(
             f"{self.API_URL}/{products_1.id}",
-            json={
-                "data": {"attributes": {"name": "test-updated", "url": "https://ya.ru"}}
-            },
+            json={"name": "test-updated", "url": "https://ya.ru"},
             headers=single_user_auth_headers,
         )
         assert resp.status_code == 200
-        resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp.json()
         assert "id" in resp_data
-        assert "type" in resp_data
+        assert "created_at" in resp_data
+        assert "updated_at" in resp_data
         resp_data.pop("id", None)
-        snapshot.assert_match(resp_json_data)
+        resp_data.pop("created_at", None)
+        resp_data.pop("updated_at", None)
+        snapshot.assert_match(resp_data)
 
     async def test_product_partial_update_no_auth(
         self, snapshot, backend_app, products_1
@@ -284,32 +281,36 @@ class TestProduct:
     ):
         resp = await backend_app.put(
             f"{self.API_URL}/{products_1.id}",
-            json={"data": {"attributes": {"name": "partial-updated-name"}}},
+            json={"name": "partial-updated-name"},
             headers=single_admin_auth_headers,
         )
         assert resp.status_code == 200
-        resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp.json()
         assert "id" in resp_data
-        assert "type" in resp_data
+        assert "created_at" in resp_data
+        assert "updated_at" in resp_data
         resp_data.pop("id", None)
-        snapshot.assert_match(resp_json_data)
+        resp_data.pop("created_at", None)
+        resp_data.pop("updated_at", None)
+        snapshot.assert_match(resp_data)
 
     async def test_product_partial_update(
         self, snapshot, backend_app, products_1, single_user_auth_headers
     ):
         resp = await backend_app.put(
             f"{self.API_URL}/{products_1.id}",
-            json={"data": {"attributes": {"name": "partial-updated-name"}}},
+            json={"name": "partial-updated-name"},
             headers=single_user_auth_headers,
         )
         assert resp.status_code == 200
-        resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp.json()
         assert "id" in resp_data
-        assert "type" in resp_data
+        assert "created_at" in resp_data
+        assert "updated_at" in resp_data
         resp_data.pop("id", None)
-        snapshot.assert_match(resp_json_data)
+        resp_data.pop("created_at", None)
+        resp_data.pop("updated_at", None)
+        snapshot.assert_match(resp_data)
 
     @pytest.mark.api_base
     async def test_product_paginator_limit(self, snapshot, backend_app, products_9):
@@ -319,12 +320,15 @@ class TestProduct:
         )
         assert resp.status_code == 200
         resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp_json_data["items"]
         assert len(resp_data) == paginator_limit
         for resp_product in resp_data:
             assert "id" in resp_product
-            assert "type" in resp_product
+            assert "created_at" in resp_product
+            assert "updated_at" in resp_product
             resp_product.pop("id", None)
+            resp_product.pop("created_at", None)
+            resp_product.pop("updated_at", None)
         snapshot.assert_match(resp_json_data)
 
 
@@ -341,21 +345,19 @@ class TestEmptyWishlist:
         assert resp.status_code == 401
 
     @pytest.mark.api_base
-    async def test_wishlist_create(
-        self, snapshot, backend_app, single_user_auth_headers
-    ):
+    async def test_wishlist_create(self, snapshot, backend_app, single_user_auth_headers):
         resp = await backend_app.post(
-            self.API_URL,
-            json={"data": {"attributes": {"name": "Wishlist1"}}},
-            headers=single_user_auth_headers,
+            self.API_URL, json={"name": "Wishlist1"}, headers=single_user_auth_headers
         )
         assert resp.status_code == 200
-        resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp.json()
         assert "id" in resp_data
-        assert "type" in resp_data
+        assert "created_at" in resp_data
+        assert "updated_at" in resp_data
         resp_data.pop("id", None)
-        snapshot.assert_match(resp_json_data)
+        resp_data.pop("created_at", None)
+        resp_data.pop("updated_at", None)
+        snapshot.assert_match(resp_data)
 
     @pytest.mark.api_base
     async def test_empty_wishlist_delete_no_auth(self, backend_app, ew_1):
@@ -403,14 +405,17 @@ class TestEmptyWishlist:
         assert resp.status_code == 200
         resp_json_data = resp.json()
         assert isinstance(resp_json_data, dict)
-        items = resp_json_data["data"]
+        items = resp_json_data["items"]
         count = resp_json_data["total"]
         assert count == 4
         # remove unique data from fetch
         for resp_product in items:
             assert "id" in resp_product
-            assert "type" in resp_product
+            assert "created_at" in resp_product
+            assert "updated_at" in resp_product
             resp_product.pop("id", None)
+            resp_product.pop("created_at", None)
+            resp_product.pop("updated_at", None)
         snapshot.assert_match(items)
 
     @pytest.mark.api_base
@@ -424,7 +429,7 @@ class TestEmptyWishlist:
         assert resp.status_code == 200
         resp_data = resp.json()
         assert isinstance(resp_data, dict)
-        items = resp_data["data"]
+        items = resp_data["items"]
         size = resp_data["size"]
         total = resp_data["total"]
         assert size == paginator_limit
@@ -432,19 +437,24 @@ class TestEmptyWishlist:
         # remove unique data from fetch
         for resp_product in items:
             assert "id" in resp_product
-            assert "type" in resp_product
+            assert "created_at" in resp_product
+            assert "updated_at" in resp_product
             resp_product.pop("id", None)
+            resp_product.pop("created_at", None)
+            resp_product.pop("updated_at", None)
         snapshot.assert_match(items)
 
     @pytest.mark.api_base
     async def test_empty_wishlist_read(self, snapshot, backend_app, ew_1):
         resp = await backend_app.get(self.API_URL + f"/{ew_1.id}")
         assert resp.status_code == 200
-        resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp.json()
         assert "id" in resp_data
-        assert "type" in resp_data
+        assert "created_at" in resp_data
+        assert "updated_at" in resp_data
         resp_data.pop("id", None)
+        resp_data.pop("created_at", None)
+        resp_data.pop("updated_at", None)
         snapshot.assert_match(resp_data)
 
     @pytest.mark.api_base
@@ -453,22 +463,23 @@ class TestEmptyWishlist:
     ):
         resp = await backend_app.put(
             f"{self.API_URL}/{ew_1.id}",
-            json={"data": {"attributes": {"name": "test-updated"}}},
+            json={"name": "test-updated"},
             headers=single_user_auth_headers,
         )
         assert resp.status_code == 200
-        resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp.json()
         assert "id" in resp_data
-        assert "type" in resp_data
+        assert "created_at" in resp_data
+        assert "updated_at" in resp_data
         resp_data.pop("id", None)
+        resp_data.pop("created_at", None)
+        resp_data.pop("updated_at", None)
         snapshot.assert_match(resp_data)
 
     @pytest.mark.api_base
     async def test_empty_wishlist_full_update_no_auth(self, backend_app, ew_1):
         resp = await backend_app.put(
-            f"{self.API_URL}/{ew_1.id}",
-            json={"data": {"attributes": {"name": "test-updated"}}},
+            f"{self.API_URL}/{ew_1.id}", json={"name": "test-updated"}
         )
         assert resp.status_code == 401
 
@@ -487,15 +498,17 @@ class TestEmptyWishlist:
     ):
         resp = await backend_app.put(
             f"{self.API_URL}/{ew_1.id}",
-            json={"data": {"attributes": {"name": "test-updated"}}},
+            json={"name": "test-updated"},
             headers=single_admin_auth_headers,
         )
         assert resp.status_code == 200
-        resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp.json()
         assert "id" in resp_data
-        assert "type" in resp_data
+        assert "created_at" in resp_data
+        assert "updated_at" in resp_data
         resp_data.pop("id", None)
+        resp_data.pop("created_at", None)
+        resp_data.pop("updated_at", None)
         snapshot.assert_match(resp_data)
 
 
@@ -506,17 +519,12 @@ class TestWishlist:
     async def test_add_product_wishlist_no_auth(self, backend_app, ew_1, products_9):
         for i, product in enumerate(products_9):
             insert_data = {
-                "data": {
-                    "attributes": {
-                        "product_id": f"{product.id}",
-                        "reserved": False,
-                        "substitutable": True,
-                    }
-                }
+                "product_id": f"{product.id}",
+                "reserved": False,
+                "substitutable": True,
             }
             expected_data = insert_data.copy()
-            expected_data["data"]["attributes"]["wishlist_id"] = f"{ew_1.id}"
-            expected_data["data"]["type"] = "wishlist_products"
+            expected_data["wishlist_id"] = f"{ew_1.id}"
             resp = await backend_app.post(
                 f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products", json=insert_data
             )
@@ -529,17 +537,12 @@ class TestWishlist:
     ):
         for i, product in enumerate(products_9):
             insert_data = {
-                "data": {
-                    "attributes": {
-                        "product_id": f"{product.id}",
-                        "reserved": False,
-                        "substitutable": True,
-                    }
-                }
+                "product_id": f"{product.id}",
+                "reserved": False,
+                "substitutable": True,
             }
             expected_data = insert_data.copy()
-            expected_data["data"]["attributes"]["wishlist_id"] = f"{ew_1.id}"
-            expected_data["data"]["type"] = "wishlist_products"
+            expected_data["wishlist_id"] = f"{ew_1.id}"
             resp = await backend_app.post(
                 f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products",
                 json=insert_data,
@@ -547,12 +550,14 @@ class TestWishlist:
             )
 
             assert resp.status_code == 200
-            resp_json_data = resp.json()
-            resp_data = resp_json_data["data"]
+            resp_data = resp.json()
             assert "id" in resp_data
-            assert "type" in resp_data
+            assert "created_at" in resp_data
+            assert "updated_at" in resp_data
             resp_data.pop("id", None)
-            assert resp_json_data == expected_data
+            resp_data.pop("created_at", None)
+            resp_data.pop("updated_at", None)
+            assert resp_data == expected_data
 
         # check all products in wishlist
         products_resp = await backend_app.get(
@@ -561,10 +566,9 @@ class TestWishlist:
 
         assert products_resp.status_code == 200
         product_resp_json_data = products_resp.json()
-        product_resp_data = product_resp_json_data["data"]
+        product_resp_data = product_resp_json_data["items"]
         for product in product_resp_data:
             assert "id" in product
-            assert "type" in product
         total = product_resp_json_data["total"]
         assert total == 9
 
@@ -869,10 +873,11 @@ class TestWishlist:
         total = product_resp_json_data["total"]
         assert total == 1
 
-        product_resp_data = product_resp_json_data["data"]
+        product_resp_data = product_resp_json_data["items"]
         for product in product_resp_data:
             assert "id" in product
-            assert "type" in product
+            assert "created_at" in product
+            assert "updated_at" in product
 
     @pytest.mark.api_base
     async def test_paginator_wishlist_products_list(
@@ -887,9 +892,10 @@ class TestWishlist:
         product_resp_json_data = products_resp.json()
         size = product_resp_json_data["size"]
         assert size == paginator_limit
-        for product in product_resp_json_data["data"]:
+        for product in product_resp_json_data["items"]:
             assert "id" in product
-            assert "type" in product
+            assert "created_at" in product
+            assert "updated_at" in product
 
     async def test_delete_fake_product_wishlist_no_auth(
         self, snapshot, backend_app, wishlist_products_1
@@ -908,9 +914,7 @@ class TestWishlist:
         )
         assert resp.status_code == 404
 
-    async def test_add_fake_product_wishlist_no_auth(
-        self, backend_app, ew_1, products_9
-    ):
+    async def test_add_fake_product_wishlist_no_auth(self, backend_app, ew_1, products_9):
         insert_data = {
             "data": {
                 "attributes": {
@@ -931,16 +935,12 @@ class TestWishlist:
         self, backend_app, ew_1, products_9, single_user_auth_headers
     ):
         insert_data = {
-            "data": {
-                "attributes": {
-                    "product_id": f"{ew_1.id}",
-                    "reserved": False,
-                    "substitutable": True,
-                }
-            }
+            "product_id": f"{ew_1.id}",
+            "reserved": False,
+            "substitutable": True,
         }
         resp = await backend_app.post(
-            f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products",  # noqa: E501
+            f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products",
             json=insert_data,
             headers=single_user_auth_headers,
         )
@@ -974,15 +974,15 @@ class TestWishlist:
     ):
         resp = await backend_app.put(
             f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"data": {"attributes": {"reserved": True}}},
+            json={"reserved": True},
             headers=single_admin_auth_headers,
         )
         assert resp.status_code == 200
-        resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp.json()
         assert "id" in resp_data
-        assert "type" in resp_data
-        assert resp_data["attributes"]["reserved"] is True
+        assert "created_at" in resp_data
+        assert "updated_at" in resp_data
+        assert resp_data["reserved"] is True
 
     @pytest.mark.api_base
     async def test_update_wishlist_product(
@@ -991,36 +991,34 @@ class TestWishlist:
         assert not wishlist_products_1.substitutable
         resp = await backend_app.put(
             f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"data": {"attributes": {"substitutable": True, "reserved": True}}},
+            json={"substitutable": True, "reserved": True},
             headers=single_user_auth_headers,
         )
         assert resp.status_code == 200
-        resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp.json()
         assert "id" in resp_data
-        assert "type" in resp_data
-        assert resp_data["attributes"]["substitutable"] is True
-        assert resp_data["attributes"]["reserved"] is True
+        assert "created_at" in resp_data
+        assert "updated_at" in resp_data
+        assert resp_data["substitutable"] is True
+        assert resp_data["reserved"] is True
 
     @pytest.mark.api_base
     async def test_reserve_wishlist_product(self, backend_app, wishlist_products_1):
         resp = await backend_app.put(
             f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}/reserve",  # noqa: E501
-            json={"data": {"attributes": {"reserved": True}}},
+            json={"reserved": True},
         )
         assert resp.status_code == 200
-        resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp.json()
         assert "id" in resp_data
-        assert "type" in resp_data
-        assert resp_data["attributes"]["reserved"] is True
+        assert "created_at" in resp_data
+        assert "updated_at" in resp_data
+        assert resp_data["reserved"] is True
 
-    async def test_reserve_fake_wishlist_product(
-        self, backend_app, wishlist_products_1
-    ):
+    async def test_reserve_fake_wishlist_product(self, backend_app, wishlist_products_1):
         resp = await backend_app.put(
             f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"data": {"attributes": {"reserved": True}}},
+            json={"reserved": True},
         )
         assert resp.status_code == 404
 
@@ -1054,15 +1052,15 @@ class TestWishlist:
         assert not wishlist_products_1.substitutable
         resp = await backend_app.put(
             f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"data": {"attributes": {"substitutable": True}}},
+            json={"substitutable": True},
             headers=single_admin_auth_headers,
         )
         assert resp.status_code == 200
-        resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp.json()
         assert "id" in resp_data
-        assert "type" in resp_data
-        assert resp_data["attributes"]["substitutable"]
+        assert "created_at" in resp_data
+        assert "updated_at" in resp_data
+        assert resp_data["substitutable"]
 
     @pytest.mark.api_base
     async def test_substitute_wishlist_product(
@@ -1071,15 +1069,15 @@ class TestWishlist:
         assert not wishlist_products_1.substitutable
         resp = await backend_app.put(
             f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"data": {"attributes": {"substitutable": True}}},
+            json={"substitutable": True},
             headers=single_user_auth_headers,
         )
         assert resp.status_code == 200
-        resp_json_data = resp.json()
-        resp_data = resp_json_data["data"]
+        resp_data = resp.json()
         assert "id" in resp_data
-        assert "type" in resp_data
-        assert resp_data["attributes"]["substitutable"]
+        assert "created_at" in resp_data
+        assert "updated_at" in resp_data
+        assert resp_data["substitutable"]
 
     async def test_substitute_fake_wishlist_product_no_auth(
         self, backend_app, wishlist_products_1
@@ -1171,15 +1169,18 @@ class TestWPPaginator(PaginatorValidator):
 
     @staticmethod
     def validate_response(json_data: dict) -> None:
-        response_data = json_data["data"]
+        response_data = json_data["items"]
         for product in response_data:
-            attributes = product["attributes"]
             assert "id" in product
-            assert "wishlist_id" in attributes
-            assert "product_id" in attributes
+            assert "wishlist_id" in product
+            assert "product_id" in product
+            assert "created_at" in product
+            assert "updated_at" in product
             product.pop("id", None)
-            attributes.pop("wishlist_id", None)
-            attributes.pop("product_id", None)
+            product.pop("wishlist_id", None)
+            product.pop("product_id", None)
+            product.pop("created_at", None)
+            product.pop("updated_at", None)
 
     @pytest.mark.api_full
     async def test_default_paginator(self, snapshot, backend_app, ew_1, wp_149):
@@ -1342,10 +1343,14 @@ class TestProductPaginator(PaginatorValidator):
 
     @staticmethod
     def validate_response(json_data: dict):
-        response_data = json_data["data"]
+        response_data = json_data["items"]
         for product in response_data:
             assert "id" in product
+            assert "created_at" in product
+            assert "updated_at" in product
             product.pop("id", None)
+            product.pop("created_at", None)
+            product.pop("updated_at", None)
         return json_data
 
     @pytest.mark.api_full
@@ -1371,7 +1376,6 @@ class TestProductPaginator(PaginatorValidator):
     @pytest.mark.api_full
     async def test_next_page_paginator(self, snapshot, backend_app, products_149):
         api_url = f"{API_URL_PREFIX}/product"
-
         # open next paginator page
         response = await backend_app.get(api_url, query_string=dict(page=2))
         assert response.status_code == 200
@@ -1391,7 +1395,6 @@ class TestProductPaginator(PaginatorValidator):
     @pytest.mark.api_full
     async def test_first_page_paginator(self, snapshot, backend_app, products_149):
         api_url = f"{API_URL_PREFIX}/product"
-
         # open first paginator page
         response = await backend_app.get(api_url, query_string=dict(page=1))
         assert response.status_code == 200
@@ -1411,7 +1414,6 @@ class TestProductPaginator(PaginatorValidator):
     @pytest.mark.api_full
     async def test_last_page_paginator(self, snapshot, backend_app, products_149):
         api_url = f"{API_URL_PREFIX}/product"
-
         # open last paginator page
         response = await backend_app.get(api_url, query_string=dict(page=3))
         assert response.status_code == 200
@@ -1431,10 +1433,8 @@ class TestProductPaginator(PaginatorValidator):
     @pytest.mark.api_full
     async def test_reduced_qs_paginator(self, snapshot, backend_app, products_149):
         api_url = f"{API_URL_PREFIX}/product"
-
         # reduce QS size
         response = await backend_app.get(api_url, query_string=dict(size=10))
-
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
@@ -1455,10 +1455,8 @@ class TestProductPaginator(PaginatorValidator):
         self, snapshot, backend_app, products_149
     ):
         api_url = f"{API_URL_PREFIX}/product"
-
         # open last page with reduced QS size
         response = await backend_app.get(api_url, query_string=dict(page=15, size=10))
-
         assert response.status_code == 200
         response_json_data = response.json()
         self.validate_response(response_json_data)
@@ -1504,10 +1502,14 @@ class TestWishlistPaginator(PaginatorValidator):
 
     @staticmethod
     def validate_response(json_data: dict):
-        response_data = json_data["data"]
+        response_data = json_data["items"]
         for product in response_data:
             assert "id" in product
+            assert "created_at" in product
+            assert "updated_at" in product
             product.pop("id", None)
+            product.pop("created_at", None)
+            product.pop("updated_at", None)
         return json_data
 
     @pytest.mark.api_full
@@ -1531,9 +1533,7 @@ class TestWishlistPaginator(PaginatorValidator):
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
-    async def test_next_page_paginator(
-        self, snapshot, backend_app, empty_wishlists_149
-    ):
+    async def test_next_page_paginator(self, snapshot, backend_app, empty_wishlists_149):
         api_url = f"{API_URL_PREFIX}/wishlist"
 
         # open next paginator page
@@ -1553,9 +1553,7 @@ class TestWishlistPaginator(PaginatorValidator):
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
-    async def test_first_page_paginator(
-        self, snapshot, backend_app, empty_wishlists_149
-    ):
+    async def test_first_page_paginator(self, snapshot, backend_app, empty_wishlists_149):
         api_url = f"{API_URL_PREFIX}/wishlist"
 
         # open first paginator page
@@ -1575,9 +1573,7 @@ class TestWishlistPaginator(PaginatorValidator):
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
-    async def test_last_page_paginator(
-        self, snapshot, backend_app, empty_wishlists_149
-    ):
+    async def test_last_page_paginator(self, snapshot, backend_app, empty_wishlists_149):
         api_url = f"{API_URL_PREFIX}/wishlist"
 
         # open last paginator page
@@ -1597,9 +1593,7 @@ class TestWishlistPaginator(PaginatorValidator):
         snapshot.assert_match(response_json_data)
 
     @pytest.mark.api_full
-    async def test_reduced_qs_paginator(
-        self, snapshot, backend_app, empty_wishlists_149
-    ):
+    async def test_reduced_qs_paginator(self, snapshot, backend_app, empty_wishlists_149):
         api_url = f"{API_URL_PREFIX}/wishlist"
 
         # reduce QS size

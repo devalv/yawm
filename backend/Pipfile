@@ -6,38 +6,40 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-fastapi = "==0.*"
+fastapi = "==0.68.*"
 uvicorn = "==0.*"
 ujson = "==4.*"
-gino-starlette = "==0.*"
+gino-starlette = "*"
 alembic = "==1.*"
 psycopg2-binary = "*"
 python-multipart = "*"
-fastapi-pagination = {extras = ["gino"], version = "*"}
+fastapi-pagination = {extras = ["gino"], version = "==0.9.1"}
 httpx = "*"
 google-auth = "*"
 google-auth-oauthlib = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
-fastapi-versioning = "*"
 uvloop = "*"
 pydantic = {extras = ["email"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
+coolname = "==1.1.*"
+fastapi-health = "==0.4.0"
 
 [dev-packages]
-coverage = "==5.*"
-codecov = "==2.*"
-pytest = "==6.*"
-pytest-cov = "==2.*"
-pytest-flake8 = "==1.*"
+coverage = "*"
+codecov = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-flake8 = "*"
 requests = "==2.*"
 pre-commit = "==2.*"
-async-asgi-testclient = "==1.*"
-pytest-asyncio = "==0.*"
-pytest-alembic = "==0.*"
+async-asgi-testclient = "*"
+pytest-asyncio = "*"
+pytest-alembic = "*"
 snapshottest = "*"
 pytest-dotenv = "*"
-pretty_errors = "==1.*"
+pretty_errors = "*"
 pytest-httpx = "*"
+mypy = "*"
 
 [requires]
 python_version = "3.9"

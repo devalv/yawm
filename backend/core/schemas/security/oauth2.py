@@ -2,19 +2,19 @@
 """Pydantic oauth2 models."""
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Type, Union
 from uuid import uuid4
 
 from jose import jwt
-from pydantic import UUID4, BaseModel, EmailStr, SecretStr, conint, constr, validator
+from pydantic import UUID4, BaseModel, EmailStr, SecretStr, confloat, constr, validator
 
 from core.config import ALGORITHM, GOOGLE_CLIENT_ID, SECRET_KEY
 
 
 class RefreshToken(BaseModel):
-    id: UUID4  # noqa: A003, VNE003
+    id: UUID4
     username: str
-    exp: conint(gt=datetime.utcnow().timestamp())
+    exp: Union[Type[float], datetime] = confloat(gt=datetime.utcnow().timestamp())
 
     @classmethod
     def decode(cls, token: str):
@@ -73,9 +73,9 @@ class GoogleIdInfo(BaseModel):
     """
 
     aud: SecretStr
-    exp: conint(gt=datetime.utcnow().timestamp())
+    exp: Union[Type[float], datetime] = confloat(gt=datetime.utcnow().timestamp())
     iat: datetime
-    iss: constr(
+    iss: Union[Type[str], str] = constr(
         regex=r"^(https://accounts\.google\.com|accounts\.google\.com)$"  # noqa: F722
     )
     sub: str

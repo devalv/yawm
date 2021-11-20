@@ -3,7 +3,7 @@
 
 from sqlalchemy.engine.url import URL, make_url
 from starlette.config import Config
-from starlette.datastructures import Secret
+from starlette.datastructures import CommaSeparatedStrings, Secret
 
 config = Config(".env")
 # Gino
@@ -35,11 +35,13 @@ DB_USE_CONNECTION_FOR_REQUEST = config(
 DB_RETRY_LIMIT = config("DB_RETRY_LIMIT", cast=int, default=1)
 DB_RETRY_INTERVAL = config("DB_RETRY_INTERVAL", cast=int, default=1)
 # uvicorn
-API_HOST = config("API_HOST", default="127.0.0.1")
+API_HOST = config("API_HOST", cast=str, default="127.0.0.1")
 API_PORT = config("API_PORT", cast=int, default=8000)
-API_DOMAIN = config("API_DOMAIN", default="localhost")
-API_PROTOCOL = config("API_PROTOCOL", default="https")
-API_LOCATION = f"{API_PROTOCOL}://{API_DOMAIN}:{API_PORT}"
+API_DOMAIN = config("API_DOMAIN", cast=str, default="localhost")
+API_PROTOCOL = config("API_PROTOCOL", cast=str, default="https")
+API_LOCATION = config(
+    "API_LOCATION", cast=str, default=f"{API_PROTOCOL}://{API_DOMAIN}:{API_PORT}"
+)
 # crawler User-Agent
 CRAWLER_USER_AGENT = config("CRAWLER_USER_AGENT", default="yawm-api")
 # Google OAuth2 configuration
@@ -48,9 +50,26 @@ GOOGLE_CLIENT_SECRETS_JSON = config("GOOGLE_CLIENT_SECRETS_JSON", default=None)
 GOOGLE_USERINFO_SCOPE = config("GOOGLE_USERINFO_SCOPE", default=None)
 GOOGLE_SCOPES = [GOOGLE_USERINFO_SCOPE]
 # security
-LOGIN_ENDPOINT = "/api/v1/login"
-SWAP_TOKEN_ENDPOINT = "/api/v1/swap_token"
+SWAG_LOGIN_ENDPOINT = config(
+    "SWAG_LOGIN_ENDPOINT", cast=str, default="/api/v1/swag_login"
+)
+SWAG_SWAP_TOKEN_ENDPOINT = config(
+    "SWAG_SWAP_TOKEN_ENDPOINT", cast=str, default="/api/v1/swag_swap_token"
+)
+REACT_SWAP_TOKEN_ENDPOINT = config(
+    "REACT_SWAP_TOKEN_ENDPOINT", cast=str, default="/api/v1/react_swap_token"
+)
 SECRET_KEY = config("SECRET_KEY", default=None)
 ALGORITHM = config("ALGORITHM", default="HS256")
-ACCESS_TOKEN_EXPIRE_MIN = config("ACCESS_TOKEN_EXPIRE_MIN", default=30)
-REFRESH_TOKEN_EXPIRE_DAYS = config("REFRESH_TOKEN_EXPIRE_DAYS", default=7)
+ACCESS_TOKEN_EXPIRE_MIN = config("ACCESS_TOKEN_EXPIRE_MIN", cast=int, default=30)
+REFRESH_TOKEN_EXPIRE_DAYS = config("REFRESH_TOKEN_EXPIRE_DAYS", cast=int, default=7)
+ALLOW_ORIGINS = config("ALLOW_ORIGINS", cast=CommaSeparatedStrings, default=[])
+# client application endpoints
+FRONTEND_DOMAIN = config("FRONTEND_DOMAIN", cast=str, default="localhost")
+FRONTEND_PORT = config("FRONTEND_PORT", cast=int, default=3000)
+FRONTEND_PROTOCOL = config("FRONTEND_PROTOCOL", cast=str, default="https")
+FRONTEND_URL = f"{FRONTEND_PROTOCOL}://{FRONTEND_DOMAIN}:{FRONTEND_PORT}"
+FRONTEND_AUTH_TOKEN_PARAM = config(
+    "FRONTEND_AUTH_TOKEN_PARAM", cast=str, default="authToken"
+)
+FRONTEND_AUTH_URL = f"{FRONTEND_URL}?{FRONTEND_AUTH_TOKEN_PARAM}"

@@ -13,9 +13,9 @@ from core.config import ACCESS_TOKEN_EXPIRE_MIN, ALGORITHM, GOOGLE_CLIENT_ID
 from core.database import TokenInfoGinoModel, UserGinoModel
 from core.schemas import GoogleIdInfo
 from core.services.security import (
-    get_current_user,
-    get_or_create_user,
-    get_user_for_refresh,
+    get_current_user_gino_obj,
+    get_or_create_user_gino_obj,
+    get_user_for_refresh_gino_obj,
 )
 from core.utils.exceptions import CREDENTIALS_EX, INACTIVE_EX
 
@@ -99,9 +99,7 @@ async def single_disabled_admin_token(single_admin_access_token, single_admin) -
 
 
 @pytest.fixture
-async def single_disabled_refresh_token(
-    single_admin_refresh_token, single_admin
-) -> str:
+async def single_disabled_refresh_token(single_admin_refresh_token, single_admin) -> str:
     await single_admin.update(disabled=True).apply()
     return single_admin_refresh_token
 
@@ -175,7 +173,7 @@ class TestGOCUser:
         self, backend_app, single_disabled_user, existing_deactivated_user_id_info
     ):
         try:
-            await get_or_create_user(existing_deactivated_user_id_info)
+            await get_or_create_user_gino_obj(existing_deactivated_user_id_info)
         except HTTPException as ex:
             assert ex.status_code == CREDENTIALS_EX.status_code
         else:
@@ -184,7 +182,7 @@ class TestGOCUser:
     async def test_get_or_create_user_update_user(
         self, backend_app, single_admin, existing_user_id_info
     ):
-        user_object = await get_or_create_user(existing_user_id_info)
+        user_object = await get_or_create_user_gino_obj(existing_user_id_info)
         assert user_object.ext_id == existing_user_id_info.sub
         assert user_object.given_name == existing_user_id_info.given_name
         assert user_object.family_name == existing_user_id_info.family_name
@@ -194,7 +192,7 @@ class TestGOCUser:
             UserGinoModel.ext_id == google_id_info.sub
         ).gino.first()
         assert not user_obj
-        user_object = await get_or_create_user(google_id_info)
+        user_object = await get_or_create_user_gino_obj(google_id_info)
         assert user_object.ext_id == google_id_info.sub
         assert user_object.given_name == google_id_info.given_name
         assert user_object.family_name == google_id_info.family_name
@@ -206,17 +204,15 @@ class TestGOCUser:
 class TestGCUser:
     """Get current (GC) user tests."""
 
-    async def test_get_current_active_user(
-        self, backend_app, single_admin_access_token
-    ):
-        user_object = await get_current_user(single_admin_access_token)
+    async def test_get_current_active_user(self, backend_app, single_admin_access_token):
+        user_object = await get_current_user_gino_obj(single_admin_access_token)
         assert isinstance(user_object, UserGinoModel)
 
     async def test_get_current_disabled_user(
         self, backend_app, single_disabled_admin_token
     ):
         try:
-            await get_current_user(single_disabled_admin_token)
+            await get_current_user_gino_obj(single_disabled_admin_token)
         except HTTPException as ex:
             assert ex.status_code == INACTIVE_EX.status_code
         else:
@@ -224,7 +220,7 @@ class TestGCUser:
 
     async def test_get_current_user_bad_token(self, backend_app, bad_access_token):
         try:
-            await get_current_user(bad_access_token)
+            await get_current_user_gino_obj(bad_access_token)
         except HTTPException as ex:
             assert ex.status_code == CREDENTIALS_EX.status_code
         else:
@@ -232,7 +228,7 @@ class TestGCUser:
 
     async def test_get_current_user_no_token(self, backend_app):
         try:
-            await get_current_user("")
+            await get_current_user_gino_obj("")
         except HTTPException as ex:
             assert ex.status_code == CREDENTIALS_EX.status_code
         else:
@@ -248,14 +244,14 @@ class TestGUserFR:
     async def test_get_active_user_for_refresh(
         self, backend_app, single_admin_refresh_token
     ):
-        user_object = await get_user_for_refresh(single_admin_refresh_token)
+        user_object = await get_user_for_refresh_gino_obj(single_admin_refresh_token)
         assert isinstance(user_object, UserGinoModel)
 
     async def test_get_disabled_user_for_refresh(
         self, backend_app, single_disabled_refresh_token
     ):
         try:
-            await get_user_for_refresh(single_disabled_refresh_token)
+            await get_user_for_refresh_gino_obj(single_disabled_refresh_token)
         except HTTPException as ex:
             assert ex.status_code == INACTIVE_EX.status_code
         else:
@@ -265,7 +261,7 @@ class TestGUserFR:
         self, backend_app, bad_access_token
     ):
         try:
-            await get_user_for_refresh(bad_access_token)
+            await get_user_for_refresh_gino_obj(bad_access_token)
         except HTTPException as ex:
             assert ex.status_code == CREDENTIALS_EX.status_code
         else:
@@ -275,7 +271,7 @@ class TestGUserFR:
         self, backend_app, single_admin_refresh_token, no_refresh_token
     ):
         try:
-            await get_user_for_refresh(single_admin_refresh_token)
+            await get_user_for_refresh_gino_obj(single_admin_refresh_token)
         except HTTPException as ex:
             assert ex.status_code == CREDENTIALS_EX.status_code
         else:
@@ -283,7 +279,7 @@ class TestGUserFR:
 
     async def test_get_current_user_for_refresh_no_token(self, backend_app):
         try:
-            await get_user_for_refresh("")
+            await get_user_for_refresh_gino_obj("")
         except HTTPException as ex:
             assert ex.status_code == CREDENTIALS_EX.status_code
         else:
@@ -293,12 +289,24 @@ class TestGUserFR:
 @pytest.mark.skipif(
     os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
 )
-async def test_login(backend_app):
-
+async def test_swag_login(backend_app):
     resp = await backend_app.get(
-        f"{API_URL_PREFIX}/login", query_string={"state": "qwe"}, allow_redirects=False
+        f"{API_URL_PREFIX}/swag_login",
+        query_string={"state": "qwe"},
+        allow_redirects=False,
     )
+    assert resp.status_code == status.HTTP_307_TEMPORARY_REDIRECT
 
+
+@pytest.mark.skipif(
+    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
+)
+async def test_react_login(backend_app):
+    resp = await backend_app.get(
+        f"{API_URL_PREFIX}/react_login",
+        query_string={"state": "qwe"},
+        allow_redirects=False,
+    )
     assert resp.status_code == status.HTTP_307_TEMPORARY_REDIRECT
 
 
@@ -333,15 +341,14 @@ class TestUserInfo:
     ):
         resp = await backend_app.get(self.API_URL, headers=single_admin_auth_headers)
         assert resp.status_code == status.HTTP_200_OK
-        assert "data" in resp.json()
-        response_data = resp.json()["data"]
-        assert "attributes" in response_data
-        response_attributes = response_data["attributes"]
-        for key in response_attributes:
-            if key == "created":
+        for key in resp.json():
+            if key in {"created_at", "updated_at"}:
                 continue
             assert hasattr(single_admin, key)
-            assert response_attributes[key] == getattr(single_admin, key)
+            value = getattr(single_admin, key)
+            if key == "id":
+                value = str(value)
+            assert resp.json()[key] == value
 
     async def test_permitted_info(self, backend_app):
         resp = await backend_app.get(self.API_URL)

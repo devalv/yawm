@@ -6,17 +6,10 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from core.utils import (
-    JsonApiCreateBaseModel,
-    JsonApiDataCreateBaseModel,
-    JsonApiDataDBModel,
-    JsonApiDataUpdateBaseModel,
-    JsonApiDBModel,
-    JsonApiUpdateBaseModel,
-)
+from core.utils import BaseViewModel
 
 
-class BaseUserAttributesModel(BaseModel):
+class BaseUserModel(BaseModel):
     """Base User model."""
 
     disabled: Optional[bool] = False
@@ -27,68 +20,25 @@ class BaseUserAttributesModel(BaseModel):
     full_name: Optional[str] = None
 
 
-class UserCreateAttributesModel(BaseUserAttributesModel):
+class UserCreateModel(BaseUserModel):
     """User attributes creation serializer."""
 
     ext_id: str
     username: str
 
 
-class UserCreateModel(JsonApiCreateBaseModel):
-    """User creation serializer."""
-
-    type: str = "user"  # noqa: A003, VNE003
-    attributes: UserCreateAttributesModel
-
-
-class UserDataCreateModel(JsonApiDataCreateBaseModel):
-    """User data creation serializer."""
-
-    data: UserCreateModel
-
-
-class UserUpdateModel(BaseUserAttributesModel):
-    """User attributes update serializer."""
-
-
-class UserUpdateModel(JsonApiUpdateBaseModel):
-    """User update serializer."""
-
-    type: str = "user"  # noqa: A003, VNE003
-    attributes: UserUpdateModel
-
-
-class UserDataUpdateModel(JsonApiDataUpdateBaseModel):
-    """User data update serializer."""
-
-    data: UserUpdateModel
-
-
-class BaseUserDB(BaseModel):
+class UserViewModel(BaseUserModel, BaseViewModel):
     """User database row attributes model."""
 
     ext_id: str
     disabled: bool
     superuser: bool
-    created: datetime
+    created_at: datetime
     username: str
+    updated_at: Optional[datetime]
     given_name: Optional[str]
     family_name: Optional[str]
     full_name: Optional[str]
 
-
-class UserDBModel(JsonApiDBModel):
-    """User serializer."""
-
-    attributes: BaseUserDB
-
-
-class UserDBDataModel(JsonApiDataDBModel):
-    """User data model."""
-
-    data: UserDBModel
-
-    @property
-    def disabled(self):
-        """Interface for UserGinoModel.disabled."""
-        return self.data.attributes.disabled
+    class Config:
+        orm_mode = True

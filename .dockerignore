@@ -1,0 +1,18 @@
+# folders
+*/venv
+*/env
+*/.vscode
+*/.idea
+*/.git
+*/docker
+*/.DS_Store
+*/*.mypy_cache
+*/*.pytest_cache
+*/*__pycache__
+*/node_modules
+
+# files
+*/db.sqlite
+*/.coverage
+*/coverage.xml
+*/*.env

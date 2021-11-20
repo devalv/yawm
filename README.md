@@ -1,23 +1,32 @@
+# Yet another wishlist maker - YAWM
+
+---
+
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://github.com/tiangolo/fastapi)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![codecov](https://codecov.io/gh/devalv/yawm/branch/main/graph/badge.svg?token=61KST8QUNE)](https://codecov.io/gh/devalv/yawm)
+[![codecov](https://codecov.io/gh/devalv/yawm/branch/main/graph/badge.svg)](https://codecov.io/gh/devalv/yawm)
 
-# yawm
-For additional instructions please see
-[Wiki](https://github.com/devalv/yawm/wiki)
+---
 
-**API schema** based on [**JSON API**](https://jsonapi.org)
+
+For any additional instructions please see [Wiki](https://github.com/devalv/yawm/wiki).
 
 ## Project directory structure
 
 ### backend
-```
+
+```bash
+├── docker
 ├── core
 │   ├── database
 │   │   ├── models
 │   │   └── migrations
 │   ├── schemas
+│   │   └── security
 │   ├── services
+│   ├── health
 │   ├── utils
 │   ├── .env
 │   └── config.py
@@ -25,33 +34,59 @@ For additional instructions please see
 │   ├── snapshots
 │   └── conftest.py
 ├── api
-│   └── v1
-│       └── handlers
+│   ├── v1
+│   │   ├── handlers
+│   │   └── schemas
+│   └── v2
+│       ├── handlers
+│       └── schemas
 ├── main.py
-└── .coveragerc
+└── tox.ini
 ```
-#### root-dir
+
+#### root
+
 Project outer-startup files, such as:
+
 * alembic configuration
-* pytest configuration
+* pytest, coverage, flake8, etc configurations (tox.ini)
 * uvicorn app file
 * project requirements lists
-* coverage configuration
 
 #### core
+
 Core project features such as:
+
 * settings (config.py)
 * database migrations and models
 * services (business logic)
 * schemas (pydantic models)
 * utils (extra utils, such as fastapi-pagination custom Page)
+* health (health check endpoint)
 
 #### tests
+
 Project tests
 
 #### api
+
 Project API by versions (v1, v2 and etc.).
 
-
 ### docker
+
 Docker-images and docker-compose configuration files.
+
+#### docker registry
+
+```bash
+docker login
+docker build . -f ./backend/docker/python/Dockerfile -t devalv/yawm:backend-0.3.0
+docker run -it devalv/yawm:backend-0.3.0 sh
+docker push devalv/yawm:backend-0.3.0
+```
+
+#### mypy
+
+```bash
+mypy --config-file=tox.ini core api
+```

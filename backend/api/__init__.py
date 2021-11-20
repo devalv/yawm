@@ -3,62 +3,79 @@
 
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi_health import health
 from fastapi_pagination import add_pagination
-from fastapi_versioning import VersionedFastAPI
 
-from core.config import SWAP_TOKEN_ENDPOINT
-from core.database.models import db
+from core.config import ALLOW_ORIGINS, SWAG_SWAP_TOKEN_ENDPOINT
+from core.database import db
+from core.health import StatusModel, services_status
 
-from .v1 import (  # noqa: I201
-    product_router,
-    security_router,
-    utils_router,
-    wishlist_product_router,
-    wishlist_router,
-)
+from .v1 import product_router as product_router_v1
+from .v1 import security_router as security_router_v1
+from .v1 import utils_router as utils_router_v1
+from .v1 import wishlist_product_router as wishlist_product_router_v1
+from .v1 import wishlist_router as wishlist_router_v1
+from .v2 import wishlist_products_router as wishlist_products_router_v2
+from .v2 import wishlist_router as wishlist_router_v2
 
 
 def get_app() -> FastAPI:
     """Just simple application initialization."""
-    return FastAPI(
+    no_version_app = FastAPI(
         title="Yet another wishlist maker",
-        version="0.2.0",
-        swagger_ui_oauth2_redirect_url=SWAP_TOKEN_ENDPOINT,
+        version="0.3.0",
+        swagger_ui_oauth2_redirect_url=SWAG_SWAP_TOKEN_ENDPOINT,
         swagger_ui_init_oauth={
             "clientId": "please keep this value",
             "clientSecret": "please keep this value",
             "appName": "Yet another wishlist maker",
         },
     )
+    no_version_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=list(ALLOW_ORIGINS),
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    return no_version_app
 
 
-def configure_routes(application: FastAPI):
+def configure_routes_v1(application: FastAPI):
     """Configure application."""
-    application.include_router(wishlist_router)
-    application.include_router(product_router)
-    application.include_router(wishlist_product_router)
-    application.include_router(utils_router)
-    application.include_router(security_router)
+    application.include_router(wishlist_router_v1, prefix="/api/v1")
+    application.include_router(product_router_v1, prefix="/api/v1")
+    application.include_router(wishlist_product_router_v1, prefix="/api/v1")
+    application.include_router(utils_router_v1, prefix="/api/v1")
+    application.include_router(security_router_v1, prefix="/api/v1")
     add_pagination(application)
 
 
-def get_versioned_app(application: FastAPI) -> VersionedFastAPI:
-    return VersionedFastAPI(
-        application,
-        version_format="{major}",
-        prefix_format="/api/v{major}",
-        swagger_ui_oauth2_redirect_url=SWAP_TOKEN_ENDPOINT,
-    )
+def configure_routes_v2(application: FastAPI):
+    """Configure application routes."""
+    application.include_router(wishlist_router_v2, prefix="/api/v2")
+    application.include_router(wishlist_products_router_v2, prefix="/api/v2")
 
 
 def configure_db(application: FastAPI):
     db.init_app(application)
 
 
+def configure_health_check(application: FastAPI):
+    application.add_api_route(
+        "/api/health",
+        health([services_status]),
+        tags=["service"],
+        response_model=StatusModel,
+    )
+
+
 app = get_app()
-configure_routes(application=app)
-app = get_versioned_app(application=app)
+configure_routes_v1(application=app)
+configure_routes_v2(application=app)
 configure_db(app)
+configure_health_check(app)
 
 
 __all__ = ["app", "db"]
