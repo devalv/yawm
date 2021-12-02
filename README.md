@@ -2,12 +2,12 @@
 
 ---
 
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
-[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://github.com/tiangolo/fastapi)
+![Python](https://shields.io/static/v1?label=python&message=3.9&color=green)
+![FastAPI](https://shields.io/static/v1?label=FastAPI&message=0.68&color=green)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![codecov](https://codecov.io/gh/devalv/yawm/branch/main/graph/badge.svg)](https://codecov.io/gh/devalv/yawm)
-
+[![CodeQL](https://github.com/devalv/yawm/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/devalv/yawm/actions/workflows/codeql-analysis.yml)
 ---
 
 
