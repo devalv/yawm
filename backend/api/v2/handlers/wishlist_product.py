@@ -5,7 +5,10 @@ from api.v2.schemas import WishlistProductUpdateV2Model, WishlistProductV2Model
 from fastapi import APIRouter, Depends, Response, status
 
 from core.database import WishlistProductsGinoModel
-from core.services.security import get_user_wishlist_product_gino_obj
+from core.services.security import (
+    get_user_wishlist_product_gino_obj,
+    get_wishlist_product_gino_obj,
+)
 
 basename = "wishlist-products"
 wishlist_products_router = APIRouter(redirect_slashes=True, tags=[basename])
@@ -17,9 +20,7 @@ wishlist_products_router = APIRouter(redirect_slashes=True, tags=[basename])
     status_code=status.HTTP_201_CREATED,
 )
 async def reserve_wishlist_product(
-    wishlist_product: WishlistProductsGinoModel = Depends(
-        get_user_wishlist_product_gino_obj
-    ),
+    wishlist_product: WishlistProductsGinoModel = Depends(get_wishlist_product_gino_obj),
 ):
     """API for making wishlist product reversed."""
     await wishlist_product.reserve()
