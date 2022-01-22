@@ -8,7 +8,7 @@ name = "pypi"
 [packages]
 fastapi = "==0.68.*"
 uvicorn = "==0.*"
-ujson = "==4.*"
+ujson = "==5.*"
 gino-starlette = "*"
 alembic = "==1.*"
 psycopg2-binary = "*"
