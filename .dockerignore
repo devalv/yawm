@@ -17,4 +17,4 @@
 */db.sqlite
 */.coverage
 */coverage.xml
-*/*.env
+*/*.env*
