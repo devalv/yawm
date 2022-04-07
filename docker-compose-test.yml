@@ -4,7 +4,7 @@ services:
 
   db-tests:
     container_name: yawm-tests-db
-    image: postgres:13
+    image: postgres:14
     ports:
       - ${DB_PORT}:${DB_PORT}
     environment:
@@ -18,10 +18,7 @@ services:
     build:
       context: .
       dockerfile: ./backend/docker/tests-python/Dockerfile
-    volumes:
-      - ./backend/:/opt/yawm/app/
     environment:
-      - PYTHONPATH=/opt/yawm/app
       - DB_HOST=db-tests
       - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
@@ -36,7 +33,5 @@ services:
       - PLATFORM=${PLATFORM}
       - OAUTHLIB_INSECURE_TRANSPORT=1
       - SECRET_KEY=${SECRET_KEY}
-    working_dir: /opt/yawm/app
-    command: sh -c "sleep 3 && pipenv run python -m pytest"
     depends_on:
       - db-tests

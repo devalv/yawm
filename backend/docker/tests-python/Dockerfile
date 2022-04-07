@@ -1,13 +1,16 @@
-FROM python:3.9-slim
+FROM devalv/yawm-backend:latest
 
-RUN set -ex \
-    \
-    && apt-get update \
-    && apt-get install -y gcc python3-dev python3-setuptools \
-    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-    && rm -rf /var/lib/apt/lists/*
+USER root
 
-WORKDIR /opt/yawm/app
-ADD ./backend/ ./
-RUN pip install pipenv
-RUN pipenv install --dev
+COPY ./backend/ .
+# chown all the files to the app user
+RUN chown -R app:app $APP_HOME
+
+RUN poetry export --dev -f requirements.txt --output dev-requirements.txt
+RUN pip install -r dev-requirements.txt
+
+# change to the app user
+USER app
+
+# run tests
+CMD python -m pytest
