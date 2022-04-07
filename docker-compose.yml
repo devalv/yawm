@@ -3,7 +3,7 @@ services:
 
   db:
     container_name: yawm-db
-    image: postgres:13
+    image: postgres:14
     ports:
       - ${DB_PORT}:${DB_PORT}
     environment:
@@ -21,9 +21,8 @@ services:
     ports:
       - ${API_PORT}:${API_PORT}
     volumes:
-      - ./backend/:/opt/yawm/app/
+      - ./backend/:/home/app
     environment:
-      - PYTHONPATH=/opt/yawm/app
       - DB_HOST=db
       - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
@@ -45,8 +44,6 @@ services:
       - SWAG_SWAP_TOKEN_ENDPOINT=${SWAG_SWAP_TOKEN_ENDPOINT}
       - REACT_SWAP_TOKEN_ENDPOINT=${REACT_SWAP_TOKEN_ENDPOINT}
       - ALLOW_ORIGINS=${ALLOW_ORIGINS}
-    working_dir: /opt/yawm/app
-    command: sh -c "pipenv install && sleep 3 && pipenv run alembic upgrade head && pipenv run python main.py"
     depends_on:
       - db
 
