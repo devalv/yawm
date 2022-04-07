@@ -35,5 +35,5 @@ RUN pip install -r requirements.txt
 USER app
 
 # run gunicorn
-# CMD gunicorn --bind 0.0.0.0:5000 main:app -k uvicorn.workers.UvicornWorker
+# CMD gunicorn --bind 0.0.0.0:8000 main:app -k uvicorn.workers.UvicornWorker
 CMD alembic upgrade head && python main.py
