@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from random import randint
 
 import pytest
+import pytest_asyncio
 from fastapi import HTTPException, status
 from jose import jwt
 from pydantic import ValidationError
@@ -30,7 +31,7 @@ pytestmark = [
 API_URL_PREFIX = "/api/v1"
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def google_id_info():
     token_info = dict()
     token_info["aud"] = GOOGLE_CLIENT_ID
@@ -43,19 +44,19 @@ async def google_id_info():
     return GoogleIdInfo(**token_info)
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def existing_user_id_info(google_id_info, single_admin):
     google_id_info.sub = single_admin.ext_id
     return google_id_info
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def existing_deactivated_user_id_info(google_id_info, single_disabled_user):
     google_id_info.sub = single_disabled_user.ext_id
     return google_id_info
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def token_data(single_admin) -> dict:
     return {
         "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MIN),
@@ -64,9 +65,8 @@ async def token_data(single_admin) -> dict:
     }
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def bad_token(token_data) -> dict:
-
     return {
         "access_token": jwt.encode(token_data, "qwe", algorithm=ALGORITHM),
         "refresh_token": jwt.encode(token_data, "qwe", algorithm=ALGORITHM),
@@ -76,29 +76,29 @@ async def bad_token(token_data) -> dict:
     }
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def bad_access_token(bad_token) -> str:
     return bad_token["access_token"]
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def no_refresh_token(single_admin):
     token = await TokenInfoGinoModel.get(single_admin.id)
     await token.delete()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def single_admin_refresh_token(single_admin_token) -> str:
     return single_admin_token["refresh_token"]
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def single_disabled_admin_token(single_admin_access_token, single_admin) -> str:
     await single_admin.update(disabled=True).apply()
     return single_admin_access_token
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def single_disabled_refresh_token(single_admin_refresh_token, single_admin) -> str:
     await single_admin.update(disabled=True).apply()
     return single_admin_refresh_token

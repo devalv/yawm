@@ -86,7 +86,8 @@ Docker-images and docker-compose configuration files.
 docker login
 docker build . -f ./backend/docker/python/Dockerfile -t devalv/yawm:backend-0.4.0 -t devalv/yawm:backend:latest
 docker run -it devalv/yawm-backend:0.4.0 sh
-docker push devalv/yawm-backend:0.4.0 devalv/yawm-backend:latest
+docker push devalv/yawm-backend:0.4.0
+docker push devalv/yawm-backend:latest
 ```
 
 #### k8s
