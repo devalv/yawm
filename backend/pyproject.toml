@@ -78,10 +78,10 @@ markers = ["smoke", "api_base", "api_full", "auth", "security"]
 flake8-max-line-length = 90
 env_files = "tests/.env"
 flake8-ignore = [".git/*.* ALL", "__pycache__/*.* ALL"]
+asyncio_mode = "strict"
 
 [tool.coverage.run]
-include = ["api", "core"]
-omit = ["tests", "backend/core/database/migrations/__init__.py", "backend/core/database/migrations/env.py"]
+omit = ["tests", "core/database/migrations/__init__.py", "core/database/migrations/env.py", "core/database/migrations/versions/*"]
 
 [tool.coverage.report]
 exclude_lines = [
