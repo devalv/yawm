@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Project API by versions."""
 
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_health import health
