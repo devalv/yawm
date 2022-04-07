@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Product rest-api handlers."""
 
-from api.v1.schemas import ProductCreateModel, ProductUpdateModel, ProductViewModel
 from fastapi import APIRouter, Depends, Response, status
 from fastapi_pagination.ext.gino import paginate
 from fastapi_pagination.links import Page
 
+from api.v1.schemas import ProductCreateModel, ProductUpdateModel, ProductViewModel
 from core.database import ProductGinoModel, UserGinoModel
 from core.services.security import (
     get_current_user_gino_obj,

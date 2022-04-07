@@ -44,3 +44,51 @@ google-auth-oauthlib = "^0.5.1"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.flake8]
+inline-quotes = "double"
+max-line-length = 90
+ignore = ["A002", "A003", "VNE003", "B008"]
+
+[tool.black]
+line-length = 90
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+src_paths = ["core", "api", "tests"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+ignore_missing_imports = false
+warn_return_any = false
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--flake8 --cov=api --cov=core --cov-report=xml --cov-report=term --test-alembic"
+testpaths = ["tests"]
+markers = ["smoke", "api_base", "api_full", "auth", "security"]
+flake8-max-line-length = 90
+env_files = "tests/.env"
+flake8-ignore = [".git/*.* ALL", "__pycache__/*.* ALL"]
+
+[tool.coverage.run]
+include = ["api", "core"]
+omit = ["tests", "backend/core/database/migrations/__init__.py", "backend/core/database/migrations/env.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise AssertionError",
+    "raise NotImplementedError"
+]
+
+[tool.coverage.html]
+directory = "tests/html"

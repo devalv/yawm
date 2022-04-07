@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Wishlist rest-api handlers."""
 
-from api.v2.schemas import WishlistProductUpdateV2Model, WishlistProductV2Model
 from fastapi import APIRouter, Depends, Response, status
 
+from api.v2.schemas import WishlistProductUpdateV2Model, WishlistProductV2Model
 from core.database import WishlistProductsGinoModel
 from core.services.security import (
     get_user_wishlist_product_gino_obj,

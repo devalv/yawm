@@ -53,7 +53,7 @@ feature/feature-name - feature branch for ongoing release
 Project outer-startup files, such as:
 
 * alembic configuration
-* pytest, coverage, flake8, etc configurations (tox.ini)
+* pytest, coverage, flake8, etc configurations (pyproject.toml)
 * uvicorn app file
 * project requirements lists
 
@@ -101,4 +101,3 @@ mypy --config-file=tox.ini core api
 #### requirements
 poetry export -f requirements.txt --output requirements.txt
 poetry export --dev -f requirements.txt --output dev-requirements.txt
-
