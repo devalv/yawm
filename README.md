@@ -1,6 +1,6 @@
 # Yet another wishlist maker - YAWM
 
-[![FastAPI](https://shields.io/static/v1?label=FastAPI&message=0.68&color=green)](https://github.com/tiangolo/fastapi)
+[![FastAPI](https://shields.io/static/v1?label=FastAPI&message=0.75&color=green)](https://github.com/tiangolo/fastapi)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![codecov](https://codecov.io/gh/devalv/yawm/branch/main/graph/badge.svg)](https://codecov.io/gh/devalv/yawm)
@@ -53,7 +53,7 @@ feature/feature-name - feature branch for ongoing release
 Project outer-startup files, such as:
 
 * alembic configuration
-* pytest, coverage, flake8, etc configurations (tox.ini)
+* pytest, coverage, flake8, etc configurations (pyproject.toml)
 * uvicorn app file
 * project requirements lists
 
@@ -97,3 +97,7 @@ kubectl proxy --address 0.0.0.0 --disable-filter true
 ```bash
 mypy --config-file=tox.ini core api
 ```
+
+#### requirements
+poetry export -f requirements.txt --output requirements.txt
+poetry export --dev -f requirements.txt --output dev-requirements.txt

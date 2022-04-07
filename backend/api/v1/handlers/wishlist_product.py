@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 """Wishlist rest-api handlers."""
 
-from api.v1.schemas import (
-    WishlistProductsCreateModel,
-    WishlistProductsUpdateModel,
-    WishlistProductsViewModel,
-)
 from fastapi import APIRouter, Depends, Response, status
 from fastapi_pagination.ext.gino import paginate
 from fastapi_pagination.links import Page
 from pydantic import UUID4
 
+from api.v1.schemas import (
+    WishlistProductsCreateModel,
+    WishlistProductsUpdateModel,
+    WishlistProductsViewModel,
+)
 from core.database import WishlistGinoModel, WishlistProductsGinoModel
 from core.services.security import get_user_wishlist_gino_obj, get_wishlist_gino_obj
 

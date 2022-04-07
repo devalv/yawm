@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Wishlist rest-api handlers."""
 
-from api.v1.schemas import WishlistCreateModel, WishlistUpdateModel, WishlistViewModel
 from fastapi import APIRouter, Depends, Response, status
 from fastapi_pagination.ext.gino import paginate
 from fastapi_pagination.links import Page
 
+from api.v1.schemas import WishlistCreateModel, WishlistUpdateModel, WishlistViewModel
 from core.database import UserGinoModel, WishlistGinoModel
 from core.services.security import (
     get_current_user_gino_obj,
