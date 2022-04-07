@@ -2,9 +2,9 @@
 """Common project fixtures."""
 
 import pytest
-from api import app
 from async_asgi_testclient import TestClient
 
+from api import app
 from core.database import UserGinoModel
 
 
