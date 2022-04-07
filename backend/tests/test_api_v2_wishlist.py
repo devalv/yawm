@@ -3,6 +3,7 @@
 import uuid
 
 import pytest
+import pytest_asyncio
 
 from core.database import ProductGinoModel, WishlistGinoModel, WishlistProductsGinoModel
 
@@ -11,26 +12,26 @@ pytestmark = [pytest.mark.asyncio, pytest.mark.api_full]
 API_URL_PREFIX = "/api/v2"
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def single_product(single_user):
     return await ProductGinoModel.create(
         user_id=single_user.id, name="test", url="https://devyatkin.dev/1"
     )
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def empty_wishlist(single_user):
     """1 empty wishlist."""
     return await WishlistGinoModel.create(user_id=single_user.id, name="test")
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def wishlist_with_single_product(empty_wishlist, single_product):
     await empty_wishlist.add_product(single_product.id)
     return empty_wishlist
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def wishlist_product(wishlist_with_single_product):
     return await WishlistProductsGinoModel.query.gino.first()
 

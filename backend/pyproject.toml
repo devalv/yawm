@@ -72,18 +72,20 @@ warn_return_any = false
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "--flake8 --cov=api --cov=core --cov-report=xml --cov-report=term --test-alembic"
+addopts = "--flake8 --cov=api --cov=core --cov-report=term --test-alembic"
 testpaths = ["tests"]
 markers = ["smoke", "api_base", "api_full", "auth", "security"]
 flake8-max-line-length = 90
 env_files = "tests/.env"
 flake8-ignore = [".git/*.* ALL", "__pycache__/*.* ALL"]
+asyncio_mode = "strict"
 
 [tool.coverage.run]
-include = ["api", "core"]
-omit = ["tests", "backend/core/database/migrations/__init__.py", "backend/core/database/migrations/env.py"]
+omit = ["tests", "core/database/migrations/__init__.py", "core/database/migrations/env.py", "core/database/migrations/versions/*"]
 
 [tool.coverage.report]
+fail_under = 93
+show_missing = true
 exclude_lines = [
     "pragma: no cover",
     "raise AssertionError",

@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 
 import pytest
+import pytest_asyncio
 from asyncpg.pgproto.pgproto import UUID as UUID_PG
 
 from core.database import TokenInfoGinoModel, UserGinoModel
@@ -17,7 +18,7 @@ pytestmark = [
 ]
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def user_shortened_mock():
     return {"ext_id": "2" * 100, "username": "user_mock"}
 

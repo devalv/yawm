@@ -2,6 +2,7 @@
 """Wishlist api tests."""
 
 import pytest
+import pytest_asyncio
 
 from core.database import ProductGinoModel, WishlistGinoModel
 
@@ -10,14 +11,14 @@ pytestmark = [pytest.mark.asyncio, pytest.mark.api_full]
 API_URL_PREFIX = "/api/v1"
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def products_1(single_user):
     return await ProductGinoModel.create(
         user_id=single_user.id, name="test", url="https://devyatkin.dev/1"
     )
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def products_9(single_user):
     products_list = list()
     for i in range(1, 10):
@@ -28,7 +29,7 @@ async def products_9(single_user):
     return products_list
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def products_149(single_user):
     products_list = list()
     for i in range(1, 150):
@@ -39,32 +40,32 @@ async def products_149(single_user):
     return products_list
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def ew_1(single_user):
     """1 empty wishlist."""
     wishlist = await WishlistGinoModel.create(user_id=single_user.id, name="test")
     return wishlist
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def empty_wishlists_4(single_user):
     for i in range(1, 5):
         await WishlistGinoModel.create(user_id=single_user.id, name=f"test{i}")
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def empty_wishlists_149(single_user):
     for i in range(1, 150):
         await WishlistGinoModel.create(user_id=single_user.id, name=f"test{i}")
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def wishlist_products_1(ew_1, products_1):
     wishlist = await WishlistGinoModel.get(ew_1.id)
     return await wishlist.add_product(products_1.id, reserved=False, substitutable=False)
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def wishlist_products_9(ew_1, products_9):
     products_list = list()
     wishlist = await WishlistGinoModel.get(ew_1.id)
@@ -74,7 +75,7 @@ async def wishlist_products_9(ew_1, products_9):
     return products_list
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def wp_149(ew_1, products_149):
     """149 wishlist products."""
     products_list = list()
