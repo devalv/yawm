@@ -26,11 +26,7 @@ jobs:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@master
       - name: Build the docker-compose stack
         run: |
           docker-compose -f docker-compose-test.yml up --build --abort-on-container-exit --exit-code-from app-tests
-      - uses: codecov/codecov-action@v1
-        with:
-          flags: unittests
-          fail_ci_if_error: true

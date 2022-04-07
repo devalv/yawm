@@ -18,8 +18,6 @@ services:
     build:
       context: .
       dockerfile: ./backend/docker/tests-python/Dockerfile
-    volumes:
-      - ./backend/:/home/app/
     environment:
       - DB_HOST=db-tests
       - DB_PORT=${DB_PORT}
