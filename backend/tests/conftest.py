@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Common project fixtures."""
 
 import pytest_asyncio
 from async_asgi_testclient import TestClient
