@@ -37,4 +37,4 @@ RUN pip install -r requirements.txt
 USER app
 
 # apply latest migrations and run gunicorn
-CMD alembic upgrade head && gunicorn --bind ${API_HOST}:${API_PORT} main:app -k uvicorn.workers.
+CMD alembic upgrade head && gunicorn --bind ${API_HOST}:${API_PORT} api:app -k main.GunicornUvicornWorker
