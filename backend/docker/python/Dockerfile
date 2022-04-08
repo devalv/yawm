@@ -5,6 +5,8 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONPATH /home/app
 ENV APP_HOME /home/app
+ENV API_HOST 0.0.0.0
+ENV API_PORT 5000
 
 RUN addgroup --system app && adduser --system --group app
 
@@ -34,6 +36,5 @@ RUN pip install -r requirements.txt
 # change to the app user
 USER app
 
-# run gunicorn
-# CMD gunicorn --bind 0.0.0.0:8000 main:app -k uvicorn.workers.UvicornWorker
-CMD alembic upgrade head && python main.py
+# apply latest migrations and run gunicorn
+CMD alembic upgrade head && gunicorn --bind ${API_HOST}:${API_PORT} api:app -k main.GunicornUvicornWorker
