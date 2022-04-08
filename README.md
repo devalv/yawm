@@ -84,21 +84,7 @@ Docker-images and docker-compose configuration files.
 
 ```bash
 docker login
-docker build . -f ./backend/docker/python/Dockerfile -t devalv/yawm:backend-0.4.0 -t devalv/yawm:backend:latest
+make build
 docker run -it devalv/yawm-backend:0.4.0 sh
-docker push devalv/yawm-backend:0.4.0
-docker push devalv/yawm-backend:latest
+make docker-push
 ```
-
-#### k8s
-kubectl proxy --address 0.0.0.0 --disable-filter true
-
-#### mypy
-
-```bash
-mypy --config-file=tox.ini core api
-```
-
-#### requirements
-poetry export -f requirements.txt --output requirements.txt
-poetry export --dev -f requirements.txt --output dev-requirements.txt
