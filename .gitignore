@@ -139,3 +139,7 @@ oauth2.json
 
 # Macosx files
 .DS_Store
+
+
+# k8s
+*secret.yml

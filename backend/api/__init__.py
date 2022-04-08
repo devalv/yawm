@@ -23,7 +23,7 @@ def get_app() -> FastAPI:
     """Just simple application initialization."""
     no_version_app = FastAPI(
         title="Yet another wishlist maker",
-        version="0.3.0",
+        version="0.4.0",
         swagger_ui_oauth2_redirect_url=SWAG_SWAP_TOKEN_ENDPOINT,
         swagger_ui_init_oauth={
             "clientId": "please keep this value",

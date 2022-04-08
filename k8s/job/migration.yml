@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: yawm-migrations
+  namespace: yawm-project
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      containers:
+        - name: migration-container
+          image: devalv/yawm-backend:latest
+          command: ['alembic', 'upgrade', 'head']
+          envFrom:
+            - secretRef:
+                name: migration-secret
+      initContainers:
+        - name: init-postgres-service
+          image: postgres:14
+          command: [ 'sh', '-c', 'until pg_isready -h postgres-service.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local -p 5432; do echo waiting for database; sleep 2; done;' ]
+      restartPolicy: OnFailure
+  backoffLimit: 15
