@@ -5,7 +5,7 @@ from typing import Optional
 
 import httpx
 
-from core.config import CRAWLER_USER_AGENT
+from core import cached_settings
 
 
 class PageParser:
@@ -170,7 +170,7 @@ async def get_product_name(url: str, chunk_size: int = 100) -> Optional[str]:
     """
     try:
         async with httpx.AsyncClient(
-            headers={"User-Agent": CRAWLER_USER_AGENT}
+            headers={"User-Agent": cached_settings.CRAWLER_USER_AGENT}
         ) as client:
             async with client.stream("GET", url) as response:
                 response_iter = response.aiter_text

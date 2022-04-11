@@ -10,7 +10,7 @@ from fastapi import HTTPException, status
 from jose import jwt
 from pydantic import ValidationError
 
-from core.config import ACCESS_TOKEN_EXPIRE_MIN, ALGORITHM, GOOGLE_CLIENT_ID
+from core import cached_settings
 from core.database import TokenInfoGinoModel, UserGinoModel
 from core.schemas import GoogleIdInfo
 from core.services.security import (
@@ -34,7 +34,7 @@ API_URL_PREFIX = "/api/v1"
 @pytest_asyncio.fixture
 async def google_id_info():
     token_info = dict()
-    token_info["aud"] = GOOGLE_CLIENT_ID
+    token_info["aud"] = cached_settings.GOOGLE_CLIENT_ID
     token_info["exp"] = (datetime.utcnow() + timedelta(days=1)).timestamp()
     token_info["iat"] = datetime.utcnow().timestamp()
     token_info["iss"] = "accounts.google.com"
@@ -59,7 +59,8 @@ async def existing_deactivated_user_id_info(google_id_info, single_disabled_user
 @pytest_asyncio.fixture
 async def token_data(single_admin) -> dict:
     return {
-        "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MIN),
+        "exp": datetime.utcnow()
+        + timedelta(minutes=cached_settings.ACCESS_TOKEN_EXPIRE_MIN),
         "id": single_admin.id_str,
         "username": single_admin.username,
     }
@@ -68,10 +69,14 @@ async def token_data(single_admin) -> dict:
 @pytest_asyncio.fixture
 async def bad_token(token_data) -> dict:
     return {
-        "access_token": jwt.encode(token_data, "qwe", algorithm=ALGORITHM),
-        "refresh_token": jwt.encode(token_data, "qwe", algorithm=ALGORITHM),
+        "access_token": jwt.encode(
+            token_data, "qwe", algorithm=cached_settings.ALGORITHM
+        ),
+        "refresh_token": jwt.encode(
+            token_data, "qwe", algorithm=cached_settings.ALGORITHM
+        ),
         "token_type": "bearer",
-        "alg": ALGORITHM,
+        "alg": cached_settings.ALGORITHM,
         "typ": "JWT",
     }
 
@@ -113,7 +118,7 @@ class TestGoogleIdInfoPydantic:
     def test_with_email(self):
         serializer = GoogleIdInfo(
             email="jeff@mail.ru",
-            aud=GOOGLE_CLIENT_ID,
+            aud=cached_settings.GOOGLE_CLIENT_ID,
             sub="1",
             iat=datetime.utcnow().timestamp(),
             exp=(datetime.utcnow() + timedelta(days=1)).timestamp(),
@@ -138,7 +143,7 @@ class TestGoogleIdInfoPydantic:
 
     def test_name(self):
         serializer = GoogleIdInfo(
-            aud=GOOGLE_CLIENT_ID,
+            aud=cached_settings.GOOGLE_CLIENT_ID,
             iat=datetime.utcnow().timestamp(),
             exp=(datetime.utcnow() + timedelta(days=1)).timestamp(),
             sub="1",
@@ -151,7 +156,7 @@ class TestGoogleIdInfoPydantic:
     def test_iss(self):
         try:
             GoogleIdInfo(
-                aud=GOOGLE_CLIENT_ID,
+                aud=cached_settings.GOOGLE_CLIENT_ID,
                 iat=datetime.utcnow().timestamp(),
                 exp=(datetime.utcnow() + timedelta(days=1)).timestamp(),
                 iss="google.com",

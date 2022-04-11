@@ -6,7 +6,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from core.config import DB_DSN
+from core import cached_settings
 from core.database import db as target_metadata
 
 # this is the Alembic Config object, which provides
@@ -17,7 +17,7 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 
-config.set_main_option("sqlalchemy.url", str(DB_DSN))
+config.set_main_option("sqlalchemy.url", str(cached_settings.DATABASE_URI))
 
 
 def run_migrations_offline():

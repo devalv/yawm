@@ -11,12 +11,7 @@ from jose import JWTError
 from oauthlib.oauth2 import OAuth2Error
 from pydantic import UUID4
 
-from core.config import (
-    GOOGLE_CLIENT_SECRETS_JSON,
-    GOOGLE_SCOPES,
-    SWAG_LOGIN_ENDPOINT,
-    SWAG_SWAP_TOKEN_ENDPOINT,
-)
+from core import cached_settings
 from core.database import (
     ProductGinoModel,
     UserGinoModel,
@@ -27,7 +22,8 @@ from core.schemas import AccessToken, GoogleIdInfo, RefreshToken
 from core.utils import CREDENTIALS_EX, INACTIVE_EX, NOT_AN_OWNER, OAUTH2_EX
 
 oauth2_scheme = OAuth2AuthorizationCodeBearer(
-    authorizationUrl=SWAG_LOGIN_ENDPOINT, tokenUrl=SWAG_SWAP_TOKEN_ENDPOINT
+    authorizationUrl=cached_settings.SWAG_LOGIN_ENDPOINT,
+    tokenUrl=cached_settings.SWAG_SWAP_TOKEN_ENDPOINT,
 )
 
 
@@ -35,7 +31,7 @@ async def google_auth(code: str, redirect_uri: str) -> Dict[str, Any]:  # pragma
     """Check Google Auth code and create access token."""
     # Get authentication code
     flow = GFlow.from_client_secrets_file(
-        GOOGLE_CLIENT_SECRETS_JSON, scopes=GOOGLE_SCOPES
+        cached_settings.GOOGLE_CLIENT_SECRETS_JSON, scopes=cached_settings.GOOGLE_SCOPES
     )
     flow.redirect_uri = redirect_uri
     try:
@@ -61,7 +57,7 @@ async def google_auth(code: str, redirect_uri: str) -> Dict[str, Any]:  # pragma
 
 async def login(state: str, redirect_url: str) -> str:
     flow = GFlow.from_client_secrets_file(
-        GOOGLE_CLIENT_SECRETS_JSON, scopes=GOOGLE_SCOPES
+        cached_settings.GOOGLE_CLIENT_SECRETS_JSON, scopes=cached_settings.GOOGLE_SCOPES
     )
     flow.redirect_uri = redirect_url
     flow_info: Tuple[str, str] = flow.authorization_url(

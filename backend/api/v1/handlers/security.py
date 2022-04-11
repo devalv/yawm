@@ -4,12 +4,7 @@
 from fastapi import APIRouter, Depends, Form, status
 from fastapi.responses import RedirectResponse, Response
 
-from core.config import (
-    API_LOCATION,
-    FRONTEND_AUTH_URL,
-    REACT_SWAP_TOKEN_ENDPOINT,
-    SWAG_SWAP_TOKEN_ENDPOINT,
-)
+from core import cached_settings
 from core.database import UserGinoModel
 from core.schemas import Token, UserViewModel
 from core.services.security import (
@@ -25,17 +20,21 @@ security_router = APIRouter(redirect_slashes=True, tags=["security"])
 @security_router.post("/swag_swap_token", response_model=Token, tags=["security"])
 async def swag_swap_token(code: str = Form(...)):  # pragma: no cover
     """SwaggerUI swap-token page."""
-    redirect_uri = f"{API_LOCATION}{SWAG_SWAP_TOKEN_ENDPOINT}"
+    redirect_uri = (
+        f"{cached_settings.API_LOCATION}{cached_settings.SWAG_SWAP_TOKEN_ENDPOINT}"
+    )
     return await google_auth(code=code, redirect_uri=redirect_uri)
 
 
 @security_router.get("/react_swap_token", response_model=Token, tags=["security"])
 async def react_swap_token(code: str):  # pragma: no cover
     """React client-app swap-token page."""
-    redirect_uri = f"{API_LOCATION}{REACT_SWAP_TOKEN_ENDPOINT}"
+    redirect_uri = (
+        f"{cached_settings.API_LOCATION}{cached_settings.REACT_SWAP_TOKEN_ENDPOINT}"
+    )
     token_info = await google_auth(code=code, redirect_uri=redirect_uri)
     access_token = token_info["access_token"] if token_info else None
-    frontend_url = f"{FRONTEND_AUTH_URL}={access_token}"
+    frontend_url = f"{cached_settings.FRONTEND_AUTH_URL}={access_token}"
     return RedirectResponse(url=frontend_url)
 
 
@@ -49,7 +48,9 @@ async def refresh_access_token(
 @security_router.get("/react_login", tags=["auth"])
 async def react_login(state: str):
     """React-app login page."""
-    redirect_uri = f"{API_LOCATION}{REACT_SWAP_TOKEN_ENDPOINT}"
+    redirect_uri = (
+        f"{cached_settings.API_LOCATION}{cached_settings.REACT_SWAP_TOKEN_ENDPOINT}"
+    )
     authorization_url = await login(state=state, redirect_url=redirect_uri)
     return RedirectResponse(url=authorization_url)
 
@@ -57,7 +58,9 @@ async def react_login(state: str):
 @security_router.get("/swag_login", tags=["auth"])
 async def swag_login(state: str):
     """SwaggerUI login page."""
-    redirect_uri = f"{API_LOCATION}{SWAG_SWAP_TOKEN_ENDPOINT}"
+    redirect_uri = (
+        f"{cached_settings.API_LOCATION}{cached_settings.SWAG_SWAP_TOKEN_ENDPOINT}"
+    )
     authorization_url = await login(state=state, redirect_url=redirect_uri)
     return RedirectResponse(url=authorization_url)
 

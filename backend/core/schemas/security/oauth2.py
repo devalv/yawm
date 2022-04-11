@@ -8,7 +8,7 @@ from uuid import uuid4
 from jose import jwt
 from pydantic import UUID4, BaseModel, EmailStr, SecretStr, confloat, constr, validator
 
-from core.config import ALGORITHM, GOOGLE_CLIENT_ID, SECRET_KEY
+from core import cached_settings
 
 
 class RefreshToken(BaseModel):
@@ -18,7 +18,9 @@ class RefreshToken(BaseModel):
 
     @classmethod
     def decode(cls, token: str):
-        return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return jwt.decode(
+            token, str(cached_settings.SECRET_KEY), algorithms=[cached_settings.ALGORITHM]
+        )
 
     @classmethod
     def decode_and_create(cls, token: str):
@@ -44,7 +46,7 @@ class Token(BaseModel):
 
     @validator("alg")
     def alg_check(cls, value):
-        assert value == ALGORITHM
+        assert value == cached_settings.ALGORITHM
         return value
 
     @validator("token_type")
@@ -89,7 +91,7 @@ class GoogleIdInfo(BaseModel):
 
     @validator("aud")
     def aud_must_equals_gci(cls, value):
-        assert value._secret_value == GOOGLE_CLIENT_ID
+        assert value._secret_value == cached_settings.GOOGLE_CLIENT_ID
         return value
 
     @property
