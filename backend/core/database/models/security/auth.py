@@ -11,12 +11,7 @@ from passlib.context import CryptContext
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
-from core.config import (
-    ACCESS_TOKEN_EXPIRE_MIN,
-    ALGORITHM,
-    REFRESH_TOKEN_EXPIRE_DAYS,
-    SECRET_KEY,
-)
+from core import cached_settings
 from core.utils import CREDENTIALS_EX
 
 from .. import BaseUpdateDateModel, db
@@ -48,21 +43,35 @@ class User(BaseUpdateDateModel):
 
     def create_access_token(self):
         """Create for a user new access token."""
+        exp_time: datetime = datetime.utcnow() + timedelta(
+            minutes=cached_settings.ACCESS_TOKEN_EXPIRE_MIN
+        )
         token_data = {
-            "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MIN),
+            "exp": exp_time,
             "id": self.id_str,
             "username": self.username,
         }
-        return jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+        return jwt.encode(
+            token_data,
+            str(cached_settings.SECRET_KEY),
+            algorithm=cached_settings.ALGORITHM,
+        )
 
     async def create_refresh_token(self):
         """Create for a user new refresh token."""
+        exp_time: datetime = datetime.utcnow() + timedelta(
+            days=cached_settings.REFRESH_TOKEN_EXPIRE_DAYS
+        )
         token_data = {
-            "exp": datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
+            "exp": exp_time,
             "id": self.id_str,
             "username": self.username,
         }
-        token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
+        token = jwt.encode(
+            token_data,
+            str(cached_settings.SECRET_KEY),
+            algorithm=cached_settings.ALGORITHM,
+        )
         await TokenInfo.add_token(user_id=self.id, refresh_token=token)
         return token
 
@@ -77,7 +86,7 @@ class User(BaseUpdateDateModel):
             "access_token": acc_token,
             "refresh_token": ref_token,
             "token_type": "bearer",
-            "alg": ALGORITHM,
+            "alg": cached_settings.ALGORITHM,
             "typ": "JWT",
         }
 

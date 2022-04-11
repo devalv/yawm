@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-"""Project health check utils."""
 from enum import Enum
 from typing import Dict
 
