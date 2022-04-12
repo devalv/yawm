@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .product import ProductCreateModel, ProductUpdateModel, ProductViewModel
-from .wishlist import WishlistCreateModel, WishlistUpdateModel, WishlistViewModel
+from .wishlist import WishlistUpdateModel, WishlistViewModel
 from .wishlist_products import (
     WishlistProductsCreateModel,
     WishlistProductsUpdateModel,
@@ -13,7 +13,6 @@ __all__ = [
     "ProductViewModel",
     "ProductUpdateModel",
     "WishlistViewModel",
-    "WishlistCreateModel",
     "WishlistUpdateModel",
     "WishlistProductsViewModel",
     "WishlistProductsCreateModel",

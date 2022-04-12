@@ -75,16 +75,3 @@ Project tests
 #### api
 
 Project API by versions (v1, v2 and etc.).
-
-### docker
-
-Docker-images and docker-compose configuration files.
-
-#### docker registry
-
-```bash
-docker login
-make build
-docker run -it devalv/yawm-backend:0.4.0 sh
-make docker-push
-```
