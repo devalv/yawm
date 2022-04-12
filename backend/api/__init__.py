@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 """Project API by versions."""
 
+import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi_health import health
 from fastapi_pagination import add_pagination
+from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 
 from core import cached_settings
 from core.database import db
@@ -37,6 +41,10 @@ def get_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    no_version_app.add_middleware(
+        TrustedHostMiddleware, allowed_hosts=[cached_settings.API_DOMAIN]
+    )
+    no_version_app.add_middleware(GZipMiddleware, minimum_size=500)
     return no_version_app
 
 
@@ -68,11 +76,21 @@ def configure_health_check(application: FastAPI):
     )
 
 
+def configure_sentry(application: FastAPI):
+    if cached_settings.SENTRY_DSN:
+        sentry_sdk.init(
+            dsn=str(cached_settings.SENTRY_DSN),
+            environment=cached_settings.SENTRY_ENVIRONMENT,
+        )
+        application.add_middleware(SentryAsgiMiddleware)
+
+
 app = get_app()
 configure_routes_v1(application=app)
 configure_routes_v2(application=app)
 configure_db(app)
 configure_health_check(app)
+configure_sentry(app)
 
 
 __all__ = ["app", "db"]
