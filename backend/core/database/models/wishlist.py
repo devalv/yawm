@@ -6,7 +6,6 @@ import uuid
 from typing import List, Optional
 
 from asyncpg.exceptions import ForeignKeyViolationError
-from coolname import generate as random_name
 from pydantic import HttpUrl
 from sqlalchemy.dialects.postgresql import UUID
 from starlette import status
@@ -14,6 +13,7 @@ from starlette.exceptions import HTTPException
 
 from core.database.models.security import User
 from core.services import get_product_name
+from core.utils.default_names import random_name
 
 from . import BaseUpdateDateModel, db
 
@@ -99,7 +99,7 @@ class Wishlist(BaseEntityModel):
         if product_name:
             product_kwargs["name"] = product_name  # pragma: no cover
         else:
-            product_kwargs["name"] = random_name()[0].capitalize()
+            product_kwargs["name"] = random_name()
         # Create new product
         new_product: Product = await Product.create(**product_kwargs)
         return new_product  # noqa: PIE781
@@ -114,7 +114,7 @@ class Wishlist(BaseEntityModel):
                 await cls.create_product(user_id=user_id, product_url=product_url)
             )
         # Create new wishlist
-        wishlist_name = random_name()[0].capitalize()
+        wishlist_name = random_name()
         wishlist: Wishlist = await Wishlist.create(name=wishlist_name, user_id=user_id)
         # Include products to a wishlist
         for product in created_products:
