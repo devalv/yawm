@@ -13,7 +13,6 @@ from core.health import StatusModel, services_status
 from .v1 import product_router as product_router_v1
 from .v1 import security_router as security_router_v1
 from .v1 import utils_router as utils_router_v1
-from .v1 import wishlist_product_router as wishlist_product_router_v1
 from .v1 import wishlist_router as wishlist_router_v1
 from .v2 import wishlist_products_router as wishlist_products_router_v2
 from .v2 import wishlist_router as wishlist_router_v2
@@ -45,7 +44,6 @@ def configure_routes_v1(application: FastAPI):
     """Configure application."""
     application.include_router(wishlist_router_v1, prefix="/api/v1")
     application.include_router(product_router_v1, prefix="/api/v1")
-    application.include_router(wishlist_product_router_v1, prefix="/api/v1")
     application.include_router(utils_router_v1, prefix="/api/v1")
     application.include_router(security_router_v1, prefix="/api/v1")
     add_pagination(application)

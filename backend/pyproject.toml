@@ -85,7 +85,7 @@ asyncio_mode = "strict"
 omit = ["tests", "core/database/migrations/__init__.py", "core/database/migrations/env.py", "core/database/migrations/versions/*"]
 
 [tool.coverage.report]
-fail_under = 93
+fail_under = 92
 show_missing = true
 exclude_lines = [
     "pragma: no cover",

@@ -34,6 +34,7 @@ services:
       - API_DOMAIN=${API_DOMAIN}
       - SECRET_KEY=${SECRET_KEY}
       - ALLOW_ORIGINS=${ALLOW_ORIGINS}
+    command: sh -c "alembic upgrade head && python main.py"
     depends_on:
       - db
 
