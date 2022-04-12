@@ -114,16 +114,17 @@ class Wishlist(BaseEntityModel):
                 await cls.create_product(user_id=user_id, product_url=product_url)
             )
         # Create new wishlist
-        wishlist_name = random_name()
+        wishlist_name: str = random_name()
         wishlist: Wishlist = await Wishlist.create(name=wishlist_name, user_id=user_id)
         # Include products to a wishlist
         for product in created_products:
-            await wishlist.add_product(product_id=product.id)
+            await wishlist.add_product(product_id=product.id, product_name=product.name)
         return wishlist
 
     async def add_product(
         self,
         product_id: str,
+        product_name: str,
         reserved: Optional[bool] = False,
         substitutable: Optional[bool] = False,
     ):
@@ -132,6 +133,7 @@ class Wishlist(BaseEntityModel):
             rv = await WishlistProducts.create(
                 product_id=product_id,
                 wishlist_id=self.id,
+                name=product_name,
                 reserved=reserved,
                 substitutable=substitutable,
             )
@@ -149,7 +151,7 @@ class Wishlist(BaseEntityModel):
             )
         # Include products to a wishlist
         for product in created_products:
-            await self.add_product(product_id=product.id)
+            await self.add_product(product_id=product.id, product_name=product.name)
         return self
 
     async def get_products_v2(self):
@@ -187,12 +189,13 @@ class WishlistProducts(BaseUpdateDateModel):
     )
     substitutable = db.Column(db.Boolean(), nullable=False, default=False)
     reserved = db.Column(db.Boolean(), nullable=False, default=False)
+    name = db.Column(db.Unicode(length=255), nullable=False)
 
     _product = None
     _wishlist = None
 
     @property
-    def product(self):  # pragma: no cover
+    def product(self):
         return self._product
 
     @product.setter
@@ -206,10 +209,6 @@ class WishlistProducts(BaseUpdateDateModel):
     @wishlist.setter
     def wishlist(self, wishlist):
         self._wishlist = wishlist
-
-    @property
-    def name(self):
-        return self._product.name
 
     @property
     def url(self):
