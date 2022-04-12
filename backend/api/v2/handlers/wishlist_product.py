@@ -14,7 +14,7 @@ basename = "wishlist-products"
 wishlist_products_router = APIRouter(redirect_slashes=True, tags=[basename])
 
 
-@wishlist_products_router.put(
+@wishlist_products_router.patch(
     f"/{basename}/" + "{id}" + "/reserve",
     response_model=WishlistProductV2Model,
     status_code=status.HTTP_201_CREATED,

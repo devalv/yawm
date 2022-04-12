@@ -11,6 +11,7 @@ class WishlistProductV2Model(BaseModel):
     reserved: bool
     substitutable: bool
     created_at: datetime
+    name: str
 
     class Config:
         orm_mode = True
@@ -19,3 +20,4 @@ class WishlistProductV2Model(BaseModel):
 class WishlistProductUpdateV2Model(BaseModel):
     reserved: Optional[bool] = None
     substitutable: Optional[bool] = None
+    name: Optional[str] = None

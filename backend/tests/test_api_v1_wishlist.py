@@ -62,7 +62,9 @@ async def empty_wishlists_149(single_user):
 @pytest_asyncio.fixture
 async def wishlist_products_1(ew_1, products_1):
     wishlist = await WishlistGinoModel.get(ew_1.id)
-    return await wishlist.add_product(products_1.id, reserved=False, substitutable=False)
+    return await wishlist.add_product(
+        products_1.id, reserved=False, substitutable=False, product_name=products_1.name
+    )
 
 
 @pytest_asyncio.fixture
@@ -70,7 +72,9 @@ async def wishlist_products_9(ew_1, products_9):
     products_list = list()
     wishlist = await WishlistGinoModel.get(ew_1.id)
     for product in products_9:
-        rv = await wishlist.add_product(product.id, reserved=False, substitutable=True)
+        rv = await wishlist.add_product(
+            product.id, reserved=False, substitutable=True, product_name=product.name
+        )
         products_list.append(rv)
     return products_list
 
@@ -81,7 +85,9 @@ async def wp_149(ew_1, products_149):
     products_list = list()
     wishlist = await WishlistGinoModel.get(ew_1.id)
     for product in products_149:
-        rv = await wishlist.add_product(product.id, reserved=False, substitutable=True)
+        rv = await wishlist.add_product(
+            product.id, reserved=False, substitutable=True, product_name=product.name
+        )
         products_list.append(rv)
     return products_list
 
