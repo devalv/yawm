@@ -47,19 +47,23 @@ class Settings(BaseSettings):
     FRONTEND_AUTH_TOKEN_PARAM: str = "authToken"
     FRONTEND_AUTH_URL: str = f"{FRONTEND_URL}?{FRONTEND_AUTH_TOKEN_PARAM}"
 
-    # API configuration # TODO: ?
-    API_HOST: str = "127.0.0.1"  # TODO: ?
-    API_PORT: int = 8000  # TODO: ?
-    API_DOMAIN: str = "localhost"  # TODO: ?
+    # API configuration
+    CRAWLER_USER_AGENT: str = "yawm-api"
+    API_HOST: str = "127.0.0.1"
+    API_PORT: int = 8000
+    API_DOMAIN: str = "localhost"
     API_PROTOCOL: str = "https"  # TODO: ?
     API_LOCATION: str = f"{API_PROTOCOL}://{API_DOMAIN}:{API_PORT}"  # TODO: ?
-    CRAWLER_USER_AGENT: str = "yawm-api"
 
     # google oauth2 configuration # TODO: ?
     GOOGLE_CLIENT_ID: Optional[str] = None
     GOOGLE_CLIENT_SECRETS_JSON: Optional[str] = None
     GOOGLE_USERINFO_SCOPE: Optional[str] = None
     GOOGLE_SCOPES: Optional[Set[Optional[str]]] = {GOOGLE_USERINFO_SCOPE}
+
+    # third-party services
+    SENTRY_DSN: Optional[Union[Secret, str]] = None
+    SENTRY_ENVIRONMENT: Optional[str] = None
 
     @validator("DATABASE_URI", pre=True)
     def assemble_db_connection(cls, value: Optional[str], values: Dict[str, Any]) -> Any:
@@ -75,9 +79,9 @@ class Settings(BaseSettings):
             path=f'/{values.get("DB_NAME") or ""}',
         )
 
-    @validator("SECRET_KEY", "DB_PASSWORD", pre=True)
+    @validator("SECRET_KEY", "DB_PASSWORD", "SENTRY_DSN", pre=True)
     def wrap_secret(cls, value: Union[Secret, str]) -> Secret:
-        if isinstance(value, Secret):
+        if isinstance(value, Secret) or value is None:
             return value
         return Secret(value)
 
