@@ -24,13 +24,10 @@ class User(BaseUpdateDateModel):
 
     __tablename__ = "user"
 
-    ext_id = db.Column(db.Unicode(length=255), nullable=False, unique=True)
     disabled = db.Column(db.Boolean(), nullable=False, default=False)
     superuser = db.Column(db.Boolean(), nullable=False, default=False)
     username = db.Column(db.Unicode(length=255), nullable=False, index=True)
-    given_name = db.Column(db.Unicode(length=255), nullable=True)
-    family_name = db.Column(db.Unicode(length=255), nullable=True)
-    full_name = db.Column(db.Unicode(length=255), nullable=True)
+    password = db.Column(db.Unicode(length=255), nullable=False, index=True)
 
     @property
     def id_str(self):
