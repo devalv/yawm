@@ -3,9 +3,9 @@
 
 from .security import (
     AccessToken,
-    GoogleIdInfo,
     RefreshToken,
     Token,
+    TokenData,
     UserCreateModel,
     UserViewModel,
 )
@@ -17,7 +17,7 @@ __all__ = [
     "UserViewModel",
     "UserCreateModel",
     "Token",
+    "TokenData",
     "AccessToken",
     "RefreshToken",
-    "GoogleIdInfo",
 ]

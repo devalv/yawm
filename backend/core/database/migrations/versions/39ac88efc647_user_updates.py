@@ -20,8 +20,8 @@ def upgrade():
     """Apply changes on database."""
     op.execute("truncate public.user cascade;")
     op.add_column("user", sa.Column("password", sa.Unicode(length=255), nullable=False))
+    op.create_index(op.f("ix_user_username"), "user", ["username"], unique=True)
     op.drop_constraint("user_ext_id_key", "user", type_="unique")
-    op.create_index(op.f("ix_user_password"), "user", ["password"], unique=False)
     op.drop_column("user", "family_name")
     op.drop_column("user", "full_name")
     op.drop_column("user", "given_name")
@@ -53,6 +53,6 @@ def downgrade():
             "family_name", sa.VARCHAR(length=255), autoincrement=False, nullable=True
         ),
     )
-    op.drop_index(op.f("ix_user_password"), table_name="user")
     op.create_unique_constraint("user_ext_id_key", "user", ["ext_id"])
     op.drop_column("user", "password")
+    op.drop_index(op.f("ix_user_username"), table_name="user")

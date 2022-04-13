@@ -12,11 +12,11 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
 from core import cached_settings
-from core.utils import CREDENTIALS_EX
 
 from .. import BaseUpdateDateModel, db
 
 ref_token_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class User(BaseUpdateDateModel):
@@ -26,8 +26,8 @@ class User(BaseUpdateDateModel):
 
     disabled = db.Column(db.Boolean(), nullable=False, default=False)
     superuser = db.Column(db.Boolean(), nullable=False, default=False)
-    username = db.Column(db.Unicode(length=255), nullable=False, index=True)
-    password = db.Column(db.Unicode(length=255), nullable=False, index=True)
+    username = db.Column(db.Unicode(length=255), nullable=False, index=True, unique=True)
+    password = db.Column(db.Unicode(length=255), nullable=False)
 
     @property
     def id_str(self):
@@ -96,37 +96,12 @@ class User(BaseUpdateDateModel):
         token_info = await self.token_info()
         return bool(token_info and token_info.verify_token(token))
 
-    @classmethod
-    async def insert_or_update_by_ext_id(
-        cls,
-        sub: str,
-        username: str,
-        family_name: str = None,
-        given_name: str = None,
-        full_name: str = None,
-        **__,
-    ) -> User:
-        """Create new record or update existing."""
+    def verify_password(self, plain_password: str):  # TODO: type
+        return pwd_context.verify(plain_password, self.password)
 
-        user_obj: User = await cls.query.where(cls.ext_id == sub).gino.first()
-        if user_obj and user_obj.active:
-            await user_obj.update(
-                username=username,
-                family_name=family_name,
-                given_name=given_name,
-                full_name=full_name,
-            ).apply()
-        elif not user_obj:
-            user_obj = await cls.create(
-                ext_id=sub,
-                username=username,
-                family_name=family_name,
-                given_name=given_name,
-                full_name=full_name,
-            )
-        else:
-            raise CREDENTIALS_EX
-        return user_obj
+    @staticmethod
+    def get_password_hash(password):  # TODO: type
+        return pwd_context.hash(password)
 
 
 class TokenInfo(db.Model):

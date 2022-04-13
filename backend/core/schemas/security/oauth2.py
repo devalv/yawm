@@ -2,11 +2,10 @@
 """Pydantic oauth2 models."""
 
 from datetime import datetime
-from typing import Optional, Type, Union
-from uuid import uuid4
+from typing import Type, Union
 
 from jose import jwt
-from pydantic import UUID4, BaseModel, EmailStr, SecretStr, confloat, constr, validator
+from pydantic import UUID4, BaseModel, SecretStr, confloat, validator
 
 from core import cached_settings
 
@@ -33,8 +32,8 @@ class AccessToken(RefreshToken):
 
 
 class Token(BaseModel):
-    access_token: str
-    refresh_token: str
+    access_token: SecretStr
+    refresh_token: SecretStr | None = None
     token_type: str
     alg: str
     typ: str
@@ -55,52 +54,7 @@ class Token(BaseModel):
         return value
 
 
-class GoogleIdInfo(BaseModel):
-    """Google ID token's payload.
-
-    Attributes:
-        aud: The audience that this ID token is intended for.
-        exp: Expiration time which the ID token must not be accepted.
-        iat: The time the ID token was issued.
-        iss: The Issuer Identifier for the Issuer of the response.
-        sub: An unique identifier for the user.
-        at_hash: Access token hash.
-        name: The user's full name, in a displayable form.
-        given_name: The user's given name(s) or first name(s).
-        family_name: The user's surname(s) or last name(s).
-        picture: The URL of the user's profile picture.
-        locale: The user's locale.
-
-    https://developers.google.com/identity/protocols/oauth2/openid-connect#obtainuserinfo
-    """
-
-    aud: SecretStr
+class TokenData(BaseModel):
+    id: UUID4 | None = None
+    username: str | None = None
     exp: Union[Type[float], datetime] = confloat(gt=datetime.utcnow().timestamp())
-    iat: datetime
-    iss: Union[Type[str], str] = constr(
-        regex=r"^(https://accounts\.google\.com|accounts\.google\.com)$"  # noqa: F722
-    )
-    sub: str
-    at_hash: Optional[str]
-    name: Optional[str]
-    given_name: Optional[str]
-    family_name: Optional[str]
-    picture: Optional[str]
-    locale: Optional[str]
-    email: Optional[EmailStr]
-
-    @validator("aud")
-    def aud_must_equals_gci(cls, value):
-        assert value._secret_value == cached_settings.GOOGLE_CLIENT_ID
-        return value
-
-    @property
-    def username(self):
-        """Generate unique username."""
-        if self.email:
-            username = self.email.split("@")[0]
-        elif self.name:
-            username = f"{self.name}-{str(uuid4())[:8]}"
-        else:
-            username = f"user-{str(uuid4())[:8]}"
-        return username
