@@ -6,8 +6,8 @@ from fastapi_pagination.ext.gino import paginate
 from fastapi_pagination.links import Page
 
 from api.v1.schemas import WishlistUpdateModel, WishlistViewModel
-from core.database import WishlistGinoModel
-from core.services.security import get_user_wishlist_gino_obj
+from core.database.models import WishlistGinoModel
+from core.services.security.auth import get_user_wishlist_gino_obj
 
 wishlist_router = APIRouter(redirect_slashes=True, tags=["wishlist"])
 

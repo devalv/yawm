@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-"""Project database models (Gino)."""
-
 from uuid import uuid4
 
 from fastapi import Depends

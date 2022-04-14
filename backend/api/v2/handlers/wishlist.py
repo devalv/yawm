@@ -4,9 +4,9 @@
 from fastapi import APIRouter, Depends, status
 
 from api.v2.schemas import WishlistProductsV2Model, WishlistViewV2Model
-from core.database import UserGinoModel, WishlistGinoModel
+from core.database.models import UserGinoModel, WishlistGinoModel
 from core.services.security import (
-    get_current_user_gino_obj,
+    get_current_active_user_by_access_token,
     get_user_wishlist_gino_obj,
     get_wishlist_gino_obj,
 )
@@ -18,7 +18,7 @@ wishlist_router = APIRouter(redirect_slashes=True, tags=[basename])
 @wishlist_router.post(f"/{basename}", response_model=WishlistViewV2Model)
 async def create_wishlist(
     products: WishlistProductsV2Model,
-    current_user: UserGinoModel = Depends(get_current_user_gino_obj),
+    current_user: UserGinoModel = Depends(get_current_active_user_by_access_token),
 ):
     """API for creating a new wishlist."""
     # TODO: @devalv create products property for wishlist and use it like
@@ -53,7 +53,7 @@ async def get_wishlist(
 async def add_wishlist_products(
     products: WishlistProductsV2Model,
     wishlist_obj: WishlistGinoModel = Depends(get_user_wishlist_gino_obj),
-    current_user: UserGinoModel = Depends(get_current_user_gino_obj),
+    current_user: UserGinoModel = Depends(get_current_active_user_by_access_token),
 ):
     """API for adding products to a wishlist that already exists."""
     await wishlist_obj.add_products_v2(

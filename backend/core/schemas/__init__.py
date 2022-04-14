@@ -1,14 +1,7 @@
 # -*- coding: utf-8 -*-
 """Pydantic models."""
 
-from .security import (
-    AccessToken,
-    RefreshToken,
-    Token,
-    TokenData,
-    UserCreateModel,
-    UserViewModel,
-)
+from .security import Token, TokenData, UserCreateModel, UserViewModel
 from .utils import ExtractUrlInModel, ExtractUrlOutModel
 
 __all__ = [
@@ -18,6 +11,4 @@ __all__ = [
     "UserCreateModel",
     "Token",
     "TokenData",
-    "AccessToken",
-    "RefreshToken",
 ]

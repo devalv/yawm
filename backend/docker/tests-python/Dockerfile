@@ -1,4 +1,6 @@
-FROM devalv/yawm-backend:latest
+# syntax = edrevo/dockerfile-plus
+
+INCLUDE+ ./backend/docker/python/Dockerfile
 
 USER root
 

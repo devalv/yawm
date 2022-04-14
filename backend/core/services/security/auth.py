@@ -1,125 +1,99 @@
-# -*- coding: utf-8 -*-
-"""Authentication system."""
-from typing import Any, Dict, Tuple
-
 from fastapi import Depends
-from fastapi.security.oauth2 import OAuth2AuthorizationCodeBearer
-from google.auth.transport import requests
-from google.oauth2 import id_token
-from google_auth_oauthlib.flow import Flow as GFlow
+from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
-from oauthlib.oauth2 import OAuth2Error
 from pydantic import UUID4
 
-from core import cached_settings
 from core.database import (
     ProductGinoModel,
     UserGinoModel,
     WishlistGinoModel,
     WishlistProductsGinoModel,
 )
-from core.schemas import AccessToken, GoogleIdInfo, RefreshToken
-from core.utils import CREDENTIALS_EX, INACTIVE_EX, NOT_AN_OWNER, OAUTH2_EX
+from core.schemas import TokenData
+from core.utils import CREDENTIALS_EX, INACTIVE_EX, NOT_AN_OWNER
 
-oauth2_scheme = OAuth2AuthorizationCodeBearer(
-    authorizationUrl=cached_settings.SWAG_LOGIN_ENDPOINT,
-    tokenUrl=cached_settings.SWAG_SWAP_TOKEN_ENDPOINT,
-)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v2/token")
 
 
-async def google_auth(code: str, redirect_uri: str) -> Dict[str, Any]:  # pragma: no cover
-    """Check Google Auth code and create access token."""
-    # Get authentication code
-    flow = GFlow.from_client_secrets_file(
-        cached_settings.GOOGLE_CLIENT_SECRETS_JSON, scopes=cached_settings.GOOGLE_SCOPES
-    )
-    flow.redirect_uri = redirect_uri
-    try:
-        flow.fetch_token(code=code)
-    except OAuth2Error:
-        raise OAUTH2_EX
-    else:
-        credentials = flow.credentials
-    # token validation
-    try:
-        # TODO: @devalv change requests.Request() to httpx.Request or local validation
-        id_info = id_token.verify_oauth2_token(
-            credentials.id_token, requests.Request(), credentials.client_id
-        )
-        id_info = GoogleIdInfo(**id_info)
-    except ValueError:
+async def authenticate_user(username: str, password: str) -> UserGinoModel:
+    user: UserGinoModel = await UserGinoModel.query.where(
+        UserGinoModel.username == username
+    ).gino.first()
+
+    if not user:
         raise CREDENTIALS_EX
-    # get user object
-    authenticated_user = await get_or_create_user_gino_obj(id_info)
-    # generate system token for a user
-    return await authenticated_user.create_token()
+
+    if not user.verify_password(password):
+        raise CREDENTIALS_EX
+
+    if not user.active:
+        raise INACTIVE_EX
+
+    return user
 
 
-async def login(state: str, redirect_url: str) -> str:
-    flow = GFlow.from_client_secrets_file(
-        cached_settings.GOOGLE_CLIENT_SECRETS_JSON, scopes=cached_settings.GOOGLE_SCOPES
-    )
-    flow.redirect_uri = redirect_url
-    flow_info: Tuple[str, str] = flow.authorization_url(
-        access_type="offline", state=state, include_granted_scopes="true"
-    )
-    return flow_info[0]
+async def get_active_user_by_token(
+    access_token: str | None = None, refresh_token: str | None = None
+) -> UserGinoModel:
+    """Get active User instance by access or refresh token."""
+    if not access_token and not refresh_token:
+        raise ValueError("Pass the access_token or refresh_token.")
 
-
-async def get_or_create_user_gino_obj(id_info: GoogleIdInfo) -> UserGinoModel:
-    """Get/Update or Create new user."""
-    return await UserGinoModel.insert_or_update_by_ext_id(
-        sub=id_info.sub,
-        username=id_info.username,
-        family_name=id_info.family_name,
-        given_name=id_info.given_name,
-        full_name=id_info.name,
-    )
-
-
-async def get_user_for_refresh_gino_obj(token: str):
     try:
-        token_info = RefreshToken.decode_and_create(token=token)
-        user = await UserGinoModel.get(token_info.id)
-        if user is None or user.disabled:
-            raise INACTIVE_EX
-        token_valid = await user.token_is_valid(token)
-        if not token_valid:
+        if access_token:
+            token_data: TokenData = TokenData.decode(token=access_token)  # type: ignore
+        else:
+            token_data: TokenData = TokenData.decode(token=refresh_token)  # type: ignore
+
+        if token_data.sub is None:
             raise CREDENTIALS_EX
-    except (JWTError, ValueError):
+    except (JWTError, NameError):
         raise CREDENTIALS_EX
+
+    user: UserGinoModel = await UserGinoModel.get(token_data.sub)
+    if user is None:
+        raise CREDENTIALS_EX
+
+    if user.disabled:
+        raise INACTIVE_EX
+
     return user
 
 
-async def get_current_user_gino_obj(token: str = Depends(oauth2_scheme)):
-    """Validate token and get user db model instance."""
-    try:
-        token_info = AccessToken.decode_and_create(token=token)
-        user = await UserGinoModel.get(token_info.id)
-        if user is None or user.disabled:
-            raise INACTIVE_EX
-    except (JWTError, ValueError):
+async def get_active_user_by_refresh_token(token: str) -> UserGinoModel:
+    """Get active User instance by refresh token."""
+    active_user = await get_active_user_by_token(refresh_token=token)
+    # Validate token
+    token_valid: bool = await active_user.refresh_token_is_valid(token)
+    if not token_valid:
         raise CREDENTIALS_EX
-    return user
+    return active_user
+
+
+async def get_current_active_user_by_access_token(
+    token: str = Depends(oauth2_scheme),
+) -> UserGinoModel:
+    """Get active User instance by access token."""
+    return await get_active_user_by_token(access_token=token)
 
 
 async def get_wishlist_gino_obj(id: UUID4):
     """Return WishlistGinoModel instance."""
     # TODO: ref view_query
-    wishlist = await WishlistGinoModel.get_or_404(id)
+    wishlist: WishlistGinoModel = await WishlistGinoModel.get_or_404(id)
     return await wishlist.view_query(wishlist.id)
 
 
 async def get_product_gino_obj(id: UUID4):
     """Return ProductGinoModel instance."""
     # TODO: ref view_query
-    product = await ProductGinoModel.get_or_404(id)
+    product: ProductGinoModel = await ProductGinoModel.get_or_404(id)
     return await product.view_query(product.id)
 
 
 async def get_user_wishlist_gino_obj(
     wishlist: WishlistGinoModel = Depends(get_wishlist_gino_obj),
-    current_user: UserGinoModel = Depends(get_current_user_gino_obj),
+    current_user: UserGinoModel = Depends(get_current_active_user_by_access_token),
 ) -> WishlistGinoModel:
     """Return WishlistGinoModel if user has rights on it."""
     if current_user.superuser or wishlist.user_id == current_user.id:
@@ -129,7 +103,7 @@ async def get_user_wishlist_gino_obj(
 
 async def get_user_product_gino_obj(
     product: ProductGinoModel = Depends(get_product_gino_obj),
-    current_user: UserGinoModel = Depends(get_current_user_gino_obj),
+    current_user: UserGinoModel = Depends(get_current_active_user_by_access_token),
 ) -> ProductGinoModel:
     """Return ProductGinoModel if user has rights on it."""
     if current_user.superuser or product.user_id == current_user.id:
@@ -144,8 +118,8 @@ async def get_wishlist_product_gino_obj(id: UUID4):
 
 async def get_user_wishlist_product_gino_obj(
     wishlist_product: WishlistProductsGinoModel = Depends(get_wishlist_product_gino_obj),
-    current_user: UserGinoModel = Depends(get_current_user_gino_obj),
-):
+    current_user: UserGinoModel = Depends(get_current_active_user_by_access_token),
+) -> WishlistProductsGinoModel:
     """Return WishlistProductsGinoModel if user has rights on it."""
     wishlist = await WishlistGinoModel.get_or_404(wishlist_product.wishlist_id)
     if current_user.superuser or wishlist.user_id == current_user.id:

@@ -15,9 +15,9 @@ from core.database import db
 from core.health import StatusModel, services_status
 
 from .v1 import product_router as product_router_v1
-from .v1 import security_router as security_router_v1
 from .v1 import utils_router as utils_router_v1
 from .v1 import wishlist_router as wishlist_router_v1
+from .v2 import local_security_router as local_security_router_v2
 from .v2 import wishlist_products_router as wishlist_products_router_v2
 from .v2 import wishlist_router as wishlist_router_v2
 
@@ -27,12 +27,6 @@ def get_app() -> FastAPI:
     no_version_app = FastAPI(
         title="Yet another wishlist maker",
         version="0.4.0",
-        swagger_ui_oauth2_redirect_url=cached_settings.SWAG_SWAP_TOKEN_ENDPOINT,
-        swagger_ui_init_oauth={
-            "clientId": "please keep this value",
-            "clientSecret": "please keep this value",
-            "appName": "Yet another wishlist maker",
-        },
     )
     no_version_app.add_middleware(
         CORSMiddleware,
@@ -53,7 +47,6 @@ def configure_routes_v1(application: FastAPI):
     application.include_router(wishlist_router_v1, prefix="/api/v1")
     application.include_router(product_router_v1, prefix="/api/v1")
     application.include_router(utils_router_v1, prefix="/api/v1")
-    application.include_router(security_router_v1, prefix="/api/v1")
     add_pagination(application)
 
 
@@ -61,6 +54,8 @@ def configure_routes_v2(application: FastAPI):
     """Configure application routes."""
     application.include_router(wishlist_router_v2, prefix="/api/v2")
     application.include_router(wishlist_products_router_v2, prefix="/api/v2")
+    application.include_router(local_security_router_v2, prefix="/api/v2")
+    add_pagination(application)
 
 
 def configure_db(application: FastAPI):

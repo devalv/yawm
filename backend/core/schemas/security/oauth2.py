@@ -2,38 +2,32 @@
 """Pydantic oauth2 models."""
 
 from datetime import datetime
-from typing import Type, Union
+from typing import Any, Dict, Type, TypeVar, Union
 
 from jose import jwt
-from pydantic import UUID4, BaseModel, SecretStr, confloat, validator
+from pydantic import UUID4, BaseModel, confloat, validator
 
 from core import cached_settings
 
+T = TypeVar("T", bound="TokenData")
 
-class RefreshToken(BaseModel):
-    id: UUID4
-    username: str
+
+class TokenData(BaseModel):
+    sub: UUID4 | None = None
+    username: str | None = None
     exp: Union[Type[float], datetime] = confloat(gt=datetime.utcnow().timestamp())
 
     @classmethod
-    def decode(cls, token: str):
-        return jwt.decode(
+    def decode(cls, token: str) -> T:
+        decoded_token: Dict[str, Any] = jwt.decode(
             token, str(cached_settings.SECRET_KEY), algorithms=[cached_settings.ALGORITHM]
         )
-
-    @classmethod
-    def decode_and_create(cls, token: str):
-        decoded_token = cls.decode(token)
         return cls(**decoded_token)
 
 
-class AccessToken(RefreshToken):
-    pass
-
-
 class Token(BaseModel):
-    access_token: SecretStr
-    refresh_token: SecretStr | None = None
+    access_token: str
+    refresh_token: str
     token_type: str
     alg: str
     typ: str
@@ -52,9 +46,3 @@ class Token(BaseModel):
     def token_type_check(cls, value):
         assert value.lower() == "bearer"
         return value
-
-
-class TokenData(BaseModel):
-    id: UUID4 | None = None
-    username: str | None = None
-    exp: Union[Type[float], datetime] = confloat(gt=datetime.utcnow().timestamp())

@@ -4,7 +4,7 @@ import pytest_asyncio
 from async_asgi_testclient import TestClient
 
 from api import app
-from core.database import UserGinoModel
+from core.database.models import UserGinoModel
 
 
 @pytest_asyncio.fixture

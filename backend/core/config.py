@@ -55,12 +55,6 @@ class Settings(BaseSettings):
     API_PROTOCOL: str = "https"  # TODO: ?
     API_LOCATION: str = f"{API_PROTOCOL}://{API_DOMAIN}:{API_PORT}"  # TODO: ?
 
-    # google oauth2 configuration # TODO: ?
-    GOOGLE_CLIENT_ID: Optional[str] = None
-    GOOGLE_CLIENT_SECRETS_JSON: Optional[str] = None
-    GOOGLE_USERINFO_SCOPE: Optional[str] = None
-    GOOGLE_SCOPES: Optional[Set[Optional[str]]] = {GOOGLE_USERINFO_SCOPE}
-
     # third-party services
     SENTRY_DSN: Optional[Union[Secret, str]] = None
     SENTRY_ENVIRONMENT: Optional[str] = None
