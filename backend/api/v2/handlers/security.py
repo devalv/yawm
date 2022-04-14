@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from core.database.models import UserGinoModel
+from core.database import UserGinoModel
 from core.schemas import Token, UserCreateModel, UserViewModel
 from core.services.security import (
     authenticate_user,

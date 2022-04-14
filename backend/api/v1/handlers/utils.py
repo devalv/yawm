@@ -3,7 +3,7 @@
 
 from fastapi import APIRouter, Depends
 
-from core.database.models import ProductGinoModel, UserGinoModel
+from core.database import ProductGinoModel, UserGinoModel
 from core.schemas import ExtractUrlInModel, ExtractUrlOutModel
 from core.services import get_product_name
 from core.services.security import get_current_active_user_by_access_token

@@ -4,7 +4,7 @@
 from fastapi import APIRouter, Depends, status
 
 from api.v2.schemas import WishlistProductsV2Model, WishlistViewV2Model
-from core.database.models import UserGinoModel, WishlistGinoModel
+from core.database import UserGinoModel, WishlistGinoModel
 from core.services.security import (
     get_current_active_user_by_access_token,
     get_user_wishlist_gino_obj,
