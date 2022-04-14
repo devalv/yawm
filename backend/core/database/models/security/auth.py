@@ -6,7 +6,6 @@ from typing import Any, Dict, TypeVar
 from asyncpg.exceptions import UniqueViolationError
 from jose import jwt
 from passlib.context import CryptContext
-from pydantic import SecretStr
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
@@ -107,8 +106,8 @@ class User(BaseUpdateDateModel):
         return pwd_context.hash(password)
 
     @classmethod
-    async def create(cls, password: SecretStr, *args, **kwargs) -> T:
-        hashed_password: str = cls.get_password_hash(password.get_secret_value())
+    async def create(cls, password: str, *args, **kwargs) -> T:
+        hashed_password: str = cls.get_password_hash(password)
         try:
             user: T = await super().create(password=hashed_password, *args, **kwargs)
         except UniqueViolationError:

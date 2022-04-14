@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade():
     """Apply changes on database."""
-    op.drop_index(op.f("ix_user_username"), table_name="user")
+    op.drop_index(op.f("ix_user_username"), "public.user")
     op.execute("truncate public.user cascade;")
     op.add_column("user", sa.Column("password", sa.Unicode(length=255), nullable=False))
     op.create_index(op.f("ix_user_username"), "user", ["username"], unique=True)
@@ -56,5 +56,5 @@ def downgrade():
     )
     op.create_unique_constraint("user_ext_id_key", "user", ["ext_id"])
     op.drop_column("user", "password")
-    op.drop_index(op.f("ix_user_username"), table_name="user")
+    op.drop_index(op.f("ix_user_username"), "public.user")
     op.create_index(op.f("ix_user_username"), "user", ["username"], unique=False)

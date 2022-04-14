@@ -37,52 +37,40 @@ def pytest_sessionfinish(session, exitstatus):
 @pytest_asyncio.fixture
 async def user_mock():
     return {
-        "ext_id": "5" * 100,
         "disabled": False,
         "superuser": False,
-        "username": "user_mock",
-        "given_name": "given_mock",
-        "family_name": "family_mock",
-        "full_name": "full_mock",
+        "username": "test-user",
+        "password": "test-user-password",
     }
 
 
 @pytest_asyncio.fixture
 async def another_user_mock():
     return {
-        "ext_id": "2" * 100,
         "disabled": False,
         "superuser": False,
-        "username": "another_user_mock",
-        "given_name": "another_given_mock",
-        "family_name": "another_family_mock",
-        "full_name": "another_full_mock",
+        "username": "another-test-user",
+        "password": "another-test-user-password",
     }
 
 
 @pytest_asyncio.fixture
 async def disabled_user_mock():
     return {
-        "ext_id": "5" * 100,
         "disabled": True,
         "superuser": False,
-        "username": "user_mock",
-        "given_name": "given_mock",
-        "family_name": "family_mock",
-        "full_name": "full_mock",
+        "username": "test-user",
+        "password": "test-user-password",
     }
 
 
 @pytest_asyncio.fixture
 async def user_admin_mock():
     return {
-        "ext_id": "1" * 100,
         "disabled": False,
         "superuser": True,
-        "username": "user_mock",
-        "given_name": "given_mock",
-        "family_name": "family_mock",
-        "full_name": "full_mock",
+        "username": "test-user-admin",
+        "password": "test-user-admin-password",
     }
 
 

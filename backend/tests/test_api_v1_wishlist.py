@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-"""Wishlist api tests."""
-
 import pytest
 import pytest_asyncio
 

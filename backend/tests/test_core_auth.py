@@ -1,24 +1,13 @@
-# -*- coding: utf-8 -*-
-"""Core auth tests."""
-import os
 from datetime import datetime, timedelta
-from random import randint
+from typing import Any, Dict
 
 import pytest
 import pytest_asyncio
-from fastapi import HTTPException, status
+from fastapi import status
 from jose import jwt
-from pydantic import ValidationError
 
 from core import cached_settings
-from core.database import TokenInfoGinoModel, UserGinoModel
-from core.schemas import GoogleIdInfo
-from core.services.security import (
-    get_current_user_gino_obj,
-    get_or_create_user_gino_obj,
-    get_user_for_refresh_gino_obj,
-)
-from core.utils.exceptions import CREDENTIALS_EX, INACTIVE_EX
+from core.database import TokenInfoGinoModel
 
 pytestmark = [
     pytest.mark.asyncio,
@@ -28,46 +17,21 @@ pytestmark = [
 ]
 
 
-API_URL_PREFIX = "/api/v1"
+API_URL_PREFIX = "/api/v2"
 
 
 @pytest_asyncio.fixture
-async def google_id_info():
-    token_info = dict()
-    token_info["aud"] = cached_settings.GOOGLE_CLIENT_ID
-    token_info["exp"] = (datetime.utcnow() + timedelta(days=1)).timestamp()
-    token_info["iat"] = datetime.utcnow().timestamp()
-    token_info["iss"] = "accounts.google.com"
-    token_info["sub"] = str(randint(1, 999)) * 84
-    token_info["given_name"] = "larry"
-    token_info["family_name"] = "brin"
-    return GoogleIdInfo(**token_info)
-
-
-@pytest_asyncio.fixture
-async def existing_user_id_info(google_id_info, single_admin):
-    google_id_info.sub = single_admin.ext_id
-    return google_id_info
-
-
-@pytest_asyncio.fixture
-async def existing_deactivated_user_id_info(google_id_info, single_disabled_user):
-    google_id_info.sub = single_disabled_user.ext_id
-    return google_id_info
-
-
-@pytest_asyncio.fixture
-async def token_data(single_admin) -> dict:
+async def token_data(single_admin) -> Dict[str, Any]:
     return {
         "exp": datetime.utcnow()
         + timedelta(minutes=cached_settings.ACCESS_TOKEN_EXPIRE_MIN),
-        "id": single_admin.id_str,
+        "sub": single_admin.id_str,
         "username": single_admin.username,
     }
 
 
 @pytest_asyncio.fixture
-async def bad_token(token_data) -> dict:
+async def bad_token(token_data) -> Dict[str, Any]:
     return {
         "access_token": jwt.encode(
             token_data, "qwe", algorithm=cached_settings.ALGORITHM
@@ -109,215 +73,6 @@ async def single_disabled_refresh_token(single_admin_refresh_token, single_admin
     return single_admin_refresh_token
 
 
-@pytest.mark.skipif(
-    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
-)
-class TestGoogleIdInfoPydantic:
-    """Pydantic model tests."""
-
-    def test_with_email(self):
-        serializer = GoogleIdInfo(
-            email="jeff@mail.ru",
-            aud=cached_settings.GOOGLE_CLIENT_ID,
-            sub="1",
-            iat=datetime.utcnow().timestamp(),
-            exp=(datetime.utcnow() + timedelta(days=1)).timestamp(),
-            iss="accounts.google.com",
-        )
-        assert isinstance(serializer, GoogleIdInfo)
-        assert serializer.username == "jeff"
-
-    def test_aud(self):
-        try:
-            GoogleIdInfo(
-                aud=123,
-                sub="1",
-                iat=datetime.utcnow().timestamp(),
-                exp=(datetime.utcnow() + timedelta(days=1)).timestamp(),
-                iss="accounts.google.com",
-            )
-        except ValidationError:
-            assert True
-        else:
-            assert False
-
-    def test_name(self):
-        serializer = GoogleIdInfo(
-            aud=cached_settings.GOOGLE_CLIENT_ID,
-            iat=datetime.utcnow().timestamp(),
-            exp=(datetime.utcnow() + timedelta(days=1)).timestamp(),
-            sub="1",
-            iss="accounts.google.com",
-            name="user",
-        )
-        assert isinstance(serializer, GoogleIdInfo)
-        assert serializer.username != "user"
-
-    def test_iss(self):
-        try:
-            GoogleIdInfo(
-                aud=cached_settings.GOOGLE_CLIENT_ID,
-                iat=datetime.utcnow().timestamp(),
-                exp=(datetime.utcnow() + timedelta(days=1)).timestamp(),
-                iss="google.com",
-                name="user",
-            )
-        except ValidationError:
-            assert True
-        else:
-            assert False
-
-
-@pytest.mark.skipif(
-    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
-)
-class TestGOCUser:
-    """Get or create (GOC) user tests."""
-
-    async def test_get_or_create_user_deactivated_user(
-        self, backend_app, single_disabled_user, existing_deactivated_user_id_info
-    ):
-        try:
-            await get_or_create_user_gino_obj(existing_deactivated_user_id_info)
-        except HTTPException as ex:
-            assert ex.status_code == CREDENTIALS_EX.status_code
-        else:
-            assert False
-
-    async def test_get_or_create_user_update_user(
-        self, backend_app, single_admin, existing_user_id_info
-    ):
-        user_object = await get_or_create_user_gino_obj(existing_user_id_info)
-        assert user_object.ext_id == existing_user_id_info.sub
-        assert user_object.given_name == existing_user_id_info.given_name
-        assert user_object.family_name == existing_user_id_info.family_name
-
-    async def test_get_or_create_user_create_user(self, backend_app, google_id_info):
-        user_obj = await UserGinoModel.query.where(
-            UserGinoModel.ext_id == google_id_info.sub
-        ).gino.first()
-        assert not user_obj
-        user_object = await get_or_create_user_gino_obj(google_id_info)
-        assert user_object.ext_id == google_id_info.sub
-        assert user_object.given_name == google_id_info.given_name
-        assert user_object.family_name == google_id_info.family_name
-
-
-@pytest.mark.skipif(
-    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
-)
-class TestGCUser:
-    """Get current (GC) user tests."""
-
-    async def test_get_current_active_user(self, backend_app, single_admin_access_token):
-        user_object = await get_current_user_gino_obj(single_admin_access_token)
-        assert isinstance(user_object, UserGinoModel)
-
-    async def test_get_current_disabled_user(
-        self, backend_app, single_disabled_admin_token
-    ):
-        try:
-            await get_current_user_gino_obj(single_disabled_admin_token)
-        except HTTPException as ex:
-            assert ex.status_code == INACTIVE_EX.status_code
-        else:
-            assert False
-
-    async def test_get_current_user_bad_token(self, backend_app, bad_access_token):
-        try:
-            await get_current_user_gino_obj(bad_access_token)
-        except HTTPException as ex:
-            assert ex.status_code == CREDENTIALS_EX.status_code
-        else:
-            assert False
-
-    async def test_get_current_user_no_token(self, backend_app):
-        try:
-            await get_current_user_gino_obj("")
-        except HTTPException as ex:
-            assert ex.status_code == CREDENTIALS_EX.status_code
-        else:
-            assert False
-
-
-@pytest.mark.skipif(
-    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
-)
-class TestGUserFR:
-    """Get user (GU) for refresh tests."""
-
-    async def test_get_active_user_for_refresh(
-        self, backend_app, single_admin_refresh_token
-    ):
-        user_object = await get_user_for_refresh_gino_obj(single_admin_refresh_token)
-        assert isinstance(user_object, UserGinoModel)
-
-    async def test_get_disabled_user_for_refresh(
-        self, backend_app, single_disabled_refresh_token
-    ):
-        try:
-            await get_user_for_refresh_gino_obj(single_disabled_refresh_token)
-        except HTTPException as ex:
-            assert ex.status_code == INACTIVE_EX.status_code
-        else:
-            assert False
-
-    async def test_get_current_user_for_refresh_bad_token(
-        self, backend_app, bad_access_token
-    ):
-        try:
-            await get_user_for_refresh_gino_obj(bad_access_token)
-        except HTTPException as ex:
-            assert ex.status_code == CREDENTIALS_EX.status_code
-        else:
-            assert False
-
-    async def test_get_current_user_for_refresh_unknown_token(
-        self, backend_app, single_admin_refresh_token, no_refresh_token
-    ):
-        try:
-            await get_user_for_refresh_gino_obj(single_admin_refresh_token)
-        except HTTPException as ex:
-            assert ex.status_code == CREDENTIALS_EX.status_code
-        else:
-            assert False
-
-    async def test_get_current_user_for_refresh_no_token(self, backend_app):
-        try:
-            await get_user_for_refresh_gino_obj("")
-        except HTTPException as ex:
-            assert ex.status_code == CREDENTIALS_EX.status_code
-        else:
-            assert False
-
-
-@pytest.mark.skipif(
-    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
-)
-async def test_swag_login(backend_app):
-    resp = await backend_app.get(
-        f"{API_URL_PREFIX}/swag_login",
-        query_string={"state": "qwe"},
-        allow_redirects=False,
-    )
-    assert resp.status_code == status.HTTP_307_TEMPORARY_REDIRECT
-
-
-@pytest.mark.skipif(
-    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
-)
-async def test_react_login(backend_app):
-    resp = await backend_app.get(
-        f"{API_URL_PREFIX}/react_login",
-        query_string={"state": "qwe"},
-        allow_redirects=False,
-    )
-    assert resp.status_code == status.HTTP_307_TEMPORARY_REDIRECT
-
-
-@pytest.mark.skipif(
-    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
-)
 async def test_logout(backend_app, single_admin_auth_headers):
     resp = await backend_app.get(
         f"{API_URL_PREFIX}/logout", headers=single_admin_auth_headers
@@ -325,17 +80,11 @@ async def test_logout(backend_app, single_admin_auth_headers):
     assert resp.status_code == status.HTTP_204_NO_CONTENT
 
 
-@pytest.mark.skipif(
-    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
-)
 async def test_logout_2(backend_app):
     resp = await backend_app.get(f"{API_URL_PREFIX}/logout")
     assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-@pytest.mark.skipif(
-    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
-)
 class TestUserInfo:
     """Authenticated user attributes tests."""
 
@@ -360,12 +109,9 @@ class TestUserInfo:
         assert resp.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-@pytest.mark.skipif(
-    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
-)
 async def test_refresh_access_token(backend_app, single_admin_refresh_token):
     resp = await backend_app.post(
-        f"{API_URL_PREFIX}/refresh_access_token",
+        f"{API_URL_PREFIX}/token/refresh",
         query_string={"token": single_admin_refresh_token},
     )
     assert resp.status_code == status.HTTP_200_OK
@@ -374,11 +120,8 @@ async def test_refresh_access_token(backend_app, single_admin_refresh_token):
     assert "refresh_token" in resp_data
 
 
-@pytest.mark.skipif(
-    os.environ.get("PLATFORM") == "GITHUB", reason="Only for a local docker."
-)
 async def test_refresh_access_token_with_bad_token(backend_app):
     resp = await backend_app.post(
-        f"{API_URL_PREFIX}/refresh_access_token", query_string={"token": "qwe"}
+        f"{API_URL_PREFIX}/token/refresh", query_string={"token": "qwe"}
     )
     assert resp.status_code == status.HTTP_401_UNAUTHORIZED

@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field, SecretStr
+from pydantic import BaseModel, Field
 
 from core.utils import BaseViewModel
 
@@ -12,7 +12,7 @@ class UserCreateModel(BaseModel):
     """Base User model."""
 
     username: str
-    password: SecretStr = Field(min_length=8, max_length=254)
+    password: str = Field(min_length=8, max_length=254)
 
 
 class UserViewModel(UserCreateModel, BaseViewModel):
