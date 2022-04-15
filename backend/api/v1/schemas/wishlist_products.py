@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Pydantic wishlist products models."""
 
-from typing import Optional
-
 from pydantic import UUID4, BaseModel
 
 from core.utils import BaseUpdateModel, BaseViewModel
@@ -31,6 +29,6 @@ class WishlistProductsViewModel(WishlistProductsCreateModel, BaseViewModel):
 class WishlistProductsUpdateModel(BaseUpdateModel):
     """Wishlist products update attributes serializer."""
 
-    product_id: Optional[UUID4]
-    reserved: Optional[bool]
-    substitutable: Optional[bool]
+    product_id: UUID4 | None
+    reserved: bool | None
+    substitutable: bool | None

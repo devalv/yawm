@@ -1,75 +1,95 @@
-# -*- coding: utf-8 -*-
-"""Project configuration file (Starlette)."""
+from functools import lru_cache
+from typing import Any, Dict, Set
 
-from sqlalchemy.engine.url import URL, make_url
-from starlette.config import Config
-from starlette.datastructures import CommaSeparatedStrings, Secret
+from jose.constants import ALGORITHMS
+from pydantic import BaseSettings, PostgresDsn, validator
+from starlette.datastructures import Secret
 
-config = Config(".env")
-# Gino
-DB_DRIVER = config("DB_DRIVER", default="postgresql")
-DB_HOST = config("DB_HOST", default=None)
-DB_PORT = config("DB_PORT", cast=int, default=None)
-DB_USER = config("DB_USER", cast=str, default=None)
-DB_PASSWORD = config("DB_PASSWORD", cast=Secret, default=None)
-DB_DATABASE = config("DB_DATABASE", default=None)
-DB_DSN = config(
-    "DB_DSN",
-    cast=make_url,
-    default=URL(
-        drivername=DB_DRIVER,
-        username=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=DB_PORT,
-        database=DB_DATABASE,
-    ),
-)
-DB_POOL_MIN_SIZE = config("DB_POOL_MIN_SIZE", cast=int, default=1)
-DB_POOL_MAX_SIZE = config("DB_POOL_MAX_SIZE", cast=int, default=16)
-DB_ECHO = config("DB_ECHO", cast=bool, default=False)
-DB_SSL = config("DB_SSL", default=None)
-DB_USE_CONNECTION_FOR_REQUEST = config(
-    "DB_USE_CONNECTION_FOR_REQUEST", cast=bool, default=True
-)
-DB_RETRY_LIMIT = config("DB_RETRY_LIMIT", cast=int, default=1)
-DB_RETRY_INTERVAL = config("DB_RETRY_INTERVAL", cast=int, default=1)
-# uvicorn
-API_HOST = config("API_HOST", cast=str, default="127.0.0.1")
-API_PORT = config("API_PORT", cast=int, default=8000)
-API_DOMAIN = config("API_DOMAIN", cast=str, default="localhost")
-API_PROTOCOL = config("API_PROTOCOL", cast=str, default="https")
-API_LOCATION = config(
-    "API_LOCATION", cast=str, default=f"{API_PROTOCOL}://{API_DOMAIN}:{API_PORT}"
-)
-# crawler User-Agent
-CRAWLER_USER_AGENT = config("CRAWLER_USER_AGENT", default="yawm-api")
-# Google OAuth2 configuration
-GOOGLE_CLIENT_ID = config("GOOGLE_CLIENT_ID", default=None)
-GOOGLE_CLIENT_SECRETS_JSON = config("GOOGLE_CLIENT_SECRETS_JSON", default=None)
-GOOGLE_USERINFO_SCOPE = config("GOOGLE_USERINFO_SCOPE", default=None)
-GOOGLE_SCOPES = [GOOGLE_USERINFO_SCOPE]
-# security
-SWAG_LOGIN_ENDPOINT = config(
-    "SWAG_LOGIN_ENDPOINT", cast=str, default="/api/v1/swag_login"
-)
-SWAG_SWAP_TOKEN_ENDPOINT = config(
-    "SWAG_SWAP_TOKEN_ENDPOINT", cast=str, default="/api/v1/swag_swap_token"
-)
-REACT_SWAP_TOKEN_ENDPOINT = config(
-    "REACT_SWAP_TOKEN_ENDPOINT", cast=str, default="/api/v1/react_swap_token"
-)
-SECRET_KEY = config("SECRET_KEY", default=None)
-ALGORITHM = config("ALGORITHM", default="HS256")
-ACCESS_TOKEN_EXPIRE_MIN = config("ACCESS_TOKEN_EXPIRE_MIN", cast=int, default=30)
-REFRESH_TOKEN_EXPIRE_DAYS = config("REFRESH_TOKEN_EXPIRE_DAYS", cast=int, default=7)
-ALLOW_ORIGINS = config("ALLOW_ORIGINS", cast=CommaSeparatedStrings, default=[])
-# client application endpoints
-FRONTEND_DOMAIN = config("FRONTEND_DOMAIN", cast=str, default="localhost")
-FRONTEND_PORT = config("FRONTEND_PORT", cast=int, default=3000)
-FRONTEND_PROTOCOL = config("FRONTEND_PROTOCOL", cast=str, default="https")
-FRONTEND_URL = f"{FRONTEND_PROTOCOL}://{FRONTEND_DOMAIN}:{FRONTEND_PORT}"
-FRONTEND_AUTH_TOKEN_PARAM = config(
-    "FRONTEND_AUTH_TOKEN_PARAM", cast=str, default="authToken"
-)
-FRONTEND_AUTH_URL = f"{FRONTEND_URL}?{FRONTEND_AUTH_TOKEN_PARAM}"
+BoolOrStr = bool | str
+BoolOrNone = bool | None
+
+
+class ProjectPostgresDsn(PostgresDsn):
+    allowed_schemes = {"postgres", "postgresql"}
+
+
+class Settings(BaseSettings):
+
+    # DB configuration
+    DB_HOST: str
+    DB_PORT: int
+    DB_USER: str
+    DB_PASSWORD: Secret | str
+    DB_NAME: str
+    DB_POOL_MIN_SIZE: int = 1
+    DB_POOL_MAX_SIZE: int = 16
+    DB_ECHO: bool | str = False
+    DB_SSL: BoolOrNone = None
+    DB_USE_CONNECTION_FOR_REQUEST: BoolOrStr = True
+    DB_RETRY_LIMIT: int = 1
+    DB_RETRY_INTERVAL: int = 1
+    DATABASE_URI: ProjectPostgresDsn | None = None
+
+    # security
+    SECRET_KEY: Secret | str
+    ALGORITHM: str = ALGORITHMS.HS256
+    ALLOW_ORIGINS: Set[str] = set()
+    ACCESS_TOKEN_EXPIRE_MIN: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    SWAG_LOGIN_ENDPOINT: str = "/api/v1/swag_login"
+    SWAG_SWAP_TOKEN_ENDPOINT: str = "/api/v1/swag_swap_token"
+    REACT_SWAP_TOKEN_ENDPOINT: str = "/api/v1/react_swap_token"
+
+    # client application endpoints
+    FRONTEND_DOMAIN: str = "localhost"
+    FRONTEND_PORT: int = 3000
+    FRONTEND_PROTOCOL: str = "https"
+    FRONTEND_URL: str = f"{FRONTEND_PROTOCOL}://{FRONTEND_DOMAIN}:{FRONTEND_PORT}"
+    FRONTEND_AUTH_TOKEN_PARAM: str = "authToken"
+    FRONTEND_AUTH_URL: str = f"{FRONTEND_URL}?{FRONTEND_AUTH_TOKEN_PARAM}"
+
+    # API configuration
+    CRAWLER_USER_AGENT: str = "yawm-api"
+    API_HOST: str = "127.0.0.1"
+    API_PORT: int = 8000
+    API_DOMAIN: str = "localhost"
+
+    # third-party services
+    SENTRY_DSN: Secret | str | None = None
+    SENTRY_ENVIRONMENT: str | None = None
+
+    @validator("DATABASE_URI", pre=True)
+    def assemble_db_connection(
+        cls, value: str, values: Dict[str, Any]
+    ) -> Any:  # pragma: no cover
+        if isinstance(value, str):
+            return value
+
+        return ProjectPostgresDsn.build(
+            scheme="postgresql",
+            user=values.get("DB_USER"),
+            password=str(values.get("DB_PASSWORD")),
+            host=values.get("DB_HOST"),
+            port=str(values.get("DB_PORT")),
+            path=f'/{values.get("DB_NAME") or ""}',
+        )
+
+    @validator("SECRET_KEY", "DB_PASSWORD", "SENTRY_DSN", pre=True)
+    def wrap_secret(cls, value: Secret | str) -> Secret:
+        if isinstance(value, Secret) or value is None:
+            return value
+        return Secret(value)
+
+    class Config:
+        env_file: str = ".env"
+        env_file_encoding: str = "utf-8"
+        case_sensitive: bool = True
+
+
+@lru_cache()
+def get_settings() -> Settings:
+    """Cached app settings.
+
+    Example: settings: config.Settings = Depends(get_settings)
+    """
+    return Settings()

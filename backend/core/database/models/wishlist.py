@@ -3,17 +3,14 @@
 from __future__ import annotations
 
 import uuid
-from typing import List, Optional
+from typing import Any, Dict, List
 
-from asyncpg.exceptions import ForeignKeyViolationError
-from coolname import generate as random_name
 from pydantic import HttpUrl
 from sqlalchemy.dialects.postgresql import UUID
-from starlette import status
-from starlette.exceptions import HTTPException
 
 from core.database.models.security import User
 from core.services import get_product_name
+from core.utils.default_names import random_name
 
 from . import BaseUpdateDateModel, db
 
@@ -78,11 +75,6 @@ class Wishlist(BaseEntityModel):
 
     name = db.Column(db.Unicode(length=255), nullable=False)
 
-    @property
-    def products(self):
-        """Get products related to wishlist object."""
-        return WishlistProducts.query.where(WishlistProducts.wishlist_id == self.id)
-
     @staticmethod
     async def create_product(user_id: UUID, product_url: HttpUrl) -> Product:
         # All urls should be in a lower case
@@ -93,13 +85,13 @@ class Wishlist(BaseEntityModel):
         ).gino.first()
         if existing_product:
             return existing_product
-        product_kwargs = {"url": url, "user_id": user_id}
+        product_kwargs: Dict[str, Any] = {"url": url, "user_id": user_id}
         # Get h1 from product page as product name
-        product_name: Optional[str] = await get_product_name(product_url.url)
+        product_name: str | None = await get_product_name(product_url.url)
         if product_name:
             product_kwargs["name"] = product_name  # pragma: no cover
         else:
-            product_kwargs["name"] = random_name()[0].capitalize()
+            product_kwargs["name"] = random_name()
         # Create new product
         new_product: Product = await Product.create(**product_kwargs)
         return new_product  # noqa: PIE781
@@ -114,30 +106,28 @@ class Wishlist(BaseEntityModel):
                 await cls.create_product(user_id=user_id, product_url=product_url)
             )
         # Create new wishlist
-        wishlist_name = random_name()[0].capitalize()
+        wishlist_name: str = random_name()
         wishlist: Wishlist = await Wishlist.create(name=wishlist_name, user_id=user_id)
         # Include products to a wishlist
         for product in created_products:
-            await wishlist.add_product(product_id=product.id)
+            await wishlist.add_product(product_id=product.id, product_name=product.name)
         return wishlist
 
     async def add_product(
         self,
         product_id: str,
-        reserved: Optional[bool] = False,
-        substitutable: Optional[bool] = False,
+        product_name: str,
+        reserved: bool = False,
+        substitutable: bool = False,
     ):
         """Add existing product to wishlist."""
-        try:
-            rv = await WishlistProducts.create(
-                product_id=product_id,
-                wishlist_id=self.id,
-                reserved=reserved,
-                substitutable=substitutable,
-            )
-        except ForeignKeyViolationError:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "Product is not found")
-        return rv
+        return await WishlistProducts.create(
+            product_id=product_id,
+            wishlist_id=self.id,
+            name=product_name,
+            reserved=reserved,
+            substitutable=substitutable,
+        )
 
     async def add_products_v2(self, user_id: UUID, product_urls: List[HttpUrl]):
         """Add Products to a Wishlist."""
@@ -149,7 +139,7 @@ class Wishlist(BaseEntityModel):
             )
         # Include products to a wishlist
         for product in created_products:
-            await self.add_product(product_id=product.id)
+            await self.add_product(product_id=product.id, product_name=product.name)
         return self
 
     async def get_products_v2(self):
@@ -187,12 +177,14 @@ class WishlistProducts(BaseUpdateDateModel):
     )
     substitutable = db.Column(db.Boolean(), nullable=False, default=False)
     reserved = db.Column(db.Boolean(), nullable=False, default=False)
+    name = db.Column(db.Unicode(length=255), nullable=False)
 
     _product = None
     _wishlist = None
 
     @property
     def product(self):  # pragma: no cover
+        """Used by Wishlist.get_products_v2."""
         return self._product
 
     @product.setter
@@ -201,15 +193,12 @@ class WishlistProducts(BaseUpdateDateModel):
 
     @property
     def wishlist(self):  # pragma: no cover
+        """Used by Wishlist.get_products_v2."""
         return self._wishlist
 
     @wishlist.setter
     def wishlist(self, wishlist):
         self._wishlist = wishlist
-
-    @property
-    def name(self):
-        return self._product.name
 
     @property
     def url(self):

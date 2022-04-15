@@ -1,17 +1,21 @@
 # Yet another wishlist maker - YAWM
 
----
-
-![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
-[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://github.com/tiangolo/fastapi)
+[![FastAPI](https://shields.io/static/v1?label=FastAPI&message=0.75&color=green)](https://github.com/tiangolo/fastapi)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![codecov](https://codecov.io/gh/devalv/yawm/branch/main/graph/badge.svg)](https://codecov.io/gh/devalv/yawm)
-
----
-
+[![codecov](https://codecov.io/gh/devalv/yawm/branch/main/graph/badge.svg?token=61KST8QUNE)](https://codecov.io/gh/devalv/yawm)
+[![CodeQL](https://github.com/devalv/yawm/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/devalv/yawm/actions/workflows/codeql-analysis.yml)
 
 For any additional instructions please see [Wiki](https://github.com/devalv/yawm/wiki).
+
+## Git branches
+
+```bash
+main - production branch
+fix/bug-name - production bug fixes
+release/fastapi-*.*.* - ongoing release
+feature/feature-name - feature branch for ongoing release
+```
 
 ## Project directory structure
 
@@ -28,10 +32,10 @@ For any additional instructions please see [Wiki](https://github.com/devalv/yawm
 │   ├── services
 │   ├── health
 │   ├── utils
-│   ├── .env
 │   └── config.py
 ├── tests
 │   ├── snapshots
+│   ├── .env
 │   └── conftest.py
 ├── api
 │   ├── v1
@@ -41,7 +45,9 @@ For any additional instructions please see [Wiki](https://github.com/devalv/yawm
 │       ├── handlers
 │       └── schemas
 ├── main.py
-└── tox.ini
+├── .env
+├── alembic.ini
+└── pyproject.toml
 ```
 
 #### root
@@ -49,7 +55,7 @@ For any additional instructions please see [Wiki](https://github.com/devalv/yawm
 Project outer-startup files, such as:
 
 * alembic configuration
-* pytest, coverage, flake8, etc configurations (tox.ini)
+* pytest, coverage, flake8, etc configurations (pyproject.toml)
 * uvicorn app file
 * project requirements lists
 
@@ -71,22 +77,3 @@ Project tests
 #### api
 
 Project API by versions (v1, v2 and etc.).
-
-### docker
-
-Docker-images and docker-compose configuration files.
-
-#### docker registry
-
-```bash
-docker login
-docker build . -f ./backend/docker/python/Dockerfile -t devalv/yawm:backend-0.3.0
-docker run -it devalv/yawm:backend-0.3.0 sh
-docker push devalv/yawm:backend-0.3.0
-```
-
-#### mypy
-
-```bash
-mypy --config-file=tox.ini core api
-```

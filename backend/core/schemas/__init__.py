@@ -1,23 +1,14 @@
 # -*- coding: utf-8 -*-
 """Pydantic models."""
 
-from .security import (
-    AccessToken,
-    GoogleIdInfo,
-    RefreshToken,
-    Token,
-    UserCreateModel,
-    UserViewModel,
-)
+from .security import Token, TokenData, UserCreateModel, UserViewModel
 from .utils import ExtractUrlInModel, ExtractUrlOutModel
 
-__all__ = [
+__all__ = (
     "ExtractUrlInModel",
     "ExtractUrlOutModel",
     "UserViewModel",
     "UserCreateModel",
     "Token",
-    "AccessToken",
-    "RefreshToken",
-    "GoogleIdInfo",
-]
+    "TokenData",
+)

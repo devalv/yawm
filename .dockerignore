@@ -10,9 +10,12 @@
 */*.pytest_cache
 */*__pycache__
 */node_modules
+.dockerignore
+*/build
 
 # files
 */db.sqlite
 */.coverage
 */coverage.xml
-*/*.env
+*/*.env*
+*/coverage

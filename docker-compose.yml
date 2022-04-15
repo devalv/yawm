@@ -3,11 +3,11 @@ services:
 
   db:
     container_name: yawm-db
-    image: postgres:13
+    image: postgres:14
     ports:
       - ${DB_PORT}:${DB_PORT}
     environment:
-      - POSTGRES_DB=${DB_DATABASE}
+      - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     command: -p ${DB_PORT}
@@ -21,67 +21,48 @@ services:
     ports:
       - ${API_PORT}:${API_PORT}
     volumes:
-      - ./backend/:/opt/yawm/app/
+      - ./backend/:/home/app
     environment:
-      - PYTHONPATH=/opt/yawm/app
       - DB_HOST=db
-      - DB_PORT=${DB_PORT}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_DATABASE=${DB_DATABASE}
       - API_HOST=0.0.0.0
       - API_PORT=${API_PORT}
-      - API_PROTOCOL=${API_PROTOCOL}
-      - API_DOMAIN=${API_DOMAIN}
-      - CRAWLER_USER_AGENT=${CRAWLER_USER_AGENT}
-      - SECRET_KEY=${SECRET_KEY}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRETS_JSON=${GOOGLE_CLIENT_SECRETS_JSON}
-      - GOOGLE_USERINFO_SCOPE=${GOOGLE_USERINFO_SCOPE}
-      - OAUTHLIB_INSECURE_TRANSPORT=1
-      - OAUTHLIB_RELAX_TOKEN_SCOPE=1
-      - FRONTEND_PROTOCOL=http
-      - SWAG_LOGIN_ENDPOINT=${SWAG_LOGIN_ENDPOINT}
-      - SWAG_SWAP_TOKEN_ENDPOINT=${SWAG_SWAP_TOKEN_ENDPOINT}
-      - REACT_SWAP_TOKEN_ENDPOINT=${REACT_SWAP_TOKEN_ENDPOINT}
-      - ALLOW_ORIGINS=${ALLOW_ORIGINS}
-    working_dir: /opt/yawm/app
-    command: sh -c "pipenv install && sleep 3 && pipenv run alembic upgrade head && pipenv run python main.py"
+    command: sh -c "alembic upgrade head && python main.py"
     depends_on:
       - db
 
-  frontend-app:
-    image: devalv/yawm:frontend-0.1.0
-    container_name: yawm-frontend
-    ports:
-      - 3000:3000
-    depends_on:
-      - app
-      - db
-    environment:
-      - REACT_APP_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - REACT_APP_API_URL=${API_PROTOCOL}://${API_HOST}:${API_PORT}/api/v1
-      - REACT_APP_API_V2_URL=${API_PROTOCOL}://${API_HOST}:${API_PORT}/api/v2
-      - REACT_APP_HEALTH_URL=${API_PROTOCOL}://${API_HOST}:${API_PORT}/api/health
-      - REACT_APP_STATE=nonrandom-docker-local-state
-    working_dir: /opt/yawm/frontend
-    command: sh -c "npm start"
-    stdin_open: true
+  # frontend-app:
+  #   image: devalv/yawm:frontend-0.1.0
+  #   container_name: yawm-frontend
+  #   ports:
+  #     - 3000:3000
+  #   depends_on:
+  #     - app
+  #     - db
+  #   environment:
+  #     - REACT_APP_API_ORIGIN=${API_PROTOCOL}://${API_HOST}:${API_PORT}
+  #     - REACT_APP_API_URL=${REACT_APP_API_ORIGIN}/api
+  #     - REACT_APP_API_V1_URL=${REACT_APP_API_URL}/v1
+  #     - REACT_APP_API_V2_URL=${REACT_APP_API_URL}/v2
+  #     - REACT_APP_HEALTH_URL=${REACT_APP_API_URL}/health
+  #     - REACT_APP_STATE=nonrandom-docker-local-state
+  #   working_dir: /opt/yawm/frontend
+  #   command: sh -c "npm start"
+  #   stdin_open: true
 
-  caddy:
-    image: "caddy:2.4.6-alpine"
-    restart: unless-stopped
-    environment:
-      - DOMAIN_NAME=${DOMAIN_NAME}
-      - API_PORT=${API_PORT}
-      - TLS_EMAIL=${TLS_EMAIL}
-    volumes:
-      - ./caddy/certs:/root/.caddy
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-    ports:
-      - 80:80
-      - 443:443
-      - 2019:2019
-    depends_on:
-      - app
-      - frontend-app
+  # caddy:
+  #   image: "caddy:2.4.6-alpine"
+  #   restart: unless-stopped
+  #   environment:
+  #     - DOMAIN_NAME=${DOMAIN_NAME}
+  #     - API_PORT=${API_PORT}
+  #     - TLS_EMAIL=${TLS_EMAIL}
+  #   volumes:
+  #     - ./caddy/certs:/root/.caddy
+  #     - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #     - 2019:2019
+  #   depends_on:
+  #     - app
+  #     - frontend-app

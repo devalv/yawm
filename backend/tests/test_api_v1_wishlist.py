@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-"""Wishlist api tests."""
-
 import pytest
+import pytest_asyncio
 
 from core.database import ProductGinoModel, WishlistGinoModel
 
@@ -10,14 +8,14 @@ pytestmark = [pytest.mark.asyncio, pytest.mark.api_full]
 API_URL_PREFIX = "/api/v1"
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def products_1(single_user):
     return await ProductGinoModel.create(
         user_id=single_user.id, name="test", url="https://devyatkin.dev/1"
     )
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def products_9(single_user):
     products_list = list()
     for i in range(1, 10):
@@ -28,7 +26,7 @@ async def products_9(single_user):
     return products_list
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def products_149(single_user):
     products_list = list()
     for i in range(1, 150):
@@ -39,58 +37,56 @@ async def products_149(single_user):
     return products_list
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def ew_1(single_user):
     """1 empty wishlist."""
     wishlist = await WishlistGinoModel.create(user_id=single_user.id, name="test")
     return wishlist
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def empty_wishlists_4(single_user):
     for i in range(1, 5):
         await WishlistGinoModel.create(user_id=single_user.id, name=f"test{i}")
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def empty_wishlists_149(single_user):
     for i in range(1, 150):
         await WishlistGinoModel.create(user_id=single_user.id, name=f"test{i}")
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def wishlist_products_1(ew_1, products_1):
     wishlist = await WishlistGinoModel.get(ew_1.id)
-    return await wishlist.add_product(products_1.id, reserved=False, substitutable=False)
+    return await wishlist.add_product(
+        products_1.id, reserved=False, substitutable=False, product_name=products_1.name
+    )
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def wishlist_products_9(ew_1, products_9):
     products_list = list()
     wishlist = await WishlistGinoModel.get(ew_1.id)
     for product in products_9:
-        rv = await wishlist.add_product(product.id, reserved=False, substitutable=True)
+        rv = await wishlist.add_product(
+            product.id, reserved=False, substitutable=True, product_name=product.name
+        )
         products_list.append(rv)
     return products_list
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def wp_149(ew_1, products_149):
     """149 wishlist products."""
     products_list = list()
     wishlist = await WishlistGinoModel.get(ew_1.id)
     for product in products_149:
-        rv = await wishlist.add_product(product.id, reserved=False, substitutable=True)
+        rv = await wishlist.add_product(
+            product.id, reserved=False, substitutable=True, product_name=product.name
+        )
         products_list.append(rv)
     return products_list
-
-
-@pytest.mark.skip(reason="not implemented yet.")
-async def test_trailing_slash(backend_app):
-    """Test that trailing slash redirects working."""
-    resp = await backend_app.get(f"{API_URL_PREFIX}/product/")
-    assert resp.is_redirect
-    assert resp.status_code == 307
 
 
 class TestProduct:
@@ -338,28 +334,6 @@ class TestEmptyWishlist:
     API_URL = f"{API_URL_PREFIX}/wishlist"
 
     @pytest.mark.api_base
-    async def test_wishlist_create_no_auth(self, snapshot, backend_app):
-        resp = await backend_app.post(
-            self.API_URL, json={"data": {"attributes": {"name": "Wishlist1"}}}
-        )
-        assert resp.status_code == 401
-
-    @pytest.mark.api_base
-    async def test_wishlist_create(self, snapshot, backend_app, single_user_auth_headers):
-        resp = await backend_app.post(
-            self.API_URL, json={"name": "Wishlist1"}, headers=single_user_auth_headers
-        )
-        assert resp.status_code == 200
-        resp_data = resp.json()
-        assert "id" in resp_data
-        assert "created_at" in resp_data
-        assert "updated_at" in resp_data
-        resp_data.pop("id", None)
-        resp_data.pop("created_at", None)
-        resp_data.pop("updated_at", None)
-        snapshot.assert_match(resp_data)
-
-    @pytest.mark.api_base
     async def test_empty_wishlist_delete_no_auth(self, backend_app, ew_1):
         resp = await backend_app.delete(f"{self.API_URL}/{ew_1.id}")
         assert resp.status_code == 401
@@ -381,10 +355,6 @@ class TestEmptyWishlist:
             f"{self.API_URL}/{ew_1.id}", headers=single_admin_auth_headers
         )
         assert resp.status_code == 204
-        new_resp = await backend_app.get(
-            f"{self.API_URL}/{ew_1.id}", headers=single_admin_auth_headers
-        )
-        assert new_resp.status_code == 404
 
     @pytest.mark.api_base
     async def test_empty_wishlist_delete(
@@ -394,10 +364,6 @@ class TestEmptyWishlist:
             f"{self.API_URL}/{ew_1.id}", headers=single_user_auth_headers
         )
         assert resp.status_code == 204
-        new_resp = await backend_app.get(
-            f"{self.API_URL}/{ew_1.id}", headers=single_user_auth_headers
-        )
-        assert new_resp.status_code == 404
 
     @pytest.mark.api_base
     async def test_empty_wishlists(self, snapshot, backend_app, empty_wishlists_4):
@@ -443,19 +409,6 @@ class TestEmptyWishlist:
             resp_product.pop("created_at", None)
             resp_product.pop("updated_at", None)
         snapshot.assert_match(items)
-
-    @pytest.mark.api_base
-    async def test_empty_wishlist_read(self, snapshot, backend_app, ew_1):
-        resp = await backend_app.get(self.API_URL + f"/{ew_1.id}")
-        assert resp.status_code == 200
-        resp_data = resp.json()
-        assert "id" in resp_data
-        assert "created_at" in resp_data
-        assert "updated_at" in resp_data
-        resp_data.pop("id", None)
-        resp_data.pop("created_at", None)
-        resp_data.pop("updated_at", None)
-        snapshot.assert_match(resp_data)
 
     @pytest.mark.api_base
     async def test_empty_wishlist_full_update(
@@ -515,162 +468,10 @@ class TestEmptyWishlist:
 class TestWishlist:
     """Wishlist API tests."""
 
-    @pytest.mark.api_base
-    async def test_add_product_wishlist_no_auth(self, backend_app, ew_1, products_9):
-        for i, product in enumerate(products_9):
-            insert_data = {
-                "product_id": f"{product.id}",
-                "reserved": False,
-                "substitutable": True,
-            }
-            expected_data = insert_data.copy()
-            expected_data["wishlist_id"] = f"{ew_1.id}"
-            resp = await backend_app.post(
-                f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products", json=insert_data
-            )
-
-            assert resp.status_code == 401
-
-    @pytest.mark.api_base
-    async def test_add_product_wishlist(
-        self, backend_app, ew_1, products_9, single_user_auth_headers
-    ):
-        for i, product in enumerate(products_9):
-            insert_data = {
-                "product_id": f"{product.id}",
-                "reserved": False,
-                "substitutable": True,
-            }
-            expected_data = insert_data.copy()
-            expected_data["wishlist_id"] = f"{ew_1.id}"
-            resp = await backend_app.post(
-                f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products",
-                json=insert_data,
-                headers=single_user_auth_headers,
-            )
-
-            assert resp.status_code == 200
-            resp_data = resp.json()
-            assert "id" in resp_data
-            assert "created_at" in resp_data
-            assert "updated_at" in resp_data
-            resp_data.pop("id", None)
-            resp_data.pop("created_at", None)
-            resp_data.pop("updated_at", None)
-            assert resp_data == expected_data
-
-        # check all products in wishlist
-        products_resp = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products"
-        )
-
-        assert products_resp.status_code == 200
-        product_resp_json_data = products_resp.json()
-        product_resp_data = product_resp_json_data["items"]
-        for product in product_resp_data:
-            assert "id" in product
-        total = product_resp_json_data["total"]
-        assert total == 9
-
-    @pytest.mark.api_base
-    async def test_delete_product_wishlist_no_auth(
-        self, snapshot, backend_app, wishlist_products_1
-    ):
-        # check products count
-        products_resp = await backend_app.get(f"{API_URL_PREFIX}/product")
-        assert products_resp.status_code == 200
-        assert products_resp.json()["total"] == 1
-        # delete 1 wishlist products
-        resp = await backend_app.delete(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}"  # noqa: E501
-        )
-        assert resp.status_code == 401
-
-    @pytest.mark.api_base
-    async def test_delete_product_wishlist_no_owner(
-        self,
-        snapshot,
-        backend_app,
-        wishlist_products_1,
-        another_single_user_auth_headers,
-    ):
-        # check products count
-        products_resp = await backend_app.get(f"{API_URL_PREFIX}/product")
-        assert products_resp.status_code == 200
-        assert products_resp.json()["total"] == 1
-        # delete 1 wishlist products
-        resp = await backend_app.delete(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            headers=another_single_user_auth_headers,
-        )
-        assert resp.status_code == 403
-
-    @pytest.mark.api_base
-    async def test_delete_product_wishlist_admin(
-        self, snapshot, backend_app, wishlist_products_1, single_admin_auth_headers
-    ):
-        # check products count
-        products_resp = await backend_app.get(f"{API_URL_PREFIX}/product")
-        assert products_resp.status_code == 200
-        assert products_resp.json()["total"] == 1
-        # delete 1 wishlist products
-        resp = await backend_app.delete(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            headers=single_admin_auth_headers,
-        )
-        assert resp.status_code == 204
-        # check all products in wishlist
-        products_resp = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products"
-        )
-        assert products_resp.status_code == 200
-        product_resp_data = products_resp.json()
-        assert isinstance(product_resp_data, dict)
-        total = product_resp_data["total"]
-        assert total == 0
-        # check products count
-        products_resp = await backend_app.get(f"{API_URL_PREFIX}/product")
-        assert products_resp.status_code == 200
-        assert products_resp.json()["total"] == 1
-
-    @pytest.mark.api_base
-    async def test_delete_product_wishlist(
-        self, snapshot, backend_app, wishlist_products_1, single_user_auth_headers
-    ):
-        # check products count
-        products_resp = await backend_app.get(f"{API_URL_PREFIX}/product")
-        assert products_resp.status_code == 200
-        assert products_resp.json()["total"] == 1
-        # delete 1 wishlist products
-        resp = await backend_app.delete(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            headers=single_user_auth_headers,
-        )
-        assert resp.status_code == 204
-        # check all products in wishlist
-        products_resp = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products"
-        )
-        assert products_resp.status_code == 200
-        product_resp_data = products_resp.json()
-        assert isinstance(product_resp_data, dict)
-        total = product_resp_data["total"]
-        assert total == 0
-        # check products count
-        products_resp = await backend_app.get(f"{API_URL_PREFIX}/product")
-        assert products_resp.status_code == 200
-        assert products_resp.json()["total"] == 1
-
     @pytest.mark.api_full
     async def test_delete_wishlist_with_products_no_auth(
         self, backend_app, wishlist_products_1
     ):
-        # check that wpr have 1 record
-        wpr = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products"
-        )
-        assert wpr.json()["total"] == 1
-        # delete wishlist assigned to wpr
         resp = await backend_app.delete(
             f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}"
         )
@@ -680,12 +481,6 @@ class TestWishlist:
     async def test_delete_wishlist_with_products_no_owner(
         self, backend_app, wishlist_products_1, another_single_user_auth_headers
     ):
-        # check that wpr have 1 record
-        wpr = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products"
-        )
-        assert wpr.json()["total"] == 1
-        # delete wishlist assigned to wpr
         resp = await backend_app.delete(
             f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}",
             headers=another_single_user_auth_headers,
@@ -696,407 +491,21 @@ class TestWishlist:
     async def test_delete_wishlist_with_products_admin(
         self, backend_app, wishlist_products_1, single_admin_auth_headers
     ):
-        # check that wpr have 1 record
-        wpr = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products"
-        )
-        assert wpr.json()["total"] == 1
-        # delete wishlist assigned to wpr
         resp = await backend_app.delete(
             f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}",
             headers=single_admin_auth_headers,
         )
         assert resp.status_code == 204
-        # check that wishlist deleted
-        new_resp = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}"
-        )
-        assert new_resp.status_code == 404
-        # check that wpr deleted too
-        wpr_2 = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products"
-        )
-        assert wpr_2.status_code == 404
 
     @pytest.mark.api_full
     async def test_delete_wishlist_with_products(
         self, backend_app, wishlist_products_1, single_user_auth_headers
     ):
-        # check that wpr have 1 record
-        wpr = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products"
-        )
-        assert wpr.json()["total"] == 1
-        # delete wishlist assigned to wpr
         resp = await backend_app.delete(
             f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}",
             headers=single_user_auth_headers,
         )
         assert resp.status_code == 204
-        # check that wishlist deleted
-        new_resp = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}"
-        )
-        assert new_resp.status_code == 404
-        # check that wpr deleted too
-        wpr_2 = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products"
-        )
-        assert wpr_2.status_code == 404
-
-    @pytest.mark.api_full
-    async def test_delete_product_in_wishlist_no_auth(
-        self, backend_app, wishlist_products_9
-    ):
-        # check that we have 9 products
-        initial_products = await backend_app.get(f"{API_URL_PREFIX}/product")
-        initial_products_total = initial_products.json()["total"]
-        initial_products_total == 9
-        #
-        first_product = wishlist_products_9[0]
-        # check that wpr exists
-        wpr = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{first_product.wishlist_id}/products"
-        )
-        assert wpr.json()["total"] == 9
-        # delete one of product
-
-        resp = await backend_app.delete(
-            f"{API_URL_PREFIX}/product/{first_product.product_id}"
-        )
-        assert resp.status_code == 401
-
-    @pytest.mark.api_full
-    async def test_delete_product_in_wishlist_no_owner(
-        self, backend_app, wishlist_products_9, another_single_user_auth_headers
-    ):
-        # check that we have 9 products
-        initial_products = await backend_app.get(f"{API_URL_PREFIX}/product")
-        initial_products_total = initial_products.json()["total"]
-        initial_products_total == 9
-        #
-        first_product = wishlist_products_9[0]
-        # check that wpr exists
-        wpr = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{first_product.wishlist_id}/products"
-        )
-        assert wpr.json()["total"] == 9
-        # delete one of product
-
-        resp = await backend_app.delete(
-            f"{API_URL_PREFIX}/product/{first_product.product_id}",
-            headers=another_single_user_auth_headers,
-        )
-        assert resp.status_code == 403
-
-    @pytest.mark.api_full
-    async def test_delete_product_in_wishlist_admin(
-        self, backend_app, wishlist_products_9, single_admin_auth_headers
-    ):
-        # check that we have 9 products
-        initial_products = await backend_app.get(f"{API_URL_PREFIX}/product")
-        initial_products_total = initial_products.json()["total"]
-        initial_products_total == 9
-        #
-        first_product = wishlist_products_9[0]
-        # check that wpr exists
-        wpr = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{first_product.wishlist_id}/products"
-        )
-        assert wpr.json()["total"] == 9
-        # delete one of product
-
-        resp = await backend_app.delete(
-            f"{API_URL_PREFIX}/product/{first_product.product_id}",
-            headers=single_admin_auth_headers,
-        )
-        assert resp.status_code == 204
-        # check that record deleted
-        new_resp = await backend_app.get(
-            f"{API_URL_PREFIX}/product/{first_product.product_id}"
-        )
-        assert new_resp.status_code == 404
-        # check that now we have 8 products
-        reduced_products = await backend_app.get(f"{API_URL_PREFIX}/product")
-        reduced_products_total = reduced_products.json()["total"]
-        reduced_products_total == 8
-        # check that wpr exists
-        wpr_2 = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{first_product.wishlist_id}/products"
-        )
-        assert wpr_2.json()["total"] == 8
-
-    @pytest.mark.api_full
-    async def test_delete_product_in_wishlist(
-        self, backend_app, wishlist_products_9, single_user_auth_headers
-    ):
-        # check that we have 9 products
-        initial_products = await backend_app.get(f"{API_URL_PREFIX}/product")
-        initial_products_total = initial_products.json()["total"]
-        initial_products_total == 9
-        #
-        first_product = wishlist_products_9[0]
-        # check that wpr exists
-        wpr = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{first_product.wishlist_id}/products"
-        )
-        assert wpr.json()["total"] == 9
-        # delete one of product
-
-        resp = await backend_app.delete(
-            f"{API_URL_PREFIX}/product/{first_product.product_id}",
-            headers=single_user_auth_headers,
-        )
-        assert resp.status_code == 204
-        # check that record deleted
-        new_resp = await backend_app.get(
-            f"{API_URL_PREFIX}/product/{first_product.product_id}"
-        )
-        assert new_resp.status_code == 404
-        # check that now we have 8 products
-        reduced_products = await backend_app.get(f"{API_URL_PREFIX}/product")
-        reduced_products_total = reduced_products.json()["total"]
-        reduced_products_total == 8
-        # check that wpr exists
-        wpr_2 = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{first_product.wishlist_id}/products"
-        )
-        assert wpr_2.json()["total"] == 8
-
-    @pytest.mark.api_base
-    async def test_wishlist_products_list(self, backend_app, wishlist_products_1):
-        products_resp = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products"
-        )
-        assert products_resp.status_code == 200
-        product_resp_json_data = products_resp.json()
-        total = product_resp_json_data["total"]
-        assert total == 1
-
-        product_resp_data = product_resp_json_data["items"]
-        for product in product_resp_data:
-            assert "id" in product
-            assert "created_at" in product
-            assert "updated_at" in product
-
-    @pytest.mark.api_base
-    async def test_paginator_wishlist_products_list(
-        self, backend_app, ew_1, wishlist_products_9
-    ):
-        paginator_limit = 5
-        products_resp = await backend_app.get(
-            f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products",
-            query_string=dict(size=paginator_limit),
-        )
-        assert products_resp.status_code == 200
-        product_resp_json_data = products_resp.json()
-        size = product_resp_json_data["size"]
-        assert size == paginator_limit
-        for product in product_resp_json_data["items"]:
-            assert "id" in product
-            assert "created_at" in product
-            assert "updated_at" in product
-
-    async def test_delete_fake_product_wishlist_no_auth(
-        self, snapshot, backend_app, wishlist_products_1
-    ):
-        resp = await backend_app.delete(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.product_id}"  # noqa: E501
-        )
-        assert resp.status_code == 401
-
-    async def test_delete_fake_product_wishlist(
-        self, snapshot, backend_app, wishlist_products_1, single_user_auth_headers
-    ):
-        resp = await backend_app.delete(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.product_id}",  # noqa: E501
-            headers=single_user_auth_headers,
-        )
-        assert resp.status_code == 404
-
-    async def test_add_fake_product_wishlist_no_auth(self, backend_app, ew_1, products_9):
-        insert_data = {
-            "data": {
-                "attributes": {
-                    "product_id": f"{ew_1.id}",
-                    "reserved": False,
-                    "substitutable": True,
-                }
-            }
-        }
-        resp = await backend_app.post(
-            f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products",  # noqa: E501
-            json=insert_data,
-        )
-
-        assert resp.status_code == 401
-
-    async def test_add_fake_product_wishlist(
-        self, backend_app, ew_1, products_9, single_user_auth_headers
-    ):
-        insert_data = {
-            "product_id": f"{ew_1.id}",
-            "reserved": False,
-            "substitutable": True,
-        }
-        resp = await backend_app.post(
-            f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products",
-            json=insert_data,
-            headers=single_user_auth_headers,
-        )
-
-        assert resp.status_code == 404
-
-    @pytest.mark.api_base
-    async def test_update_wishlist_product_no_auth(
-        self, backend_app, wishlist_products_1
-    ):
-        resp = await backend_app.put(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"data": {"attributes": {"reserved": True}}},
-        )
-        assert resp.status_code == 401
-
-    @pytest.mark.api_base
-    async def test_update_wishlist_product_no_owner(
-        self, backend_app, wishlist_products_1, another_single_user_auth_headers
-    ):
-        resp = await backend_app.put(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"data": {"attributes": {"reserved": True}}},
-            headers=another_single_user_auth_headers,
-        )
-        assert resp.status_code == 403
-
-    @pytest.mark.api_base
-    async def test_update_wishlist_product_admin(
-        self, backend_app, wishlist_products_1, single_admin_auth_headers
-    ):
-        resp = await backend_app.put(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"reserved": True},
-            headers=single_admin_auth_headers,
-        )
-        assert resp.status_code == 200
-        resp_data = resp.json()
-        assert "id" in resp_data
-        assert "created_at" in resp_data
-        assert "updated_at" in resp_data
-        assert resp_data["reserved"] is True
-
-    @pytest.mark.api_base
-    async def test_update_wishlist_product(
-        self, backend_app, wishlist_products_1, single_user_auth_headers
-    ):
-        assert not wishlist_products_1.substitutable
-        resp = await backend_app.put(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"substitutable": True, "reserved": True},
-            headers=single_user_auth_headers,
-        )
-        assert resp.status_code == 200
-        resp_data = resp.json()
-        assert "id" in resp_data
-        assert "created_at" in resp_data
-        assert "updated_at" in resp_data
-        assert resp_data["substitutable"] is True
-        assert resp_data["reserved"] is True
-
-    @pytest.mark.api_base
-    async def test_reserve_wishlist_product(self, backend_app, wishlist_products_1):
-        resp = await backend_app.put(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}/reserve",  # noqa: E501
-            json={"reserved": True},
-        )
-        assert resp.status_code == 200
-        resp_data = resp.json()
-        assert "id" in resp_data
-        assert "created_at" in resp_data
-        assert "updated_at" in resp_data
-        assert resp_data["reserved"] is True
-
-    async def test_reserve_fake_wishlist_product(self, backend_app, wishlist_products_1):
-        resp = await backend_app.put(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"reserved": True},
-        )
-        assert resp.status_code == 404
-
-    @pytest.mark.api_base
-    async def test_substitute_wishlist_product_no_auth(
-        self, backend_app, wishlist_products_1
-    ):
-        assert not wishlist_products_1.substitutable
-        resp = await backend_app.put(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"data": {"attributes": {"substitutable": True}}},
-        )
-        assert resp.status_code == 401
-
-    @pytest.mark.api_base
-    async def test_substitute_wishlist_product_no_owner(
-        self, backend_app, wishlist_products_1, another_single_user_auth_headers
-    ):
-        assert not wishlist_products_1.substitutable
-        resp = await backend_app.put(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"data": {"attributes": {"substitutable": True}}},
-            headers=another_single_user_auth_headers,
-        )
-        assert resp.status_code == 403
-
-    @pytest.mark.api_base
-    async def test_substitute_wishlist_product_admin(
-        self, backend_app, wishlist_products_1, single_admin_auth_headers
-    ):
-        assert not wishlist_products_1.substitutable
-        resp = await backend_app.put(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"substitutable": True},
-            headers=single_admin_auth_headers,
-        )
-        assert resp.status_code == 200
-        resp_data = resp.json()
-        assert "id" in resp_data
-        assert "created_at" in resp_data
-        assert "updated_at" in resp_data
-        assert resp_data["substitutable"]
-
-    @pytest.mark.api_base
-    async def test_substitute_wishlist_product(
-        self, backend_app, wishlist_products_1, single_user_auth_headers
-    ):
-        assert not wishlist_products_1.substitutable
-        resp = await backend_app.put(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"substitutable": True},
-            headers=single_user_auth_headers,
-        )
-        assert resp.status_code == 200
-        resp_data = resp.json()
-        assert "id" in resp_data
-        assert "created_at" in resp_data
-        assert "updated_at" in resp_data
-        assert resp_data["substitutable"]
-
-    async def test_substitute_fake_wishlist_product_no_auth(
-        self, backend_app, wishlist_products_1
-    ):
-        resp = await backend_app.put(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.wishlist_id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"data": {"attributes": {"substitutable": True}}},
-        )
-        assert resp.status_code == 401
-
-    async def test_substitute_fake_wishlist_product(
-        self, backend_app, wishlist_products_1, single_user_auth_headers
-    ):
-        resp = await backend_app.put(
-            f"{API_URL_PREFIX}/wishlist/{wishlist_products_1.id}/products/{wishlist_products_1.id}",  # noqa: E501
-            json={"data": {"attributes": {"substitutable": True}}},
-            headers=single_user_auth_headers,
-        )
-        assert resp.status_code == 404
 
 
 class PaginatorValidator:
@@ -1162,180 +571,6 @@ class PaginatorValidator:
                 assert f"size={size}" in links["prev"]
         else:
             assert links["prev"] is None
-
-
-class TestWPPaginator(PaginatorValidator):
-    """Wishlist Products paginator extra tests."""
-
-    @staticmethod
-    def validate_response(json_data: dict) -> None:
-        response_data = json_data["items"]
-        for product in response_data:
-            assert "id" in product
-            assert "wishlist_id" in product
-            assert "product_id" in product
-            assert "created_at" in product
-            assert "updated_at" in product
-            product.pop("id", None)
-            product.pop("wishlist_id", None)
-            product.pop("product_id", None)
-            product.pop("created_at", None)
-            product.pop("updated_at", None)
-
-    @pytest.mark.api_full
-    async def test_default_paginator(self, snapshot, backend_app, ew_1, wp_149):
-        api_url = f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products"
-
-        # open default page
-        response = await backend_app.get(api_url)
-        assert response.status_code == 200
-        response_json_data = response.json()
-        # check pagination links
-        self.validate_links(
-            response_json_data.pop("links"),
-            url=api_url,
-            last_page_num=3,
-            next_page_num=2,
-            prev_page_num=None,
-            self_page_num=None,
-        )
-        # assert response data
-        self.validate_response(response_json_data)
-        snapshot.assert_match(response_json_data)
-
-    @pytest.mark.api_full
-    async def test_next_page_paginator(self, snapshot, backend_app, ew_1, wp_149):
-        api_url = f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products"
-
-        # open next paginator page
-        response = await backend_app.get(api_url, query_string=dict(page=2))
-        assert response.status_code == 200
-        response_json_data = response.json()
-        # check pagination links
-        self.validate_links(
-            response_json_data.pop("links"),
-            url=api_url,
-            last_page_num=3,
-            next_page_num=3,
-            prev_page_num=1,
-            self_page_num=2,
-        )
-        # check response data
-        self.validate_response(response_json_data)
-        snapshot.assert_match(response_json_data)
-
-    @pytest.mark.api_full
-    async def test_first_page_paginator(self, snapshot, backend_app, ew_1, wp_149):
-        api_url = f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products"
-
-        # open first paginator page
-        response = await backend_app.get(api_url, query_string=dict(page=1))
-        assert response.status_code == 200
-        response_json_data = response.json()
-        self.validate_response(response_json_data)
-        # check pagination links
-        self.validate_links(
-            response_json_data.pop("links"),
-            url=api_url,
-            last_page_num=3,
-            next_page_num=2,
-            prev_page_num=None,
-            self_page_num=1,
-        )
-        # assert response data
-        snapshot.assert_match(response_json_data)
-
-    @pytest.mark.api_full
-    async def test_last_page_paginator(self, snapshot, backend_app, ew_1, wp_149):
-        api_url = f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products"
-
-        # open last paginator page
-        response = await backend_app.get(api_url, query_string=dict(page=3))
-        assert response.status_code == 200
-        response_json_data = response.json()
-        self.validate_response(response_json_data)
-        # check pagination links
-        self.validate_links(
-            response_json_data.pop("links"),
-            url=api_url,
-            last_page_num=3,
-            next_page_num=None,
-            prev_page_num=2,
-            self_page_num=3,
-        )
-        # assert response data
-        snapshot.assert_match(response_json_data)
-
-    @pytest.mark.api_full
-    async def test_reduced_qs_paginator(self, snapshot, backend_app, ew_1, wp_149):
-        api_url = f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products"
-
-        # reduce QS size
-        response = await backend_app.get(api_url, query_string=dict(size=10))
-
-        assert response.status_code == 200
-        response_json_data = response.json()
-        self.validate_response(response_json_data)
-        # check pagination links
-        self.validate_links(
-            response_json_data.pop("links"),
-            url=f"{api_url}",
-            last_page_num=15,
-            next_page_num=2,
-            prev_page_num=None,
-            self_page_num=None,
-            size=10,
-        )
-        # assert response data
-        snapshot.assert_match(response_json_data)
-
-    @pytest.mark.api_full
-    async def test_last_page_reduced_qs_paginator(
-        self, snapshot, backend_app, ew_1, wp_149
-    ):
-        api_url = f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products"
-
-        # open last page with reduced QS size
-        response = await backend_app.get(api_url, query_string=dict(page=15, size=10))
-
-        assert response.status_code == 200
-        response_json_data = response.json()
-        self.validate_response(response_json_data)
-        # check pagination links
-        self.validate_links(
-            response_json_data.pop("links"),
-            url=api_url,
-            size=10,
-            last_page_num=15,
-            next_page_num=None,
-            prev_page_num=14,
-            self_page_num=15,
-        )
-        snapshot.assert_match(response_json_data)
-
-    @pytest.mark.api_full
-    async def test_empty_page_reduced_qs_paginator(
-        self, snapshot, backend_app, ew_1, wp_149
-    ):
-        api_url = f"{API_URL_PREFIX}/wishlist/{ew_1.id}/products"
-
-        # open empty page with reduced QS size
-        response = await backend_app.get(api_url, query_string=dict(page=16, size=10))
-
-        assert response.status_code == 200
-        response_json_data = response.json()
-        self.validate_response(response_json_data)
-        # check pagination links
-        self.validate_links(
-            response_json_data.pop("links"),
-            url=api_url,
-            size=10,
-            last_page_num=15,
-            next_page_num=None,
-            prev_page_num=15,
-            self_page_num=16,
-        )
-        snapshot.assert_match(response_json_data)
 
 
 class TestProductPaginator(PaginatorValidator):

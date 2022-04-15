@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """Pydantic product models."""
-from typing import Optional
-
 from pydantic import BaseModel, HttpUrl
 
 from core.utils import BaseUpdateModel, BaseViewModel
@@ -20,5 +18,5 @@ class ProductViewModel(ProductCreateModel, BaseViewModel):
 
 
 class ProductUpdateModel(BaseUpdateModel):
-    name: Optional[str]
-    url: Optional[HttpUrl]
+    name: str | None
+    url: HttpUrl | None

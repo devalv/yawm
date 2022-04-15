@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-"""Project health check utils."""
 from enum import Enum
 from typing import Dict
 
@@ -22,7 +20,7 @@ def services_status(db_status: bool = Depends(is_database_online)) -> Dict[str, 
     return {"database": StatusEnum.online if db_status else StatusEnum.offline}
 
 
-__all__ = [
+__all__ = (
     "services_status",
     "StatusModel",
-]
+)

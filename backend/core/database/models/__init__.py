@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-"""Project database models (Gino)."""
-
 from uuid import uuid4
 
 from fastapi import Depends
@@ -9,17 +6,17 @@ from gino_starlette import Gino
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
-from ... import config
+from core import cached_settings
 
 db = Gino(
-    dsn=config.DB_DSN,
-    pool_min_size=config.DB_POOL_MIN_SIZE,
-    pool_max_size=config.DB_POOL_MAX_SIZE,
-    echo=config.DB_ECHO,
-    ssl=config.DB_SSL,
-    use_connection_for_request=config.DB_USE_CONNECTION_FOR_REQUEST,
-    retry_limit=config.DB_RETRY_LIMIT,
-    retry_interval=config.DB_RETRY_INTERVAL,
+    dsn=cached_settings.DATABASE_URI,
+    pool_min_size=cached_settings.DB_POOL_MIN_SIZE,
+    pool_max_size=cached_settings.DB_POOL_MAX_SIZE,
+    echo=cached_settings.DB_ECHO,
+    ssl=cached_settings.DB_SSL,
+    use_connection_for_request=cached_settings.DB_USE_CONNECTION_FOR_REQUEST,
+    retry_limit=cached_settings.DB_RETRY_LIMIT,
+    retry_interval=cached_settings.DB_RETRY_INTERVAL,
 )
 
 BaseGinoModel: DeclarativeModel = db.Model

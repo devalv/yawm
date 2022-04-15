@@ -3,6 +3,7 @@
 import uuid
 
 import pytest
+import pytest_asyncio
 
 from core.database import ProductGinoModel, WishlistGinoModel, WishlistProductsGinoModel
 
@@ -11,26 +12,28 @@ pytestmark = [pytest.mark.asyncio, pytest.mark.api_full]
 API_URL_PREFIX = "/api/v2"
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def single_product(single_user):
     return await ProductGinoModel.create(
         user_id=single_user.id, name="test", url="https://devyatkin.dev/1"
     )
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def empty_wishlist(single_user):
     """1 empty wishlist."""
     return await WishlistGinoModel.create(user_id=single_user.id, name="test")
 
 
-@pytest.fixture
-async def wishlist_with_single_product(empty_wishlist, single_product):
-    await empty_wishlist.add_product(single_product.id)
+@pytest_asyncio.fixture
+async def wishlist_with_single_product(
+    empty_wishlist: WishlistGinoModel, single_product: WishlistProductsGinoModel
+):
+    await empty_wishlist.add_product(single_product.id, product_name=single_product.name)
     return empty_wishlist
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def wishlist_product(wishlist_with_single_product):
     return await WishlistProductsGinoModel.query.gino.first()
 
@@ -136,7 +139,7 @@ class TestWishlistV2:
     @pytest.mark.api_base
     async def test_reserve_product(self, backend_app, wishlist_product):
         handler_url = f"{API_URL_PREFIX}/wishlist-products/{wishlist_product.id}/reserve"
-        resp = await backend_app.put(handler_url)
+        resp = await backend_app.patch(handler_url)
         assert resp.status_code == 201
         product = await WishlistProductsGinoModel.query.gino.first()
         assert product.reserved is True
@@ -170,7 +173,7 @@ class TestWishlistV2:
         self, backend_app, wishlist_product, single_user_auth_headers
     ):
         handler_url = f"{API_URL_PREFIX}/wishlist-products/{wishlist_product.id}"
-        test_data = {"substitutable": True, "reserved": True}
+        test_data = {"substitutable": True, "reserved": True, "name": "update-test"}
         resp = await backend_app.put(
             handler_url, json=test_data, headers=single_user_auth_headers
         )
@@ -178,11 +181,14 @@ class TestWishlistV2:
         product = await WishlistProductsGinoModel.query.gino.first()
         assert product.substitutable is True
         assert product.reserved is True
+        assert product.name == "update-test"
+        original_product = await ProductGinoModel.query.gino.first()
+        assert original_product.name != "update-test"
 
     @pytest.mark.api_base
     async def test_update_product_no_auth(self, backend_app, wishlist_product):
         handler_url = f"{API_URL_PREFIX}/wishlist-products/{wishlist_product.id}"
-        test_data = {"substitutable": True, "reserved": True}
+        test_data = {"substitutable": True, "reserved": True, "name": "test"}
         resp = await backend_app.put(handler_url, json=test_data)
         assert resp.status_code == 401
 
@@ -191,7 +197,7 @@ class TestWishlistV2:
         self, backend_app, wishlist_product, another_single_user_auth_headers
     ):
         handler_url = f"{API_URL_PREFIX}/wishlist-products/{wishlist_product.id}"
-        test_data = {"substitutable": True, "reserved": True}
+        test_data = {"substitutable": True, "reserved": True, "name": "test"}
         resp = await backend_app.put(
             handler_url, json=test_data, headers=another_single_user_auth_headers
         )
