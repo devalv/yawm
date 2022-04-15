@@ -14,8 +14,7 @@ from core.utils.exceptions import USER_EXISTS_EX
 
 from .. import BaseUpdateDateModel, db
 
-ref_token_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+crypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 T = TypeVar("T", bound="User")
@@ -99,11 +98,11 @@ class User(BaseUpdateDateModel):
         return bool(token_info and token_info.verify_token(token))
 
     def verify_password(self, plain_password: str):
-        return pwd_context.verify(plain_password, self.password)
+        return crypt_context.verify(plain_password, self.password)
 
     @staticmethod
     def get_password_hash(password: str):
-        return pwd_context.hash(password)
+        return crypt_context.hash(password)
 
     @classmethod
     async def create(cls, password: str, *args, **kwargs) -> T:
@@ -135,7 +134,7 @@ class TokenInfo(db.Model):
     @staticmethod
     def get_refresh_token_hash(token: str):
         """Hash plain token str."""
-        return ref_token_context.hash(token)
+        return crypt_context.hash(token)
 
     @classmethod
     async def add_token(cls, user_id: UUID, refresh_token: str) -> None:
@@ -149,4 +148,4 @@ class TokenInfo(db.Model):
 
     def verify_token(self, refresh_token: str):
         """Verify plain token text and stored hashed value."""
-        return ref_token_context.verify(refresh_token, self.refresh_token)
+        return crypt_context.verify(refresh_token, self.refresh_token)

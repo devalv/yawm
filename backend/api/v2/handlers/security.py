@@ -9,7 +9,7 @@ from core.services.security import (
     get_current_active_user_by_access_token,
 )
 
-local_security_router = APIRouter(redirect_slashes=True, tags=["security"])
+local_security_router = APIRouter(tags=["security"])
 
 
 @local_security_router.post("/users/create", response_model=UserViewModel)

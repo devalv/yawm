@@ -8,7 +8,7 @@ from core.schemas import ExtractUrlInModel, ExtractUrlOutModel
 from core.services import get_product_name
 from core.services.security import get_current_active_user_by_access_token
 
-utils_router = APIRouter(redirect_slashes=True, tags=["utils"])
+utils_router = APIRouter(tags=["utils"])
 
 
 @utils_router.post("/extract-product-title", response_model=ExtractUrlOutModel)

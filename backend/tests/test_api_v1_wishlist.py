@@ -89,14 +89,6 @@ async def wp_149(ew_1, products_149):
     return products_list
 
 
-@pytest.mark.skip(reason="not implemented yet.")
-async def test_trailing_slash(backend_app):
-    """Test that trailing slash redirects working."""
-    resp = await backend_app.get(f"{API_URL_PREFIX}/product/")
-    assert resp.is_redirect
-    assert resp.status_code == 307
-
-
 class TestProduct:
     """Product API tests."""
 

@@ -12,7 +12,7 @@ from core.services.security import (
 )
 
 basename = "wishlists"
-wishlist_router = APIRouter(redirect_slashes=True, tags=[basename])
+wishlist_router = APIRouter(tags=[basename])
 
 
 @wishlist_router.post(f"/{basename}", response_model=WishlistViewV2Model)

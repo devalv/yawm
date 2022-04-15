@@ -75,7 +75,7 @@ minversion = "6.0"
 addopts = "--flake8 --cov=api --cov=core --cov-report=term --test-alembic"
 testpaths = ["tests"]
 markers = ["smoke", "api_base", "api_full", "security"]
-flake8-max-line-length = 100
+flake8-max-line-length = 90
 env_files = "tests/.env"
 flake8-ignore = [".git/*.* ALL", "__pycache__/*.* ALL"]
 asyncio_mode = "strict"
@@ -84,7 +84,7 @@ asyncio_mode = "strict"
 omit = ["tests", "core/database/migrations/__init__.py", "core/database/migrations/env.py", "core/database/migrations/versions/*"]
 
 [tool.coverage.report]
-fail_under = 92
+fail_under = 100
 show_missing = true
 exclude_lines = [
     "pragma: no cover",

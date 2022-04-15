@@ -13,7 +13,7 @@ from core.services.security import (
     get_user_product_gino_obj,
 )
 
-product_router = APIRouter(redirect_slashes=True, tags=["product"])
+product_router = APIRouter(tags=["product"])
 
 
 @product_router.get("/product", response_model=Page[ProductViewModel])

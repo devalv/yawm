@@ -11,7 +11,7 @@ from core.services.security.auth import (
 )
 
 basename = "wishlist-products"
-wishlist_products_router = APIRouter(redirect_slashes=True, tags=[basename])
+wishlist_products_router = APIRouter(tags=[basename])
 
 
 @wishlist_products_router.patch(

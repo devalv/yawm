@@ -87,16 +87,6 @@ class TestPageParser:
         response = await get_product_name(url=test_url)
         assert response == "TestProduct3"
 
-    @pytest.mark.skip(reason="valid spec indicates that headers can only be h1-h6.")
-    @pytest.mark.asyncio
-    async def test_h11_before_h1(
-        self, httpx_mock: HTTPXMock, h11_before_h1_response: str
-    ):
-        test_url = "https://h11_before_h1"
-        httpx_mock.add_response(match_content=h11_before_h1_response, url=test_url)
-        response = await get_product_name(url=test_url)
-        assert response == "TestProduct4"
-
     @pytest.mark.asyncio
     async def test_bad_response(self, httpx_mock: HTTPXMock):
         test_url = "https://bad"
