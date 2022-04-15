@@ -3,7 +3,7 @@
 [![FastAPI](https://shields.io/static/v1?label=FastAPI&message=0.75&color=green)](https://github.com/tiangolo/fastapi)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![codecov](https://codecov.io/gh/devalv/yawm/branch/main/graph/badge.svg)](https://codecov.io/gh/devalv/yawm)
+[![codecov](https://codecov.io/gh/devalv/yawm/branch/main/graph/badge.svg?token=61KST8QUNE)](https://codecov.io/gh/devalv/yawm)
 [![CodeQL](https://github.com/devalv/yawm/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/devalv/yawm/actions/workflows/codeql-analysis.yml)
 
 For any additional instructions please see [Wiki](https://github.com/devalv/yawm/wiki).
