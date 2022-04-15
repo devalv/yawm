@@ -74,8 +74,8 @@ warn_return_any = false
 minversion = "6.0"
 addopts = "--flake8 --cov=api --cov=core --cov-report=term --test-alembic"
 testpaths = ["tests"]
-markers = ["smoke", "api_base", "api_full", "auth", "security"]
-flake8-max-line-length = 90
+markers = ["smoke", "api_base", "api_full", "security"]
+flake8-max-line-length = 100
 env_files = "tests/.env"
 flake8-ignore = [".git/*.* ALL", "__pycache__/*.* ALL"]
 asyncio_mode = "strict"

@@ -26,7 +26,7 @@ async def authenticate_user(username: str, password: str) -> UserGinoModel:
     if not user.verify_password(password):
         raise CREDENTIALS_EX
 
-    if not user.active:
+    if user.disabled:
         raise INACTIVE_EX
 
     return user

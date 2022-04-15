@@ -13,7 +13,7 @@ local_security_router = APIRouter(redirect_slashes=True, tags=["security"])
 
 
 @local_security_router.post("/users/create", response_model=UserViewModel)
-async def create_user(user_data: UserCreateModel):
+async def user_create(user_data: UserCreateModel):
     return await UserGinoModel.create(
         username=user_data.username, password=user_data.password
     )
@@ -40,7 +40,7 @@ async def logout(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@local_security_router.get("/user/info", response_model=UserViewModel)
+@local_security_router.get("/users/info", response_model=UserViewModel)
 async def user_info(
     current_user: UserGinoModel = Depends(get_current_active_user_by_access_token),
 ):
