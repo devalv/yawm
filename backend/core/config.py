@@ -52,8 +52,6 @@ class Settings(BaseSettings):
     API_HOST: str = "127.0.0.1"
     API_PORT: int = 8000
     API_DOMAIN: str = "localhost"
-    API_PROTOCOL: str = "https"  # TODO: ?
-    API_LOCATION: str = f"{API_PROTOCOL}://{API_DOMAIN}:{API_PORT}"  # TODO: ?
 
     # third-party services
     SENTRY_DSN: Optional[Union[Secret, str]] = None
