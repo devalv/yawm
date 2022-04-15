@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Wishlist rest-api handlers."""
+from typing import Any, Dict
 
 from fastapi import APIRouter, Depends, status
 
@@ -11,11 +12,10 @@ from core.services.security import (
     get_wishlist_gino_obj,
 )
 
-basename = "wishlists"
-wishlist_router = APIRouter(tags=[basename])
+wishlist_router = APIRouter(tags=["wishlists"], prefix="/wishlists")
 
 
-@wishlist_router.post(f"/{basename}", response_model=WishlistViewV2Model)
+@wishlist_router.post("", response_model=WishlistViewV2Model)
 async def create_wishlist(
     products: WishlistProductsV2Model,
     current_user: UserGinoModel = Depends(get_current_active_user_by_access_token),
@@ -24,29 +24,29 @@ async def create_wishlist(
     # TODO: @devalv create products property for wishlist and use it like
     #  a product or user loader and use Orm mode
 
-    wishlist_obj = await WishlistGinoModel.create_v2(
+    wishlist_obj: WishlistGinoModel = await WishlistGinoModel.create_v2(
         user_id=current_user.id, product_urls=products.product_urls
     )
 
-    wishlist_dict = wishlist_obj.to_dict()
+    wishlist_dict: Dict[str, Any] = wishlist_obj.to_dict()
     wishlist_dict["products"] = await wishlist_obj.get_products_v2()
     wishlist_dict["username"] = current_user.username
     return wishlist_dict
 
 
-@wishlist_router.get(f"/{basename}/" + "{id}", response_model=WishlistViewV2Model)
+@wishlist_router.get("/{id}", response_model=WishlistViewV2Model)
 async def get_wishlist(
     wishlist: WishlistGinoModel = Depends(get_wishlist_gino_obj),
 ):
     """API for getting a wishlist."""
-    wishlist_dict = wishlist.to_dict()
+    wishlist_dict: Dict[str, Any] = wishlist.to_dict()
     wishlist_dict["products"] = await wishlist.get_products_v2()
     wishlist_dict["username"] = wishlist.username
     return wishlist_dict
 
 
 @wishlist_router.put(
-    f"/{basename}/" + "{id}" + "/products-add",
+    "/{id}/products-add",
     response_model=WishlistViewV2Model,
     status_code=status.HTTP_201_CREATED,
 )
@@ -59,7 +59,7 @@ async def add_wishlist_products(
     await wishlist_obj.add_products_v2(
         user_id=current_user.id, product_urls=products.product_urls
     )
-    wishlist_dict = wishlist_obj.to_dict()
+    wishlist_dict: Dict[str, Any] = wishlist_obj.to_dict()
     wishlist_dict["products"] = await wishlist_obj.get_products_v2()
     wishlist_dict["username"] = current_user.username
     return wishlist_dict

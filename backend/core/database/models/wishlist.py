@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from typing import List, Optional
+from typing import Any, Dict, List
 
 from pydantic import HttpUrl
 from sqlalchemy.dialects.postgresql import UUID
@@ -85,9 +85,9 @@ class Wishlist(BaseEntityModel):
         ).gino.first()
         if existing_product:
             return existing_product
-        product_kwargs = {"url": url, "user_id": user_id}
+        product_kwargs: Dict[str, Any] = {"url": url, "user_id": user_id}
         # Get h1 from product page as product name
-        product_name: Optional[str] = await get_product_name(product_url.url)
+        product_name: str | None = await get_product_name(product_url.url)
         if product_name:
             product_kwargs["name"] = product_name  # pragma: no cover
         else:
@@ -117,8 +117,8 @@ class Wishlist(BaseEntityModel):
         self,
         product_id: str,
         product_name: str,
-        reserved: Optional[bool] = False,
-        substitutable: Optional[bool] = False,
+        reserved: bool = False,
+        substitutable: bool = False,
     ):
         """Add existing product to wishlist."""
         return await WishlistProducts.create(

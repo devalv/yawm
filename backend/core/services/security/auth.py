@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
@@ -77,14 +79,14 @@ async def get_current_active_user_by_access_token(
     return await get_active_user_by_token(access_token=token)
 
 
-async def get_wishlist_gino_obj(id: UUID4):
+async def get_wishlist_gino_obj(id: UUID4) -> Any:
     """Return WishlistGinoModel instance."""
     # TODO: ref view_query
     wishlist: WishlistGinoModel = await WishlistGinoModel.get_or_404(id)
     return await wishlist.view_query(wishlist.id)
 
 
-async def get_product_gino_obj(id: UUID4):
+async def get_product_gino_obj(id: UUID4) -> Any:
     """Return ProductGinoModel instance."""
     # TODO: ref view_query
     product: ProductGinoModel = await ProductGinoModel.get_or_404(id)
@@ -111,7 +113,7 @@ async def get_user_product_gino_obj(
     raise NOT_AN_OWNER
 
 
-async def get_wishlist_product_gino_obj(id: UUID4):
+async def get_wishlist_product_gino_obj(id: UUID4) -> Any:
     """Return WishlistProductsGinoModel instance."""
     return await WishlistProductsGinoModel.get_or_404(id)
 

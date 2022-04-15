@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Project web utils."""
 
-from typing import Optional
-
 import httpx
 
 from core import cached_settings
@@ -64,7 +62,7 @@ class PageParser:
         return self.__close_tag_ind
 
     @close_tag_ind.setter
-    def close_tag_ind(self, chunk: str):
+    def close_tag_ind(self, chunk: str) -> None:
         """Find a tag position in a chunk and remember index."""
         # TODO: @devalv remove setter
         # TODO: @devalv ref - chunk may be int
@@ -94,6 +92,7 @@ class PageParser:
                     break
         # set private value
         self.__close_tag_ind = value_ind
+        return None
 
     @property
     def open_tag_ind(self) -> int:
@@ -138,7 +137,7 @@ class PageParser:
         """If both indexes found - you can get a value."""
         return self.open_tag_ind >= 0 and self.close_tag_ind >= 1
 
-    async def get_value(self) -> Optional[str]:
+    async def get_value(self) -> str | None:
         """Get html tag value from PageParser.chunk_iter."""
         async for chunk in self.chunk_iter(chunk_size=self.chunk_size):
             if self.close_tag_ind <= -1:
@@ -162,7 +161,7 @@ class PageParser:
         return None
 
 
-async def get_product_name(url: str, chunk_size: int = 100) -> Optional[str]:
+async def get_product_name(url: str, chunk_size: int = 100) -> str | None:
     """Extract product name from url.
 
     Note:
