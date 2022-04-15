@@ -18,3 +18,4 @@
 */.coverage
 */coverage.xml
 */*.env*
+*/coverage

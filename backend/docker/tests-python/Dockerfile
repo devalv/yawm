@@ -8,8 +8,6 @@ ENV APP_HOME /home/app
 ENV API_HOST 0.0.0.0
 ENV API_PORT 5000
 
-RUN addgroup --system app && adduser --system --group app
-
 RUN mkdir -p $APP_HOME
 
 WORKDIR $APP_HOME
@@ -24,7 +22,6 @@ RUN set -ex \
 
 # chown all the files to the app user
 COPY ./backend/ .
-RUN chown -R app:app $APP_HOME
 
 # install python dependencies
 RUN pip install --upgrade pip
@@ -34,8 +31,6 @@ RUN pip install poetry
 RUN poetry export --dev -f requirements.txt --output dev-requirements.txt
 RUN pip install -r dev-requirements.txt
 
-# change to the app user
-USER app
 
 # run tests
 CMD python -m pytest

@@ -72,7 +72,7 @@ warn_return_any = false
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "--flake8 --cov=api --cov=core --cov-report=term --test-alembic"
+addopts = "--flake8 --cov=api --cov=core --cov-report=term --cov-report=xml --test-alembic"
 testpaths = ["tests"]
 markers = ["smoke", "api_base", "api_full", "security"]
 flake8-max-line-length = 90
