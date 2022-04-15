@@ -60,7 +60,9 @@ class Settings(BaseSettings):
     SENTRY_ENVIRONMENT: Optional[str] = None
 
     @validator("DATABASE_URI", pre=True)
-    def assemble_db_connection(cls, value: Optional[str], values: Dict[str, Any]) -> Any:
+    def assemble_db_connection(
+        cls, value: Optional[str], values: Dict[str, Any]
+    ) -> Any:  # pragma: no cover
         if isinstance(value, str):
             return value
 

@@ -5,11 +5,8 @@ from __future__ import annotations
 import uuid
 from typing import List, Optional
 
-from asyncpg.exceptions import ForeignKeyViolationError
 from pydantic import HttpUrl
 from sqlalchemy.dialects.postgresql import UUID
-from starlette import status
-from starlette.exceptions import HTTPException
 
 from core.database.models.security import User
 from core.services import get_product_name
@@ -78,11 +75,6 @@ class Wishlist(BaseEntityModel):
 
     name = db.Column(db.Unicode(length=255), nullable=False)
 
-    @property
-    def products(self):
-        """Get products related to wishlist object."""
-        return WishlistProducts.query.where(WishlistProducts.wishlist_id == self.id)
-
     @staticmethod
     async def create_product(user_id: UUID, product_url: HttpUrl) -> Product:
         # All urls should be in a lower case
@@ -129,17 +121,13 @@ class Wishlist(BaseEntityModel):
         substitutable: Optional[bool] = False,
     ):
         """Add existing product to wishlist."""
-        try:
-            rv = await WishlistProducts.create(
-                product_id=product_id,
-                wishlist_id=self.id,
-                name=product_name,
-                reserved=reserved,
-                substitutable=substitutable,
-            )
-        except ForeignKeyViolationError:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "Product is not found")
-        return rv
+        return await WishlistProducts.create(
+            product_id=product_id,
+            wishlist_id=self.id,
+            name=product_name,
+            reserved=reserved,
+            substitutable=substitutable,
+        )
 
     async def add_products_v2(self, user_id: UUID, product_urls: List[HttpUrl]):
         """Add Products to a Wishlist."""
@@ -195,7 +183,8 @@ class WishlistProducts(BaseUpdateDateModel):
     _wishlist = None
 
     @property
-    def product(self):
+    def product(self):  # pragma: no cover
+        """Used by Wishlist.get_products_v2."""
         return self._product
 
     @product.setter
@@ -204,6 +193,7 @@ class WishlistProducts(BaseUpdateDateModel):
 
     @property
     def wishlist(self):  # pragma: no cover
+        """Used by Wishlist.get_products_v2."""
         return self._wishlist
 
     @wishlist.setter

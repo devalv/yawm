@@ -71,7 +71,7 @@ def configure_health_check(application: FastAPI):
     )
 
 
-def configure_sentry(application: FastAPI):
+def configure_sentry(application: FastAPI):  # pragma: no cover
     if cached_settings.SENTRY_DSN:
         sentry_sdk.init(
             dsn=str(cached_settings.SENTRY_DSN),

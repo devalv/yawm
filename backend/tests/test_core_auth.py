@@ -12,7 +12,6 @@ from core.database import TokenInfoGinoModel
 pytestmark = [
     pytest.mark.asyncio,
     pytest.mark.api_full,
-    pytest.mark.auth,
     pytest.mark.security,
 ]
 
@@ -24,7 +23,7 @@ API_URL_PREFIX = "/api/v2"
 async def token_data(single_admin) -> Dict[str, Any]:
     return {
         "exp": datetime.utcnow()
-        + timedelta(minutes=cached_settings.ACCESS_TOKEN_EXPIRE_MIN),
+        + timedelta(minutes=cached_settings.ACCESS_TOKEN_EXPIRE_MIN),  # noqa: W503
         "sub": single_admin.id_str,
         "username": single_admin.username,
     }
