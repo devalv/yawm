@@ -5,7 +5,6 @@ The main idea is to have a standard format for model interfaces.
 """
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import UUID4, BaseModel
 
@@ -15,7 +14,7 @@ class BaseViewModel(BaseModel):
 
     id: UUID4
     created_at: datetime
-    updated_at: Optional[datetime] = None
+    updated_at: datetime | None = None
 
 
 class BaseUpdateModel(BaseModel):

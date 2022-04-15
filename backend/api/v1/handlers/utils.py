@@ -17,11 +17,11 @@ async def extract_name_by_url(
     current_user: UserGinoModel = Depends(get_current_active_user_by_access_token),
 ):
     """Extract product name by url."""
-    product_with_url = await ProductGinoModel.query.where(
+    product_with_url: ProductGinoModel = await ProductGinoModel.query.where(
         ProductGinoModel.url == product_url.url
     ).gino.first()
 
     if product_with_url:
         return {"h1": product_with_url.name}
-    value = await get_product_name(product_url.url)
+    value: str | None = await get_product_name(product_url.url)
     return {"h1": value}

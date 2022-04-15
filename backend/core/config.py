@@ -1,11 +1,12 @@
 from functools import lru_cache
-from typing import Any, Dict, Optional, Set, Union
+from typing import Any, Dict, Set
 
 from jose.constants import ALGORITHMS
 from pydantic import BaseSettings, PostgresDsn, validator
 from starlette.datastructures import Secret
 
-BoolOrStr = Union[bool, str]
+BoolOrStr = bool | str
+BoolOrNone = bool | None
 
 
 class ProjectPostgresDsn(PostgresDsn):
@@ -18,19 +19,19 @@ class Settings(BaseSettings):
     DB_HOST: str
     DB_PORT: int
     DB_USER: str
-    DB_PASSWORD: Union[Secret, str]
+    DB_PASSWORD: Secret | str
     DB_NAME: str
     DB_POOL_MIN_SIZE: int = 1
     DB_POOL_MAX_SIZE: int = 16
-    DB_ECHO: BoolOrStr = False
-    DB_SSL: Optional[bool] = None
+    DB_ECHO: bool | str = False
+    DB_SSL: BoolOrNone = None
     DB_USE_CONNECTION_FOR_REQUEST: BoolOrStr = True
     DB_RETRY_LIMIT: int = 1
     DB_RETRY_INTERVAL: int = 1
-    DATABASE_URI: Optional[ProjectPostgresDsn] = None
+    DATABASE_URI: ProjectPostgresDsn | None = None
 
     # security
-    SECRET_KEY: Union[Secret, str]
+    SECRET_KEY: Secret | str
     ALGORITHM: str = ALGORITHMS.HS256
     ALLOW_ORIGINS: Set[str] = set()
     ACCESS_TOKEN_EXPIRE_MIN: int = 30
@@ -52,16 +53,14 @@ class Settings(BaseSettings):
     API_HOST: str = "127.0.0.1"
     API_PORT: int = 8000
     API_DOMAIN: str = "localhost"
-    API_PROTOCOL: str = "https"  # TODO: ?
-    API_LOCATION: str = f"{API_PROTOCOL}://{API_DOMAIN}:{API_PORT}"  # TODO: ?
 
     # third-party services
-    SENTRY_DSN: Optional[Union[Secret, str]] = None
-    SENTRY_ENVIRONMENT: Optional[str] = None
+    SENTRY_DSN: Secret | str | None = None
+    SENTRY_ENVIRONMENT: str | None = None
 
     @validator("DATABASE_URI", pre=True)
     def assemble_db_connection(
-        cls, value: Optional[str], values: Dict[str, Any]
+        cls, value: str, values: Dict[str, Any]
     ) -> Any:  # pragma: no cover
         if isinstance(value, str):
             return value
@@ -76,19 +75,19 @@ class Settings(BaseSettings):
         )
 
     @validator("SECRET_KEY", "DB_PASSWORD", "SENTRY_DSN", pre=True)
-    def wrap_secret(cls, value: Union[Secret, str]) -> Secret:
+    def wrap_secret(cls, value: Secret | str) -> Secret:
         if isinstance(value, Secret) or value is None:
             return value
         return Secret(value)
 
     class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = True
+        env_file: str = ".env"
+        env_file_encoding: str = "utf-8"
+        case_sensitive: bool = True
 
 
 @lru_cache()
-def get_settings():
+def get_settings() -> Settings:
     """Cached app settings.
 
     Example: settings: config.Settings = Depends(get_settings)

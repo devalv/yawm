@@ -4,11 +4,11 @@
 from .security import Token, TokenData, UserCreateModel, UserViewModel
 from .utils import ExtractUrlInModel, ExtractUrlOutModel
 
-__all__ = [
+__all__ = (
     "ExtractUrlInModel",
     "ExtractUrlOutModel",
     "UserViewModel",
     "UserCreateModel",
     "Token",
     "TokenData",
-]
+)

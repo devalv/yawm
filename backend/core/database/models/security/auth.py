@@ -44,7 +44,7 @@ class User(BaseUpdateDateModel):
         exp_time: datetime = datetime.utcnow() + timedelta(
             minutes=cached_settings.ACCESS_TOKEN_EXPIRE_MIN
         )
-        token_data = {
+        token_data: Dict[str, Any] = {
             "exp": exp_time,
             "sub": self.id_str,
             "username": self.username,
@@ -60,7 +60,7 @@ class User(BaseUpdateDateModel):
         exp_time: datetime = datetime.utcnow() + timedelta(
             days=cached_settings.REFRESH_TOKEN_EXPIRE_DAYS
         )
-        token_data = {
+        token_data: Dict[str, Any] = {
             "exp": exp_time,
             "sub": self.id_str,
             "username": self.username,
@@ -78,8 +78,8 @@ class User(BaseUpdateDateModel):
         return await TokenInfo.delete.where(TokenInfo.user_id == self.id).gino.status()
 
     async def create_token(self) -> Dict[str, Any]:
-        acc_token = self.create_access_token()
-        ref_token = await self.create_refresh_token()
+        acc_token: str = self.create_access_token()
+        ref_token: str = await self.create_refresh_token()
         return {
             "access_token": acc_token,
             "refresh_token": ref_token,

@@ -1,3 +1,3 @@
 from .auth import TokenInfo, User
 
-__all__ = ["User", "TokenInfo"]
+__all__ = ("User", "TokenInfo")

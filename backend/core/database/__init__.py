@@ -5,7 +5,7 @@ from .models.wishlist import Product as ProductGinoModel
 from .models.wishlist import Wishlist as WishlistGinoModel
 from .models.wishlist import WishlistProducts as WishlistProductsGinoModel
 
-__all__ = [
+__all__ = (
     "ProductGinoModel",
     "WishlistProductsGinoModel",
     "WishlistGinoModel",
@@ -13,4 +13,4 @@ __all__ = [
     "TokenInfoGinoModel",
     "db",
     "is_database_online",
-]
+)

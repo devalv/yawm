@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Pydantic wishlist-products models (v2)."""
 from datetime import datetime
-from typing import Optional
 
 from pydantic import UUID4, BaseModel
 
@@ -18,6 +17,6 @@ class WishlistProductV2Model(BaseModel):
 
 
 class WishlistProductUpdateV2Model(BaseModel):
-    reserved: Optional[bool] = None
-    substitutable: Optional[bool] = None
-    name: Optional[str] = None
+    reserved: bool | None
+    substitutable: bool | None
+    name: str | None
