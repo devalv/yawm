@@ -32,10 +32,10 @@ feature/feature-name - feature branch for ongoing release
 │   ├── services
 │   ├── health
 │   ├── utils
-│   ├── .env
 │   └── config.py
 ├── tests
 │   ├── snapshots
+│   ├── .env
 │   └── conftest.py
 ├── api
 │   ├── v1
@@ -45,7 +45,9 @@ feature/feature-name - feature branch for ongoing release
 │       ├── handlers
 │       └── schemas
 ├── main.py
-└── tox.ini
+├── .env
+├── alembic.ini
+└── pyproject.toml
 ```
 
 #### root
