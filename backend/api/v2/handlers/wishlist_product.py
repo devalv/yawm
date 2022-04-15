@@ -5,13 +5,13 @@ from fastapi import APIRouter, Depends, Response, status
 
 from api.v2.schemas import WishlistProductUpdateV2Model, WishlistProductV2Model
 from core.database import WishlistProductsGinoModel
-from core.services.security import (
+from core.services.security.auth import (
     get_user_wishlist_product_gino_obj,
     get_wishlist_product_gino_obj,
 )
 
 basename = "wishlist-products"
-wishlist_products_router = APIRouter(redirect_slashes=True, tags=[basename])
+wishlist_products_router = APIRouter(tags=[basename])
 
 
 @wishlist_products_router.patch(

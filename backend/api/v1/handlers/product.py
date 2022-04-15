@@ -8,12 +8,12 @@ from fastapi_pagination.links import Page
 from api.v1.schemas import ProductCreateModel, ProductUpdateModel, ProductViewModel
 from core.database import ProductGinoModel, UserGinoModel
 from core.services.security import (
-    get_current_user_gino_obj,
+    get_current_active_user_by_access_token,
     get_product_gino_obj,
     get_user_product_gino_obj,
 )
 
-product_router = APIRouter(redirect_slashes=True, tags=["product"])
+product_router = APIRouter(tags=["product"])
 
 
 @product_router.get("/product", response_model=Page[ProductViewModel])
@@ -33,7 +33,7 @@ async def get_product(
 @product_router.post("/product", response_model=ProductViewModel)
 async def create_product(
     product: ProductCreateModel,
-    current_user: UserGinoModel = Depends(get_current_user_gino_obj),
+    current_user: UserGinoModel = Depends(get_current_active_user_by_access_token),
 ):
     """API for creating a new product."""
     product_obj = await ProductGinoModel.create(user_id=current_user.id, **product.dict())
