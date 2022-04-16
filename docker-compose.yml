@@ -30,24 +30,24 @@ services:
     depends_on:
       - db
 
-  # frontend-app:
-  #   image: devalv/yawm:frontend-0.1.0
-  #   container_name: yawm-frontend
-  #   ports:
-  #     - 3000:3000
-  #   depends_on:
-  #     - app
-  #     - db
-  #   environment:
-  #     - REACT_APP_API_ORIGIN=${API_PROTOCOL}://${API_HOST}:${API_PORT}
-  #     - REACT_APP_API_URL=${REACT_APP_API_ORIGIN}/api
-  #     - REACT_APP_API_V1_URL=${REACT_APP_API_URL}/v1
-  #     - REACT_APP_API_V2_URL=${REACT_APP_API_URL}/v2
-  #     - REACT_APP_HEALTH_URL=${REACT_APP_API_URL}/health
-  #     - REACT_APP_STATE=nonrandom-docker-local-state
-  #   working_dir: /opt/yawm/frontend
-  #   command: sh -c "npm start"
-  #   stdin_open: true
+  frontend-app:
+    image: devalv/yawm:frontend-0.1.0
+    container_name: yawm-frontend
+    ports:
+      - 3000:3000
+    depends_on:
+      - app
+      - db
+    environment:
+      - REACT_APP_API_ORIGIN=http://${API_DOMAIN}:${API_PORT}
+      - REACT_APP_API_URL=http://${API_DOMAIN}:${API_PORT}/api
+      - REACT_APP_API_V1_URL=http://${API_DOMAIN}:${API_PORT}/api/v1
+      - REACT_APP_API_V2_URL=http://${API_DOMAIN}:${API_PORT}/api/v2
+      - REACT_APP_HEALTH_URL=http://${API_DOMAIN}:${API_PORT}/api/health
+      - REACT_APP_STATE=nonrandom-docker-local-state
+    working_dir: /opt/yawm/frontend
+    command: sh -c "npm start"
+    stdin_open: true
 
   # caddy:
   #   image: "caddy:2.4.6-alpine"

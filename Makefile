@@ -9,7 +9,7 @@ docker-tests:
 	docker compose --env-file=backend/tests/.env -f docker-compose-test.yml up db-tests app-tests --build --force-recreate --abort-on-container-exit --exit-code-from app-tests
 
 docker-up:
-	docker compose --env-file=backend/.env up db app --build --force-recreate
+	docker compose --env-file=backend/.env up db app frontend-app --build --force-recreate
 
 test:
 	cd backend && poetry run pytest
