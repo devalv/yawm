@@ -5,7 +5,7 @@ services:
     container_name: yawm-db
     image: postgres:14
     ports:
-      - ${DB_PORT}:${DB_PORT}
+      - "${DB_PORT}:${DB_PORT}"
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
@@ -19,7 +19,7 @@ services:
       context: .
       dockerfile: ./backend/docker/python/Dockerfile
     ports:
-      - ${API_PORT}:${API_PORT}
+      - "${API_PORT}:${API_PORT}"
     volumes:
       - ./backend/:/home/app
     environment:
@@ -31,10 +31,14 @@ services:
       - db
 
   frontend-app:
-    image: devalv/yawm:frontend-0.1.0
+    build:
+      context: .
+      dockerfile: ./frontend/docker/react/Dockerfile
+    volumes:
+      - ./frontend:/opt/yawm/frontend
     container_name: yawm-frontend
     ports:
-      - 3000:3000
+      - "3000:3000"
     depends_on:
       - app
       - db
