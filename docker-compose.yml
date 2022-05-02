@@ -35,7 +35,7 @@ services:
       context: .
       dockerfile: ./frontend/docker/react/Dockerfile
     volumes:
-      - ./frontend:/opt/yawm/frontend
+      - ./frontend:/home/app
     container_name: yawm-frontend
     ports:
       - "3000:3000"
@@ -49,24 +49,6 @@ services:
       - REACT_APP_API_V2_URL=http://${API_DOMAIN}:${API_PORT}/api/v2
       - REACT_APP_HEALTH_URL=http://${API_DOMAIN}:${API_PORT}/api/health
       - REACT_APP_STATE=nonrandom-docker-local-state
-    working_dir: /opt/yawm/frontend
-    command: sh -c "npm start"
+      - REACT_APP_SENTRY_DSN=https://efba663b9e534fd0876d7a40ba3c191d@o1201644.ingest.sentry.io/6373679
     stdin_open: true
-
-  # caddy:
-  #   image: "caddy:2.4.6-alpine"
-  #   restart: unless-stopped
-  #   environment:
-  #     - DOMAIN_NAME=${DOMAIN_NAME}
-  #     - API_PORT=${API_PORT}
-  #     - TLS_EMAIL=${TLS_EMAIL}
-  #   volumes:
-  #     - ./caddy/certs:/root/.caddy
-  #     - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #     - 2019:2019
-  #   depends_on:
-  #     - app
-  #     - frontend-app
+    command: "npm start --host 0.0.0.0"

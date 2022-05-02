@@ -1,12 +1,28 @@
 {$DOMAIN_NAME}
 
+encode zstd gzip
+
 # Https configuration
 tls {$TLS_EMAIL}
 header / Strict-Transport-Security "max-age=31536000;"
 
 # Removing some headers for improved security:
 header / -Server
-reverse_proxy /api/* {$DOMAIN_NAME}:{$API_PORT}
-reverse_proxy * {$DOMAIN_NAME}:{$REACT_PORT}
 
-encode zstd gzip
+# Redirect all api requests to a backend
+reverse_proxy /api/* {$DOMAIN_NAME}:{$API_PORT}
+
+# Static files configuration
+root * /usr/share/caddy/html
+
+@notAPI {
+    not {
+        path /api*
+    }
+    file {
+        try_files {path} /index.html
+    }
+}
+rewrite @notAPI {http.matchers.file.relative}
+
+file_server

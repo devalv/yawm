@@ -1,0 +1,12 @@
+{$DOMAIN_NAME}
+
+# Https configuration
+tls {$TLS_EMAIL}
+header / Strict-Transport-Security "max-age=31536000;"
+
+# Removing some headers for improved security:
+header / -Server
+reverse_proxy /api/* {$DOMAIN_NAME}:{$API_PORT}
+reverse_proxy * {$DOMAIN_NAME}:{$REACT_PORT}
+
+encode zstd gzip
