@@ -6,8 +6,6 @@
 [![codecov](https://codecov.io/gh/devalv/yawm/branch/main/graph/badge.svg?token=61KST8QUNE)](https://codecov.io/gh/devalv/yawm)
 [![CodeQL](https://github.com/devalv/yawm/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/devalv/yawm/actions/workflows/codeql-analysis.yml)
 
-For any additional instructions please see [Wiki](https://github.com/devalv/yawm/wiki).
-
 ## Git branches
 
 ```bash
