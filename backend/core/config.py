@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     # security
     SECRET_KEY: Secret | str
     ALGORITHM: str = ALGORITHMS.HS256
+    # TODO: @devalv не удается прочитать из env
     ALLOW_ORIGINS: Set[str] = set()
     ACCESS_TOKEN_EXPIRE_MIN: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
