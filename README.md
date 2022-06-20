@@ -52,21 +52,21 @@ feature/feature-name - feature branch for ongoing release
 
 Project outer-startup files, such as:
 
-* alembic configuration
-* pytest, coverage, flake8, etc configurations (pyproject.toml)
-* uvicorn app file
-* project requirements lists
+- alembic configuration
+- pytest, coverage, flake8, etc configurations (pyproject.toml)
+- uvicorn app file
+- project requirements lists
 
 #### core
 
 Core project features such as:
 
-* settings (config.py)
-* database migrations and models
-* services (business logic)
-* schemas (pydantic models)
-* utils (extra utils, such as fastapi-pagination custom Page)
-* health (health check endpoint)
+- settings (config.py)
+- database migrations and models
+- services (business logic)
+- schemas (pydantic models)
+- utils (extra utils, such as fastapi-pagination custom Page)
+- health (health check endpoint)
 
 #### tests
 
