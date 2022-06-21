@@ -27,5 +27,5 @@ jobs:
           git commit -am "fixup: Format Python code with Black"
           git push
       - name: Pull frontend sub-repo
-        run: git fetch --all
+        run: git submodule update --init --recursive
       - uses: pre-commit/action@v2.0.0
