@@ -42,13 +42,5 @@ services:
     depends_on:
       - app
       - db
-    environment:
-      - REACT_APP_API_ORIGIN=http://${API_DOMAIN}:${API_PORT}
-      - REACT_APP_API_URL=http://${API_DOMAIN}:${API_PORT}/api
-      - REACT_APP_API_V1_URL=http://${API_DOMAIN}:${API_PORT}/api/v1
-      - REACT_APP_API_V2_URL=http://${API_DOMAIN}:${API_PORT}/api/v2
-      - REACT_APP_HEALTH_URL=http://${API_DOMAIN}:${API_PORT}/api/health
-      - REACT_APP_STATE=nonrandom-docker-local-state
-      - REACT_APP_SENTRY_DSN=https://efba663b9e534fd0876d7a40ba3c191d@o1201644.ingest.sentry.io/6373679
     stdin_open: true
-    command: "npm start --host 0.0.0.0"
+    command: sh -c "npm start --host 0.0.0.0"

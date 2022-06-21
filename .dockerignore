@@ -17,5 +17,6 @@
 */db.sqlite
 */.coverage
 */coverage.xml
+# Current build use frontend/.env file - for rc build - comment this line
 */*.env*
 */coverage
